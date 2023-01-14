@@ -40,7 +40,6 @@
 #if JAM_PLATFORM==JAM_PLATFORM_UNIX
 #include <cstring>
 #include "stddef.h"
-
 #endif
 
 #if (defined(DEBUG) || defined(_DEBUG))
