@@ -34,8 +34,8 @@ namespace Jam
     public:
         JAM_DECLARE_TYPE(T)
 
-        typedef ArrayBase<T, Options, Allocator> BaseType;
-        typedef typename Allocator::SizeType     SizeType;
+        using BaseType = ArrayBase<T, Options, Allocator>;
+        using SizeType = typename Allocator::SizeType;
 
     public:
         Array()               = default;
