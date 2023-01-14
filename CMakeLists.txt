@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(Template)
+project(InternalUtils)
 
 # Use C++-17 by default.
 enable_language(CXX)
@@ -11,13 +11,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # CMake - Contains project local modules.
 #
 # CMake/Modules - Contains project independent modules.
-#   GitUpdate.cmake invokes python ${Template_SOURCE_DIR}/gitupdate.py
+#   GitUpdate.cmake invokes python ${InternalUtils_SOURCE_DIR}/gitupdate.py
 #   to pull all submodules and update to head.
 #   If this fails, it will attempt to invoke git directly to pull 
 #   submodules. 
 list(APPEND CMAKE_MODULE_PATH 
-  ${Template_SOURCE_DIR}/CMake 
-  ${Template_SOURCE_DIR}/CMake/Modules
+  ${InternalUtils_SOURCE_DIR}/CMake 
+  ${InternalUtils_SOURCE_DIR}/CMake/Modules
 )
 include(Configure)
 if (NOT Configure_SUCCEEDED)
@@ -26,24 +26,24 @@ endif()
 
 
 
-if (Template_ExternalTarget)
-    set(TargetFolders ${Template_TargetFolders})
-    set(TargetName    ${Template_TargetName})
-    set(TargetGroup   ${Template_TargetGroup})
+if (InternalUtils_ExternalTarget)
+    set(TargetFolders ${InternalUtils_TargetFolders})
+    set(TargetName    ${InternalUtils_TargetName})
+    set(TargetGroup   ${InternalUtils_TargetGroup})
 else()
     add_subdirectory(CMake)
 
     set(TargetFolders TRUE)
-    set(TargetName Template)
+    set(TargetName InternalUtils)
     set(TargetGroup )
 
-    set(Template_INCLUDE  ${Template_SOURCE_DIR}/Source)
-    set(Template_LIBRARY  ${TargetName})
+    set(InternalUtils_INCLUDE  ${InternalUtils_SOURCE_DIR}/Source)
+    set(InternalUtils_LIBRARY  ${TargetName})
 endif()
 
 add_subdirectory(Source)
 
-if (Template_BUILD_TEST)
+if (InternalUtils_BUILD_TEST)
     add_subdirectory(${GTEST_DIR})
 
     set(TargetGroup Units)

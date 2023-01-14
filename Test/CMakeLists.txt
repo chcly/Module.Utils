@@ -43,7 +43,7 @@ if (TargetFolders)
 endif()
 
 
-if (Template_AUTO_RUN_TEST)
+if (InternalUtils_AUTO_RUN_TEST)
 
    add_custom_command(TARGET 
         ${TestTargetName} POST_BUILD
