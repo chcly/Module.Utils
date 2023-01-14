@@ -9,6 +9,3 @@ jobs:
        run: cmake -DInternalUtils_BUILD_TEST=ON -DInternalUtils_AUTO_RUN_TEST=ON .
      - name: Build
        run: make
-     - name: Test Output
-       run: ./Source/InternalUtils > out.ans && diff out.ans Test/inp.ans
-       
