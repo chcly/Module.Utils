@@ -47,15 +47,15 @@ namespace Jam
     class AllocBase
     {
     public:
-        typedef Type        ValueType;
-        typedef Type&       ReferenceType;
-        typedef Type*       PointerType;
-        typedef const Type* ConstPointerType;
-        typedef const Type& ConstReferenceType;
-        typedef Size        SizeType;
+        using ValueType          = Type;
+        using ReferenceType      = Type&;
+        using PointerType        = Type*;
+        using ConstPointerType   = const Type*;
+        using ConstReferenceType = const Type&;
+        using SizeType           = Size;
 
-        static const SizeType npos{Limit};
-        static const SizeType limit{Limit};
+        static const SizeType npos;
+        static const SizeType limit;
 
         void fill(PointerType      dst,
                   ConstPointerType src,
@@ -128,6 +128,12 @@ namespace Jam
         }
     };
 
+    template <typename Type, typename Size, const Size Limit>
+    const Size AllocBase<Type, Size, Limit>::npos = {Limit};
+
+    template <typename Type, typename Size, const Size Limit>
+    const Size AllocBase<Type, Size, Limit>::limit = {Limit};
+
     template <typename Type,
               typename Size    = size_t,
               const Size Limit = MakeLimit<Size>()>
@@ -137,7 +143,7 @@ namespace Jam
         JAM_DECLARE_TYPE(Type)
 
     public:
-        typedef NewAllocator<Type, Size, Limit> SelfType;
+        using SelfType = NewAllocator<Type, Size, Limit>;
 
     public:
         explicit NewAllocator() = default;

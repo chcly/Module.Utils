@@ -70,7 +70,7 @@ namespace Jam
 
         void push_back(ConstReferenceType v)
         {
-            if (this->_size + 1 <= this->_alloc.limit)
+            if (this->_size + 1 <= Allocator::limit)
             {
                 // If the size of the array is known ahead of time
                 // and the data is reserved before pushing any elements.
@@ -86,12 +86,12 @@ namespace Jam
                     this->_data[this->_size++] = v;
             }
             else
-                throw Exception("Allocation limit (", this->_alloc.limit, ") exceed");
+                throw Exception("Allocation limit (", Allocator::limit, ") exceed");
         }
 
         void explicit_push(ConstReferenceType v)
         {
-            if (this->_size + 1 <= this->_alloc.limit)
+            if (this->_size + 1 <= Allocator::limit)
             {
                 if (this->_data != nullptr && this->_size + 1 <= this->_capacity)
                     this->_data[this->_size++] = v;
