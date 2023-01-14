@@ -21,7 +21,7 @@
 set(TestTargetName ${TargetName}Test)
 
 set(TestTarget_SOURCE
-    Test1.cpp
+    Utils.cpp
 )
 
 set(ABSOLUTE_TEST_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
@@ -30,13 +30,13 @@ configure_file(
 	${CMAKE_CURRENT_BINARY_DIR}/TestDirectory.h
 )
 
-include_directories(. ${GTEST_INCLUDE} ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(. ${GTEST_INCLUDE} ${CMAKE_CURRENT_BINARY_DIR} ${InternalUtils_INCLUDE})
 
 add_executable(
     ${TestTargetName}
     ${TestTarget_SOURCE}
 )
-target_link_libraries(${TestTargetName} ${GTEST_LIBRARY})
+target_link_libraries(${TestTargetName} ${GTEST_LIBRARY} ${InternalUtils_LIBRARY})
 
 if (TargetFolders)
     set_target_properties(${TestTargetName} PROPERTIES FOLDER "${TargetGroup}")

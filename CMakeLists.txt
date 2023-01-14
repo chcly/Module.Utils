@@ -34,10 +34,10 @@ else()
     add_subdirectory(CMake)
 
     set(TargetFolders TRUE)
-    set(TargetName InternalUtils)
+    set(TargetName Utils)
     set(TargetGroup )
 
-    set(InternalUtils_INCLUDE  ${InternalUtils_SOURCE_DIR}/Source)
+    set(InternalUtils_INCLUDE  ${InternalUtils_SOURCE_DIR})
     set(InternalUtils_LIBRARY  ${TargetName})
 
 endif()
