@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Utils/Array.h"
 
 namespace Jam
 {
@@ -9,7 +8,7 @@ namespace Jam
     {
     public:
         JAM_DECLARE_TYPE(T)
-        static const uint16_t limit = L;
+        static const uint16_t limit;
 
     protected:
         mutable ValueType _data[L + 1];
@@ -40,6 +39,12 @@ namespace Jam
             _size(L)
         {
             Fill(_data, v, L);
+        }
+
+        FixedArray(const std::initializer_list<T>& o) :
+            _size(Min<U16>((U16)L, (U16)o.size()))
+        {
+            Fill(_data, data(o), _size);
         }
 
         void push_back(ConstReferenceType rhs)
@@ -185,5 +190,8 @@ namespace Jam
             return _data[idx];
         }
     };
+
+    template <typename T, const uint16_t L>
+    const uint16_t FixedArray<T, L>::limit = L;
 
 }  // namespace Jam

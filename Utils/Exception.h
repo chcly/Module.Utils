@@ -29,7 +29,7 @@
 namespace Jam
 {
     /**
-     * \brief Primary class for exception handling  
+     * \brief Primary class for exception handling
      */
     class Exception : public std::exception
     {
@@ -68,29 +68,4 @@ namespace Jam
             return _string.c_str();
         }
     };
-
-    // clang-format off
-#if 0//def _DEBUG
-#define FLS  __FILE__ "(", __LINE__, "):\n\t" __FUNCTION__ "\n\n\t"
-#define NotImplemented()            Jam::Exception(FLS, "Not implemented")
-#define IndexOutOfBounds()          Jam::Exception(FLS, "Array index out of bounds")
-#define NotFound()                  Jam::Exception(FLS, "Not found")
-#define FileNotFound(x)             Jam::Exception(FLS, "The file '", x, "' was not found at the supplied path")
-#define InvalidPointer()            Jam::Exception(FLS, "Invalid pointer")
-#define InvalidFile(file)           Jam::Exception(FLS, "No such file path '", file, '\'')
-#define InputException(msg, ...)    Jam::Exception(FLS, msg, __VA_ARGS__)
-#define MessageException(msg)       Jam::Exception(FLS, msg)
-#define NullOrEmptyString()         Jam::Exception(FLS, "The supplied string is empty")
-#else
-    #define NotImplemented()            Jam::Exception("not implemented")
-    #define IndexOutOfBounds()          Jam::Exception("array index out of bounds")
-    #define NotFound()                  Jam::Exception("not found")
-    #define FileNotFound(x)             Jam::Exception("The file '", x, "' was not found at the supplied path")
-    #define InvalidPointer()            Jam::Exception("invalid pointer")
-    #define InvalidFile(file)           Jam::Exception("No such file path '", file, '\'')
-    #define InputException(msg, ...)    Jam::Exception(msg, __VA_ARGS__)
-    #define MessageException(msg)       Jam::Exception(msg)
-    #define NullOrEmptyString()         Jam::Exception("the supplied string is empty")
-#endif
-    // clang-format on
 }  // namespace Jam

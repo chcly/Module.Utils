@@ -21,6 +21,7 @@
 */
 #pragma once
 
+#include "Traits.h"
 #include "Utils/Allocator.h"
 #include "Utils/Definitions.h"
 
@@ -50,10 +51,15 @@ namespace Jam
     class ArrayBase
     {
     public:
-        JAM_DECLARE_TYPE(T)
+        using ValueType          = T;
+        using ReferenceType      = T&;
+        using PointerType        = T*;
+        using ConstValueType     = const T;
+        using ConstPointerType   = const T*;
+        using ConstReferenceType = const T&;
 
         /**
-         * \brief Defines shorthand access to the current template type. 
+         * \brief Defines shorthand access to the current template type.
          */
         using SelfType = ArrayBase<T, Options, Allocator>;
 

@@ -34,8 +34,8 @@ namespace Jam
     class IndexCache
     {
     public:
-        typedef std::unordered_map<T, size_t> Table;
-        typedef std::vector<T>                Array;
+        using Table = std::unordered_map<T, size_t>;
+        using Array = std::vector<T>;
 
     private:
         Table _elements;
@@ -60,31 +60,20 @@ namespace Jam
             return idx;
         }
 
-        /// <summary>
-        /// Copies the cache value at the supplied index into the destination variable.
-        /// </summary>
-        /// <param name="destination">The destination variable</param>
-        /// <param name="index">The index into the cache.</param>
-        /// <remarks>Throws an out of bounds exception if the supplied index is invalid.</remarks>
         void at(T& destination, const size_t& index) const
         {
             if (index < _list.size())
                 destination = _list.at(index);
             else
-                throw IndexOutOfBounds();
+                throw Jam::Exception("array index out of bounds");
         }
 
-        /// <summary>
-        /// Returns the cache value at the supplied index into the destination variable.
-        /// </summary>
-        /// <param name="index">The index into the cache.</param>
-        /// <remarks>Throws an out of bounds exception if the supplied index is invalid.</remarks>
         const T& at(const size_t& index) const
         {
             if (index < _list.size())
                 return _list.at(index);
 
-            throw IndexOutOfBounds();
+            throw Exception("array index out of bounds");
         }
 
         bool contains(const size_t& index) const
@@ -104,7 +93,7 @@ namespace Jam
             if (it != _elements.end())
                 return it->second;
 
-            throw NotFound();
+            throw Jam::Exception("cache element not found");
         }
 
         size_t size() const
@@ -133,7 +122,7 @@ namespace Jam
     class Cache
     {
     public:
-        typedef std::unordered_set<T> Table;
+        using Table = std::unordered_set<T>;
 
     private:
         Table _elements;
@@ -158,8 +147,8 @@ namespace Jam
     class KeyIndexCache
     {
     public:
-        typedef std::unordered_map<Key, size_t> Table;
-        typedef std::vector<Value>              Array;
+        using Table = std::unordered_map<Key, size_t>;
+        using Array = std::vector<Value>;
 
     private:
         Table _elements;
@@ -189,14 +178,14 @@ namespace Jam
             if (index < _list.size())
                 dest = _list.at(index);
             else
-                throw IndexOutOfBounds();
+                throw Exception("array index out of bounds");
         }
 
         const Value& at(const size_t& index) const
         {
             if (index < _list.size())
                 return _list.at(index);
-            throw IndexOutOfBounds();
+            throw Exception("array index out of bounds");
         }
 
         bool contains(const size_t& index) const

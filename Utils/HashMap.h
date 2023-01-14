@@ -37,7 +37,7 @@ namespace Jam
         Entry()  = default;
         ~Entry() = default;
 
-        Entry(const Key& k, const Value& v, hash_t hk) :
+        Entry(const Key& k, const Value& v, const hash_t hk) :
             first(k),
             second(v),
             hash(hk)
@@ -60,16 +60,16 @@ namespace Jam
     class HashTable
     {
     public:
-        typedef Allocator<size_t>            IndexAllocator;
-        typedef HashTable<Key, Value, Alloc> SelfType;
+        using IndexAllocator = Allocator<size_t>;
+        using SelfType       = HashTable<Key, Value, Alloc>;
 
     public:
-        typedef Entry<Key, Value> Pair;
+        using Pair = Entry<Key, Value>;
         JAM_DECLARE_TYPE(Pair)
 
         typedef size_t* IndexArray;
-        typedef Key     PairKeyType;
-        typedef Value   PairValueType;
+        using PairKeyType   = Key;
+        using PairValueType = Value;
 
     private:
         Alloc          _alloc;
@@ -167,7 +167,7 @@ namespace Jam
         {
             size_t i = find(key);
             if (i == JtNpos)
-                throw NotFound();
+                throw Exception("element not found");
             return _bucket[i].second;
         }
 

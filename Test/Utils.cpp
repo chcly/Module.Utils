@@ -22,8 +22,31 @@
 #include <cstdio>
 #include "Utils/Allocator.h"
 #include "Utils/Array.h"
+#include "Utils/FixedArray.h"
 #include "Utils/HashMap.h"
 #include "gtest/gtest.h"
+#include "Utils/Char.h"
+
+GTEST_TEST(Utils, FixedArray_001)
+{
+    Jam::FixedArray<int, 10> a = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    EXPECT_EQ(a[0], 0);
+    EXPECT_EQ(a[1], 1);
+    EXPECT_EQ(a[2], 2);
+    EXPECT_EQ(a[3], 3);
+    EXPECT_EQ(a[4], 4);
+    EXPECT_EQ(a[5], 5);
+    EXPECT_EQ(a[6], 6);
+    EXPECT_EQ(a[7], 7);
+    EXPECT_EQ(a[8], 8);
+    EXPECT_EQ(a[9], 9);
+    Jam::FixedArray<char, 9> b = {'h', 'e', 'l', 'l', 'o', '.', '.', '.', 0};
+    EXPECT_TRUE(Jam::Char::equals(b.ptr(), "hello...", 8));
+    Jam::FixedArray<char, 9> c = b;
+    EXPECT_TRUE(Jam::Char::equals(c.ptr(), "hello...", 8));
+
+}
+
 
 struct Complex
 {

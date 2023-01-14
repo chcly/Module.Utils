@@ -22,13 +22,13 @@
 #pragma once
 #include "Utils/Definitions.h"
 
-#define JAM_DECLARE_TYPE(T)            \
-    typedef T        ValueType;        \
-    typedef T&       ReferenceType;    \
-    typedef T*       PointerType;      \
-    typedef const T  ConstValueType;   \
-    typedef const T* ConstPointerType; \
-    typedef const T& ConstReferenceType;
+#define JAM_DECLARE_TYPE(T)              \
+    using ValueType          = T;        \
+    using ReferenceType      = T&;       \
+    using PointerType        = T*;       \
+    using ConstValueType     = const T;  \
+    using ConstPointerType   = const T*; \
+    using ConstReferenceType = const T&;
 
 #define JAM_DECLARE_REF_TYPE(T)                              \
     typedef typename T::ValueType          ValueType;        \

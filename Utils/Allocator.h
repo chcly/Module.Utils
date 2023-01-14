@@ -24,26 +24,27 @@
 #include <cstdlib>
 #include "Utils/Definitions.h"
 #include "Utils/Exception.h"
-#include "Utils/Traits.h"
 
 namespace Jam
 {
-    template <typename Size   = size_t,
-              Size UpperBound = MakeLimit<Size>()>
-    JAM_FORCE_INLINE constexpr void enforce(Size capacity)
+    /**
+     * \brief Utility method to guard against allocating
+     *    more than the UpperBound limit.
+     * \param elementCount The size of the memory allocation to check.
+     */
+    template <typename Size = size_t, Size UpperBound = MakeLimit<Size>()>
+    JAM_FORCE_INLINE constexpr void enforce(Size elementCount)
     {
-        if (capacity > UpperBound)
+        if (elementCount > UpperBound)
         {
             throw Exception(
-                "Alloc limit exceed by (",
-                (Size)(capacity - UpperBound),
-                ") bytes");
+                "Allocation limit exceed by ",
+                (Size)(elementCount - UpperBound),
+                " elements");
         }
     }
 
-    template <typename Type,
-              typename Size,
-              const Size Limit = MakeLimit<Size>()>
+    template <typename Type, typename Size, const Size Limit = MakeLimit<Size>()>
     class AllocBase
     {
     public:
@@ -65,7 +66,7 @@ namespace Jam
                 Fill(dst, src, cap);
         }
 
-        void fill(PointerType        dst,
+        void fill(const PointerType  dst,
                   ConstReferenceType src,
                   const SizeType     capacity)
         {
@@ -134,18 +135,18 @@ namespace Jam
     template <typename Type, typename Size, const Size Limit>
     const Size AllocBase<Type, Size, Limit>::limit = {Limit};
 
-    template <typename Type,
-              typename Size    = size_t,
-              const Size Limit = MakeLimit<Size>()>
+    template <typename Type, typename Size = size_t, const Size Limit = MakeLimit<Size>()>
     class NewAllocator : public AllocBase<Type, Size, Limit>
     {
     public:
-        JAM_DECLARE_TYPE(Type)
+        using ValueType          = Type;
+        using ReferenceType      = Type&;
+        using PointerType        = Type*;
+        using ConstValueType     = const Type;
+        using ConstPointerType   = const Type*;
+        using ConstReferenceType = const Type&;
+        using SelfType           = NewAllocator<Type, Size, Limit>;
 
-    public:
-        using SelfType = NewAllocator<Type, Size, Limit>;
-
-    public:
         explicit NewAllocator() = default;
 
         NewAllocator(const SelfType&) = default;
@@ -193,16 +194,13 @@ namespace Jam
             return base;
         }
 
-        static void deallocateArray(
-            const ConstPointerType pointer,
-            Size)
+        static void deallocateArray(const ConstPointerType pointer, Size)
         {
             delete[] pointer;
         }
     };
 
-    template <typename Type,
-              typename Size    = size_t,
-              const Size Limit = MakeLimit<Size>()>
+    template <typename Type, typename Size = size_t, const Size Limit = MakeLimit<Size>()>
     using Allocator = NewAllocator<Type, Size, Limit>;
+
 }  // namespace Jam
