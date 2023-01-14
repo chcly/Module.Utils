@@ -19,11 +19,11 @@ list(APPEND CMAKE_MODULE_PATH
   ${InternalUtils_SOURCE_DIR}/CMake 
   ${InternalUtils_SOURCE_DIR}/CMake/Modules
 )
+
 include(Configure)
 if (NOT Configure_SUCCEEDED)
    return()
 endif()
-
 
 
 if (InternalUtils_ExternalTarget)
@@ -39,9 +39,10 @@ else()
 
     set(InternalUtils_INCLUDE  ${InternalUtils_SOURCE_DIR}/Source)
     set(InternalUtils_LIBRARY  ${TargetName})
+
 endif()
 
-add_subdirectory(Source)
+add_subdirectory(Utils)
 
 if (InternalUtils_BUILD_TEST)
     add_subdirectory(${GTEST_DIR})
