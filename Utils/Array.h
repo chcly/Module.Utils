@@ -250,7 +250,7 @@ namespace Jam
         SimpleArray(const SimpleArray& o) = default;
 
         SimpleArray(std::initializer_list<T> o) :
-            Array(o)
+            Jam::Array<T, AOP_SIMPLE_TYPE, Allocator>(o)
         {
         }
     };

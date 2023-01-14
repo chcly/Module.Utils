@@ -33,8 +33,14 @@
     #define JAM_PLATFORM JAM_PLATFORM_WINDOWS
 #elif defined(__APPLE__)
     #define JAM_PLATFORM JAM_PLATFORM_APPLE
-#elif
+#else
     #define JAM_PLATFORM JAM_PLATFORM_UNIX
+#endif
+
+#if JAM_PLATFORM==JAM_PLATFORM_UNIX
+#include <cstring>
+#include "stddef.h"
+
 #endif
 
 #if (defined(DEBUG) || defined(_DEBUG))

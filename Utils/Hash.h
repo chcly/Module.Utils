@@ -21,8 +21,7 @@
 */
 #pragma once
 
-#include <cstdint>
-
+#include "Utils/Definitions.h"
 namespace Jam
 {
     using hash_t = size_t;
