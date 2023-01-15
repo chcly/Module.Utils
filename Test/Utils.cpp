@@ -22,10 +22,10 @@
 #include <cstdio>
 #include "Utils/Allocator.h"
 #include "Utils/Array.h"
+#include "Utils/Char.h"
 #include "Utils/FixedArray.h"
 #include "Utils/HashMap.h"
 #include "gtest/gtest.h"
-#include "Utils/Char.h"
 
 GTEST_TEST(Utils, FixedArray_001)
 {
@@ -44,7 +44,124 @@ GTEST_TEST(Utils, FixedArray_001)
     EXPECT_TRUE(Jam::Char::equals(b.ptr(), "hello...", 8));
     Jam::FixedArray<char, 9> c = b;
     EXPECT_TRUE(Jam::Char::equals(c.ptr(), "hello...", 8));
+}
 
+GTEST_TEST(Utils, FixedArray_002)
+{
+    Jam::FixedArray<int, 10> a;
+    for (uint16_t i = 0; i < Jam::FixedArray<int, 10>::capacity(); ++i)
+        a.push_back(i);
+
+    EXPECT_EQ(a[0], 0);
+    EXPECT_EQ(a[1], 1);
+    EXPECT_EQ(a[2], 2);
+    EXPECT_EQ(a[3], 3);
+    EXPECT_EQ(a[4], 4);
+    EXPECT_EQ(a[5], 5);
+    EXPECT_EQ(a[6], 6);
+    EXPECT_EQ(a[7], 7);
+    EXPECT_EQ(a[8], 8);
+    EXPECT_EQ(a[9], 9);
+
+    try
+    {
+        Jam::FixedArray<int, 10> b;
+        for (uint16_t i = 0; i < 11; ++i)
+            b.push_back(i);
+        FAIL();
+    }
+    catch (...)
+    {
+    }
+}
+
+
+GTEST_TEST(Utils, FixedArray_003)
+{
+    Jam::FixedArray<int, 10> a;
+    a.resize(5);
+    for (uint16_t i = 0; i < 5; ++i)
+        a[i] = (i);
+
+    EXPECT_EQ(a[0], 0);
+    EXPECT_EQ(a[1], 1);
+    EXPECT_EQ(a[2], 2);
+    EXPECT_EQ(a[3], 3);
+    EXPECT_EQ(a[4], 4);
+
+    try
+    {
+        Jam::FixedArray<int, 10> b;
+        b.resize(5);
+        for (uint16_t i = 0; i < 6; ++i)
+            b[i] = i;
+        FAIL();
+    }
+    catch (...)
+    {
+    }
+}
+
+
+GTEST_TEST(Utils, FixedArray_004)
+{
+    Jam::FixedArray<int, 10> a = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+    int i = 0;
+    for (const auto& elm : a)
+    {
+        EXPECT_EQ(i, elm);
+        ++i;
+    }
+}
+
+GTEST_TEST(Utils, FixedArray_005)
+{
+    Jam::FixedArray<int, 10> a = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    EXPECT_EQ(10, a.capacity());
+    EXPECT_EQ(10, a.size());
+    a.remove(5);
+    EXPECT_EQ(10, a.capacity());
+    EXPECT_EQ(9, a.size());
+    a.remove(6);
+    EXPECT_EQ(10, a.capacity());
+    EXPECT_EQ(8, a.size());
+    a.remove(4);
+    EXPECT_EQ(10, a.capacity());
+    EXPECT_EQ(7, a.size());
+
+    EXPECT_EQ(a[0], 0);
+    EXPECT_EQ(a[1], 1);
+    EXPECT_EQ(a[2], 2);
+    EXPECT_EQ(a[3], 3);
+    EXPECT_EQ(a[4], 6);
+    EXPECT_EQ(a[5], 8);
+    EXPECT_EQ(a[6], 9);
+}
+
+GTEST_TEST(Utils, FixedArray_006)
+{
+    Jam::FixedArray<int, 10> a = {};
+    for (uint16_t i = 0; i < 10; ++i)
+        a.push_back(i);
+
+    while (!a.empty())
+    {
+        for (int& i : a)
+            Jam::Con::print(i, ' ');
+        Jam::Con::println();
+        a.remove(0);
+    }
+
+    for (uint16_t i = 0; i < 10; ++i)
+        a.push_back(i);
+    while (!a.empty())
+    {
+        for (int& i : a)
+            Jam::Con::print(i, ' ');
+        Jam::Con::println();
+        a.remove(a.size() - 1);
+    }
 }
 
 
@@ -87,15 +204,11 @@ GTEST_TEST(Utils, Array_001)
     using IntArray = Jam::Array<int, Jam::AOP_SIMPLE_TYPE>;
     IntArray ia;
 
-    // Jam::Console::writeLine((int64_t)sizeof(ia));
-    // Jam::Console::writeLine((int64_t)sizeof(Jam::Allocator<int, uint32_t>));
-    // Jam::Console::writeLine((int64_t)sizeof(std::vector<int>));
     ia.reserve(20000);
     for (uint32_t i = 0; i < 20000; ++i)
         ia.push_back(i);
 
     const uint32_t pos = ia.findBinary(2);
-
     EXPECT_EQ(pos, 2);
     EXPECT_EQ(ia[pos], 2);
 
@@ -118,8 +231,7 @@ GTEST_TEST(Utils, Array_002)
     for (uint32_t i = 0; i < 20000; ++i)
         EXPECT_EQ(i, ia[i]);
 
-#if JT_DEBUG == 1
-
+#if JAM_DEBUG == 1
     try
     {
         Jam::Console::writeLine((int64_t)ia[ia.capacity()]);
