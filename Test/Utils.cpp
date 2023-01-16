@@ -147,19 +147,26 @@ GTEST_TEST(Utils, FixedArray_006)
 
     while (!a.empty())
     {
+        int exp = a.at(0);
         for (int& i : a)
-            Jam::Con::print(i, ' ');
-        Jam::Con::println();
+        {
+            EXPECT_EQ(i, exp);
+            ++exp;
+        }
         a.remove(0);
     }
 
     for (uint16_t i = 0; i < 10; ++i)
         a.push_back(i);
+
     while (!a.empty())
     {
+        int exp = 0;
         for (int& i : a)
-            Jam::Con::print(i, ' ');
-        Jam::Con::println();
+        {
+            EXPECT_EQ(i, exp);
+            ++exp;
+        }
         a.remove(a.size() - 1);
     }
 }
@@ -205,7 +212,7 @@ GTEST_TEST(Utils, Array_001)
     IntArray ia;
 
     ia.reserve(20000);
-    for (uint32_t i = 0; i < 20000; ++i)
+    for (int i = 0; i < 20000; ++i)
         ia.push_back(i);
 
     const uint32_t pos = ia.findBinary(2);
@@ -223,7 +230,7 @@ GTEST_TEST(Utils, Array_002)
 
     ia.reserve(20000);
 
-    for (uint32_t i = 0; i < 20000; ++i)
+    for (int i = 0; i < 20000; ++i)
         ia.push_back(i);
 
     EXPECT_EQ(20001, ia.capacity());
