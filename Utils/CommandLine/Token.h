@@ -23,7 +23,7 @@
 
 #include "Utils/String.h"
 
-namespace Jam::CommandLine
+namespace Rt2::CommandLine
 {
     enum TokenType
     {

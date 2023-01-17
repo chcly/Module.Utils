@@ -22,7 +22,7 @@
 #pragma once
 #include "Utils/String.h"
 
-namespace Jam::WriteUtils
+namespace Rt2::WriteUtils
 {
     inline void indent(OStream& out, int n)
     {

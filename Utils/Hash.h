@@ -22,7 +22,7 @@
 #pragma once
 
 #include "Utils/Definitions.h"
-namespace Jam
+namespace Rt2
 {
     using hash_t = size_t;
 

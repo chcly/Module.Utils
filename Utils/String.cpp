@@ -23,7 +23,7 @@
 #include "Utils/Char.h"
 #include "Utils/Definitions.h"
 
-namespace Jam
+namespace Rt2
 {
     void StringUtils::replaceAll(String&       dest,
                                  const String& input,
@@ -292,17 +292,17 @@ namespace Jam
         const size_t n1 = (n2 >> 1) + n2 % 2;
 
         size_t i = 0;
-        size_t x = JtNpos;
-        size_t y = JtNpos;
+        size_t x = Npos;
+        size_t y = Npos;
 
-        while (i < n1 && (x == JtNpos || y == JtNpos))
+        while (i < n1 && (x == Npos || y == Npos))
         {
-            if (x == JtNpos)
+            if (x == Npos)
             {
                 if (const char f = in[i]; !isWs(f))
                     x = i;
             }
-            if (y == JtNpos)
+            if (y == Npos)
             {
                 if (const char l = in[n2 - 1 - i]; !isWs(l))
                     y = n2 - i;
@@ -310,9 +310,9 @@ namespace Jam
             ++i;
         }
 
-        if (x == JtNpos)
+        if (x == Npos)
             x = 0;
-        if (y == JtNpos)
+        if (y == Npos)
             y = n2 > 1 ? n2 - 1 : 0;
         di = in.substr(x, y - x);
     }

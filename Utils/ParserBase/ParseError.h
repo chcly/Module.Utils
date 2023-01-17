@@ -22,7 +22,7 @@
 #pragma once
 #include "Utils/Exception.h"
 
-namespace Jam
+namespace Rt2
 {
     class ParseError final : public Exception
     {

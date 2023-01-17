@@ -25,7 +25,7 @@
 #include "Utils/ParserBase/TokenBase.h"
 #include "Utils/Path.h"
 
-namespace Jam
+namespace Rt2
 {
     using StringTable = IndexCache<String>;
     using IntTable    = IndexCache<int>;

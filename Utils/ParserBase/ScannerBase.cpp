@@ -23,7 +23,7 @@
 #include "Utils/Char.h"
 #include "Utils/ParserBase/ParseError.h"
 
-namespace Jam
+namespace Rt2
 {
     ScannerBase::ScannerBase() :
         _stream(nullptr),

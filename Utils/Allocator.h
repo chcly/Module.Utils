@@ -25,7 +25,7 @@
 #include "Utils/Definitions.h"
 #include "Utils/Exception.h"
 
-namespace Jam
+namespace Rt2
 {
     /**
      * \brief Utility method to guard against allocating
@@ -33,7 +33,7 @@ namespace Jam
      * \param elementCount The size of the memory allocation to check.
      */
     template <typename Size = size_t, Size UpperBound = MakeLimit<Size>()>
-    JAM_FORCE_INLINE constexpr void enforce(Size elementCount)
+    RT_FORCE_INLINE constexpr void enforce(Size elementCount)
     {
         if (elementCount > UpperBound)
         {

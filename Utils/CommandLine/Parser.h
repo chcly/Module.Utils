@@ -26,7 +26,7 @@
 #include "Utils/FileSystem.h"
 #include "Utils/Path.h"
 
-namespace Jam::CommandLine
+namespace Rt2::CommandLine
 {
     class Parser
     {

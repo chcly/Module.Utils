@@ -24,7 +24,7 @@
 #include "Utils/ParserBase/ScannerBase.h"
 #include "Utils/ParserBase/TokenBase.h"
 
-namespace Jam
+namespace Rt2
 {
     class ScannerBase;
 

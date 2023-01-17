@@ -22,7 +22,7 @@
 #pragma once
 #include <cstdint>
 
-namespace Jam
+namespace Rt2
 {
     extern void CrtTestMemory();
     extern void CrtBreakOn(uint64_t alloc);

@@ -24,7 +24,7 @@
 #include "Utils/Allocator.h"
 #include "Utils/ArrayBase.h"
 
-namespace Jam
+namespace Rt2
 {
     template <typename T,
               int Options        = AOP_SIMPLE_TYPE,
@@ -32,7 +32,7 @@ namespace Jam
     class Array : public ArrayBase<T, Options, Allocator>
     {
     public:
-        JAM_DECLARE_TYPE(T)
+        RT_DECLARE_TYPE(T)
 
         using BaseType = ArrayBase<T, Options, Allocator>;
         using SizeType = typename Allocator::SizeType;
@@ -161,49 +161,49 @@ namespace Jam
 
         ReferenceType operator[](SizeType idx)
         {
-            JAM_ASSERT(idx < this->_capacity)
+            RT_ASSERT(idx < this->_capacity)
             return this->_data[idx];
         }
 
         ConstReferenceType operator[](SizeType idx) const
         {
-            JAM_ASSERT(idx < this->_capacity)
+            RT_ASSERT(idx < this->_capacity)
             return this->_data[idx];
         }
 
         ReferenceType at(SizeType idx)
         {
-            JAM_ASSERT(idx < this->_capacity)
+            RT_ASSERT(idx < this->_capacity)
             return this->_data[idx];
         }
 
         ConstReferenceType at(SizeType idx) const
         {
-            JAM_ASSERT(idx < this->_capacity)
+            RT_ASSERT(idx < this->_capacity)
             return this->_data[idx];
         }
 
         ReferenceType front()
         {
-            JAM_ASSERT(this->_size > 0)
+            RT_ASSERT(this->_size > 0)
             return this->_data[0];
         }
 
         ReferenceType back()
         {
-            JAM_ASSERT(this->_size > 0)
+            RT_ASSERT(this->_size > 0)
             return this->_data[this->_size - 1];
         }
 
         ConstReferenceType front() const
         {
-            JAM_ASSERT(this->_size > 0)
+            RT_ASSERT(this->_size > 0)
             return this->_data[0];
         }
 
         ConstReferenceType back() const
         {
-            JAM_ASSERT(this->_size > 0)
+            RT_ASSERT(this->_size > 0)
             return this->_data[this->_size - 1];
         }
 
@@ -250,7 +250,7 @@ namespace Jam
         SimpleArray(const SimpleArray& o) = default;
 
         SimpleArray(std::initializer_list<T> o) :
-            Jam::Array<T, AOP_SIMPLE_TYPE, Allocator>(o)
+            Rt2::Array<T, AOP_SIMPLE_TYPE, Allocator>(o)
         {
         }
     };

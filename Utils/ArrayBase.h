@@ -25,7 +25,7 @@
 #include "Utils/Allocator.h"
 #include "Utils/Definitions.h"
 
-namespace Jam
+namespace Rt2
 {
     enum ArrayOptions
     {

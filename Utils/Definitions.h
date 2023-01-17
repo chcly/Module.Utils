@@ -22,109 +22,109 @@
 #pragma once
 #include <cstdint>
 
-#define JAM_PLATFORM_UNIX 0
-#define JAM_PLATFORM_APPLE 1
-#define JAM_PLATFORM_WINDOWS 2
-#define JAM_PLATFORM_EMSCRIPTEN 3
+#define RT_PLATFORM_UNIX 0
+#define RT_PLATFORM_APPLE 1
+#define RT_PLATFORM_WINDOWS 2
+#define RT_PLATFORM_EMSCRIPTEN 3
 
 #if defined(__EMSCRIPTEN__)
-#define JAM_PLATFORM JAM_PLATFORM_EMSCRIPTEN
+#define RT_PLATFORM RT_PLATFORM_EMSCRIPTEN
 #elif defined(_WIN32)
-#define JAM_PLATFORM JAM_PLATFORM_WINDOWS
+#define RT_PLATFORM RT_PLATFORM_WINDOWS
 #elif defined(__APPLE__)
-#define JAM_PLATFORM JAM_PLATFORM_APPLE
+#define RT_PLATFORM RT_PLATFORM_APPLE
 #else
-#define JAM_PLATFORM JAM_PLATFORM_UNIX
+#define RT_PLATFORM RT_PLATFORM_UNIX
 #endif
 
-#if JAM_PLATFORM == JAM_PLATFORM_UNIX
+#if RT_PLATFORM == RT_PLATFORM_UNIX
 #include <cstring>
 #include "stddef.h"
 #endif
 
 #if (defined(DEBUG) || defined(_DEBUG))
 #include "Utils/Assert.h"
-#define JAM_DEBUG 1
-#define JAM_ASSERT(x)                                              \
+#define RT_DEBUG 1
+#define RT_ASSERT(x)                                               \
     {                                                              \
         if (!(x))                                                  \
-            Jam::AssertTrap(#x, __FILE__, __LINE__, __FUNCTION__); \
+            Rt2::AssertTrap(#x, __FILE__, __LINE__, __FUNCTION__); \
     }
-#define JAM_DEBUG_CATCH()                   \
+#define RT_DEBUG_CATCH()                    \
     catch (Jam::Exception & ex)             \
     {                                       \
-        Jam::Console::writeLine(ex.what()); \
+        Rt2::Console::writeLine(ex.what()); \
     }
 #else
-#define JAM_DEBUG_CATCH() \
-    catch (...)           \
-    {                     \
+#define RT_DEBUG_CATCH() \
+    catch (...)          \
+    {                    \
     }
-#define JAM_ASSERT(x) ((void)(x));
-#define JAM_DEBUG 0
+#define RT_ASSERT(x) ((void)(x));
+#define RT_DEBUG 0
 #endif
 
-#define JAM_COMPILER_MSVC 0
-#define JAM_COMPILER_GNU 1
-#define JAM_COMPILER_EMSCRIPTEN 2
-#define JAM_COMPILER_MSVC_CLANG 3
+#define RT_COMPILER_MSVC 0
+#define RT_COMPILER_GNU 1
+#define RT_COMPILER_EMSCRIPTEN 2
+#define RT_COMPILER_MSVC_CLANG 3
 
 #if defined(__EMSCRIPTEN__)
-#define JAM_COMPILER JAM_COMPILER_EMSCRIPTEN
+#define RT_COMPILER RT_COMPILER_EMSCRIPTEN
 #elif defined(_MSC_VER)
 #if defined __clang__
-#define JAM_COMPILER JAM_COMPILER_MSVC
-#define JAM_COMPILER_SUBTYPE JAM_COMPILER_MSVC_CLANG
+#define RT_COMPILER RT_COMPILER_MSVC
+#define RT_COMPILER_SUBTYPE RT_COMPILER_MSVC_CLANG
 #else
-#define JAM_COMPILER JAM_COMPILER_MSVC
-#define JAM_COMPILER_SUBTYPE JAM_COMPILER
+#define RT_COMPILER RT_COMPILER_MSVC
+#define RT_COMPILER_SUBTYPE RT_COMPILER
 #endif
 #elif defined(__GNUC__)
-#define JAM_COMPILER JAM_COMPILER_GNU
+#define RT_COMPILER RT_COMPILER_GNU
 #else
 #error unknown compiler
 #endif
 
-#if JAM_COMPILER == JAM_COMPILER_MSVC
-#if JAM_COMPILER_SUBTYPE == JAM_COMPILER_MSVC_CLANG
-#define JAM_FORCE_INLINE inline
+#if RT_COMPILER == RT_COMPILER_MSVC
+#if RT_COMPILER_SUBTYPE == RT_COMPILER_MSVC_CLANG
+#define RT_FORCE_INLINE inline
 #else
-#define JAM_FORCE_INLINE __forceinline
+#define RT_FORCE_INLINE __forceinline
 #endif
 #else
-#define JAM_FORCE_INLINE inline
+#define RT_FORCE_INLINE inline
 #endif
 
-#define JAM_ENDIAN_LITTLE 0
-#define JAM_ENDIAN_BIG 1
+#define RT_ENDIAN_LITTLE 0
+#define RT_ENDIAN_BIG 1
 
 #if defined(__sgi) || defined(__sparc) ||     \
     defined(__sparc__) || defined(__PPC__) || \
     defined(__ppc__) || defined(__BIG_ENDIAN__)
-#define JAM_ENDIAN JAM_ENDIAN_BIG
+#define RT_ENDIAN RT_ENDIAN_BIG
 #else
-#define JAM_ENDIAN JAM_ENDIAN_LITTLE
+#define RT_ENDIAN RT_ENDIAN_LITTLE
 #endif
 
-#define JAM_ARCH_32 0
-#define JAM_ARCH_64 1
+#define RT_ARCH_32 0
+#define RT_ARCH_64 1
 
 #if defined(__x86_64__) || defined(_M_X64) ||       \
     defined(__powerpc64__) || defined(__alpha__) || \
     defined(__ia64__) || defined(__s390__) ||       \
     defined(__s390x__)
-#define JAM_ARCH JAM_ARCH_64
+#define RT_ARCH RT_ARCH_64
 #else
-#define JAM_ARCH JAM_ARCH_32
+#define RT_ARCH RT_ARCH_32
 #endif
 
-// #define JAM_OPEN_MP 1
-#ifdef JAM_OPEN_MP
+// #define RT_OPEN_MP 1
+#ifdef RT_OPEN_MP
 #include <omp.h>
 #include <thread>
 #endif
 
-namespace Jam
+namespace Rt2
 {
     using I8   = int8_t;
     using I16  = int16_t;
@@ -201,16 +201,12 @@ namespace Jam
         return MakeLimit<T>() >> 1;
     }
 
-    constexpr size_t   JtNpos   = MakeLimit<size_t>();
-    constexpr uint32_t JtNpos32 = MakeLimit<uint32_t>();
-    constexpr uint32_t JtNpos16 = MakeLimit<uint16_t>();
-    constexpr uint32_t JtNpos8  = MakeLimit<uint8_t>();
+    constexpr size_t   Npos   = MakeLimit<size_t>();
+    constexpr uint32_t Npos32 = MakeLimit<uint32_t>();
+    constexpr uint32_t Npos16 = MakeLimit<uint16_t>();
+    constexpr uint32_t Npos8  = MakeLimit<uint8_t>();
 
-    constexpr uint32_t Jt16k = 16384;
-    constexpr uint32_t Jt8k  = Jt16k >> 1;
-    constexpr uint32_t Jt4k  = Jt8k >> 1;
-
-#ifdef JAM_OPEN_MP
+#ifdef RT_OPEN_MP
     template <typename T, size_t Ub = MakeLimit<size_t>()>
     void Fill(T* dest, const T* src, const size_t nr)
     {
@@ -273,4 +269,4 @@ namespace Jam
         }
     }
 #endif
-}  // namespace Jam
+}  // namespace Rt2

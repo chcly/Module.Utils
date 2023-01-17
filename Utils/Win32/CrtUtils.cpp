@@ -26,7 +26,7 @@
 #include "Utils/Console.h"
 #endif
 
-namespace Jam
+namespace Rt2
 {
 #ifdef _WIN32
     static _CrtMemState __startState = {};

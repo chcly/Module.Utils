@@ -26,7 +26,7 @@
 #include "Utils/Console.h"
 #include "Utils/String.h"
 
-namespace Jam
+namespace Rt2
 {
     /**
      * \brief Primary class for exception handling

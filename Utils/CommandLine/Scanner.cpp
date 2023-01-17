@@ -22,7 +22,7 @@
 #include "Utils/CommandLine/Scanner.h"
 #include "Utils/ParserBase/ScannerBase.h"
 
-namespace Jam::CommandLine
+namespace Rt2::CommandLine
 {
 
     void Scanner::clear()

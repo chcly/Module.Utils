@@ -24,7 +24,7 @@
 #include "Utils/Allocator.h"
 #include "Utils/Hash.h"
 
-namespace Jam
+namespace Rt2
 {
     template <typename Key, typename Value>
     class Entry
@@ -32,7 +32,7 @@ namespace Jam
     public:
         Key    first{};
         Value  second{};
-        hash_t hash{JtNpos};
+        hash_t hash{Npos};
 
         Entry()  = default;
         ~Entry() = default;
@@ -65,7 +65,7 @@ namespace Jam
 
     public:
         using Pair = Entry<Key, Value>;
-        JAM_DECLARE_TYPE(Pair)
+        RT_DECLARE_TYPE(Pair)
 
         typedef size_t* IndexArray;
         using PairKeyType   = Key;
@@ -129,44 +129,44 @@ namespace Jam
 
         Value& at(size_t i)
         {
-            JAM_ASSERT(_bucket && i < _size)
+            RT_ASSERT(_bucket && i < _size)
             return _bucket[i].second;
         }
 
         Value& operator[](size_t i)
         {
-            JAM_ASSERT(_bucket && i < _size)
+            RT_ASSERT(_bucket && i < _size)
             return _bucket[i].second;
         }
 
         const Value& at(size_t i) const
         {
-            JAM_ASSERT(_bucket && i < _size)
+            RT_ASSERT(_bucket && i < _size)
             return _bucket[i].second;
         }
 
         const Value& operator[](size_t i) const
         {
-            JAM_ASSERT(_bucket && i < _size)
+            RT_ASSERT(_bucket && i < _size)
             return _bucket[i].second;
         }
 
         Key& keyAt(size_t i)
         {
-            JAM_ASSERT(_bucket && i < _size)
+            RT_ASSERT(_bucket && i < _size)
             return _bucket[i].first;
         }
 
         const Key& keyAt(size_t i) const
         {
-            JAM_ASSERT(_bucket && i < _size)
+            RT_ASSERT(_bucket && i < _size)
             return _bucket[i].first;
         }
 
         Value& get(const Key& key)
         {
             size_t i = find(key);
-            if (i == JtNpos)
+            if (i == Npos)
                 throw Exception("element not found");
             return _bucket[i].second;
         }
@@ -184,13 +184,13 @@ namespace Jam
         size_t find(const Key& key) const
         {
             if (empty())
-                return JtNpos;
+                return Npos;
 
             hash_t       hk = Hash(key);
             const hash_t hr = hk & _capacity - 1;
             size_t       fh = _indices[hr];
 
-            while (fh != JtNpos && hk != _bucket[fh].hash)
+            while (fh != Npos && hk != _bucket[fh].hash)
                 fh = _next[fh];
 
             return fh;
@@ -200,7 +200,7 @@ namespace Jam
         {
             if (!empty())
             {
-                if (find(key) != JtNpos)
+                if (find(key) != Npos)
                     return false;
             }
 
@@ -230,7 +230,7 @@ namespace Jam
             const hash_t hash   = Hash(key) & _capacity - 1;
 
             size_t index  = _indices[hash];
-            size_t pIndex = JtNpos;
+            size_t pIndex = Npos;
 
             while (index != fIndex)
             {
@@ -238,9 +238,9 @@ namespace Jam
                 index  = _next[index];
             }
 
-            if (pIndex != JtNpos)
+            if (pIndex != Npos)
             {
-                JAM_ASSERT(_next[pIndex] == fIndex)
+                RT_ASSERT(_next[pIndex] == fIndex)
                 _next[pIndex] = _next[fIndex];
             }
             else
@@ -257,16 +257,16 @@ namespace Jam
             const hash_t lHash = _bucket[lIndex].hash & _capacity - 1;
             index              = _indices[lHash];
 
-            pIndex = JtNpos;
+            pIndex = Npos;
             while (index != lIndex)
             {
                 pIndex = index;
                 index  = _next[index];
             }
 
-            if (pIndex != JtNpos)
+            if (pIndex != Npos)
             {
-                JAM_ASSERT(_next[pIndex] == lIndex)
+                RT_ASSERT(_next[pIndex] == lIndex)
                 _next[pIndex] = _next[lIndex];
             }
             else
@@ -312,7 +312,7 @@ namespace Jam
 
         void reserve(const size_t& nr)
         {
-            if (_capacity < nr && nr != JtNpos)
+            if (_capacity < nr && nr != Npos)
                 rehash(nr);
         }
 
@@ -331,7 +331,7 @@ namespace Jam
         {
             if (to <= 0 || from >= to)
                 return;
-#ifdef JAM_OPEN_MP
+#ifdef RT_OPEN_MP
             {
 #pragma omp parallel for num_threads(4)
                 for (int64_t i = from; i < (int64_t)to; ++i)
@@ -343,7 +343,7 @@ namespace Jam
             size_t i = from;
             do
             {
-                _indices[i] = _next[i] = JtNpos;
+                _indices[i] = _next[i] = Npos;
             } while (++i < to);
 #endif
         }
@@ -379,7 +379,7 @@ namespace Jam
             _next    = _iAlloc.reallocateArray(_next, nr, _capacity);
 
             _capacity = nr;
-            JAM_ASSERT(_bucket && _indices && _next)
+            RT_ASSERT(_bucket && _indices && _next)
 
             zeroIndices(0, _capacity);
 

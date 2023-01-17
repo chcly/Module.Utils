@@ -28,7 +28,7 @@
 #undef min
 #undef max
 
-namespace Jam
+namespace Rt2
 {
     template <typename T>
     struct CallableStream

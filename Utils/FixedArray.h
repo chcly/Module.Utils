@@ -21,7 +21,7 @@
 */
 #pragma once
 
-namespace Jam
+namespace Rt2
 {
     template <typename T, const uint16_t L>
     class FixedArray
@@ -65,7 +65,7 @@ namespace Jam
                     return current;
             }
 
-            return JtNpos16;
+            return Npos16;
         }
 
         void remove(uint16_t pos)
@@ -148,13 +148,13 @@ namespace Jam
 
         ReferenceType back()
         {
-            JAM_ASSERT(!empty())
+            RT_ASSERT(!empty())
             return _data[_size - 1];
         }
 
         ConstReferenceType back() const
         {
-            JAM_ASSERT(!empty())
+            RT_ASSERT(!empty())
             return _data[_size - 1];
         }
 

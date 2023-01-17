@@ -6,7 +6,7 @@
 #include "Traits.h"
 #include "Definitions.h"
 
-namespace Jam
+namespace Rt2
 {
     template <typename T, typename Alloc = Allocator<Entry<T, bool>, size_t> >
     class Set
@@ -14,7 +14,7 @@ namespace Jam
     public:
         using TableType = HashTable<T, bool, Alloc>;
 
-        JAM_DECLARE_REF_TYPE(TableType)
+        RT_DECLARE_REF_TYPE(TableType)
 
         using SelfType = Set<T, Alloc>;
 
@@ -49,25 +49,25 @@ namespace Jam
 
         T& operator[](size_t idx)
         {
-            JAM_ASSERT(idx < size());
+            RT_ASSERT(idx < size());
             return _table.at(idx);
         }
 
         const T& operator[](size_t idx) const
         {
-            JAM_ASSERT(idx < size());
+            RT_ASSERT(idx < size());
             return _table.at(idx);
         }
 
         T& at(size_t idx)
         {
-            JAM_ASSERT(idx < size());
+            RT_ASSERT(idx < size());
             return _table.at(idx);
         }
 
         const T& at(size_t idx) const
         {
-            JAM_ASSERT(idx < size());
+            RT_ASSERT(idx < size());
             return _table.at(idx);
         }
 

@@ -22,7 +22,7 @@
 #pragma once
 #include "Utils/Definitions.h"
 
-#define JAM_DECLARE_TYPE(T)              \
+#define RT_DECLARE_TYPE(T)              \
     using ValueType          = T;        \
     using ReferenceType      = T&;       \
     using PointerType        = T*;       \
@@ -30,7 +30,7 @@
     using ConstPointerType   = const T*; \
     using ConstReferenceType = const T&;
 
-#define JAM_DECLARE_REF_TYPE(T)                              \
+#define RT_DECLARE_REF_TYPE(T)                              \
     typedef typename T::ValueType          ValueType;        \
     typedef typename T::ReferenceType      ReferenceType;    \
     typedef typename T::PointerType        PointerType;      \

@@ -23,7 +23,7 @@
 #include "Utils/Char.h"
 #include "Utils/Definitions.h"
 
-namespace Jam
+namespace Rt2
 {
     // magic numbers from http://www.isthe.com/chongo/tech/comp/fnv/
     // constexpr size_t InitialFnv2 = 0x9E3779B9;
@@ -34,15 +34,15 @@ namespace Jam
     hash_t Hash(const char* key)
     {
         if (!key)
-            return JtNpos;
+            return Npos;
         return Hash(key, Char::length(key));
     }
 
     // Fowler/Noll/Vo (FNV) Hash
     hash_t Hash(const char* key, const size_t len)
     {
-        if (!key || len == 0 || len == JtNpos)
-            return JtNpos;
+        if (!key || len == 0 || len == Npos)
+            return Npos;
 
         size_t hash = InitialFnv;
 

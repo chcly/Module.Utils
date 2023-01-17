@@ -25,7 +25,7 @@
 #include "Utils/Char.h"
 #include "Utils/String.h"
 
-namespace Jam::CommandLine
+namespace Rt2::CommandLine
 {
     /**
      * \brief A structure that represents a command line switch.

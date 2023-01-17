@@ -28,7 +28,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace Jam
+namespace Rt2
 {
     using String      = std::string;
     using StringDeque = std::deque<std::string>;

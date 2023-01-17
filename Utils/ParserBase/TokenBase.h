@@ -2,12 +2,12 @@
 #include <cstdint>
 #include "Utils/Definitions.h"
 
-namespace Jam
+namespace Rt2
 {
     class TokenBase
     {
     private:
-        size_t _index{JtNpos};
+        size_t _index{Npos};
         int8_t _type{0};
         size_t _line{0};
 
@@ -22,7 +22,7 @@ namespace Jam
         {
             // Reset the lookup index
             // Its range is any value >= 0 && < structure.size()
-            _index = JtNpos;
+            _index = Npos;
 
             // the type here should pivot around zero,
             // negative values are errors, positive values are

@@ -7,7 +7,7 @@
 #include "Utils/Console.h"
 #include "Utils/Definitions.h"
 
-namespace Jam
+namespace Rt2
 {
     static ConsoleColor gForeground = CS_WHITE;
     static ConsoleColor gBackground = CS_BLACK;

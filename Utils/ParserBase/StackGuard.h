@@ -23,7 +23,7 @@
 #include "Utils/Definitions.h"
 #include "Utils/Exception.h"
 
-namespace Jam
+namespace Rt2
 {
     class StackGuard
     {

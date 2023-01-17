@@ -29,7 +29,7 @@
 
 GTEST_TEST(Utils, FixedArray_001)
 {
-    Jam::FixedArray<int, 10> a = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    Rt2::FixedArray<int, 10> a = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     EXPECT_EQ(a[0], 0);
     EXPECT_EQ(a[1], 1);
     EXPECT_EQ(a[2], 2);
@@ -40,16 +40,16 @@ GTEST_TEST(Utils, FixedArray_001)
     EXPECT_EQ(a[7], 7);
     EXPECT_EQ(a[8], 8);
     EXPECT_EQ(a[9], 9);
-    Jam::FixedArray<char, 9> b = {'h', 'e', 'l', 'l', 'o', '.', '.', '.', 0};
-    EXPECT_TRUE(Jam::Char::equals(b.ptr(), "hello...", 8));
-    Jam::FixedArray<char, 9> c = b;
-    EXPECT_TRUE(Jam::Char::equals(c.ptr(), "hello...", 8));
+    Rt2::FixedArray<char, 9> b = {'h', 'e', 'l', 'l', 'o', '.', '.', '.', 0};
+    EXPECT_TRUE(Rt2::Char::equals(b.ptr(), "hello...", 8));
+    Rt2::FixedArray<char, 9> c = b;
+    EXPECT_TRUE(Rt2::Char::equals(c.ptr(), "hello...", 8));
 }
 
 GTEST_TEST(Utils, FixedArray_002)
 {
-    Jam::FixedArray<int, 10> a;
-    for (uint16_t i = 0; i < Jam::FixedArray<int, 10>::capacity(); ++i)
+    Rt2::FixedArray<int, 10> a;
+    for (uint16_t i = 0; i < Rt2::FixedArray<int, 10>::capacity(); ++i)
         a.push_back(i);
 
     EXPECT_EQ(a[0], 0);
@@ -65,7 +65,7 @@ GTEST_TEST(Utils, FixedArray_002)
 
     try
     {
-        Jam::FixedArray<int, 10> b;
+        Rt2::FixedArray<int, 10> b;
         for (uint16_t i = 0; i < 11; ++i)
             b.push_back(i);
         FAIL();
@@ -78,7 +78,7 @@ GTEST_TEST(Utils, FixedArray_002)
 
 GTEST_TEST(Utils, FixedArray_003)
 {
-    Jam::FixedArray<int, 10> a;
+    Rt2::FixedArray<int, 10> a;
     a.resize(5);
     for (uint16_t i = 0; i < 5; ++i)
         a[i] = (i);
@@ -91,7 +91,7 @@ GTEST_TEST(Utils, FixedArray_003)
 
     try
     {
-        Jam::FixedArray<int, 10> b;
+        Rt2::FixedArray<int, 10> b;
         b.resize(5);
         for (uint16_t i = 0; i < 6; ++i)
             b[i] = i;
@@ -105,7 +105,7 @@ GTEST_TEST(Utils, FixedArray_003)
 
 GTEST_TEST(Utils, FixedArray_004)
 {
-    Jam::FixedArray<int, 10> a = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    Rt2::FixedArray<int, 10> a = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
     int i = 0;
     for (const auto& elm : a)
@@ -117,7 +117,7 @@ GTEST_TEST(Utils, FixedArray_004)
 
 GTEST_TEST(Utils, FixedArray_005)
 {
-    Jam::FixedArray<int, 10> a = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    Rt2::FixedArray<int, 10> a = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     EXPECT_EQ(10, a.capacity());
     EXPECT_EQ(10, a.size());
     a.remove(5);
@@ -141,7 +141,7 @@ GTEST_TEST(Utils, FixedArray_005)
 
 GTEST_TEST(Utils, FixedArray_006)
 {
-    Jam::FixedArray<int, 10> a = {};
+    Rt2::FixedArray<int, 10> a = {};
     for (uint16_t i = 0; i < 10; ++i)
         a.push_back(i);
 
@@ -183,7 +183,7 @@ GTEST_TEST(Utils, Allocator_001)
 {
     try
     {
-        Jam::Allocator<Complex, size_t, 32> alloc;
+        Rt2::Allocator<Complex, size_t, 32> alloc;
         alloc.allocateArray(33);
         FAIL();
     }
@@ -195,7 +195,7 @@ GTEST_TEST(Utils, Allocator_001)
 
 GTEST_TEST(Utils, Allocator_002)
 {
-    using Alloc = Jam::Allocator<Complex, size_t>;
+    using Alloc = Rt2::Allocator<Complex, size_t>;
     Alloc al;
 
     Complex* c = al.allocate();
@@ -208,7 +208,7 @@ GTEST_TEST(Utils, Allocator_002)
 
 GTEST_TEST(Utils, Array_001)
 {
-    using IntArray = Jam::Array<int, Jam::AOP_SIMPLE_TYPE>;
+    using IntArray = Rt2::Array<int, Rt2::AOP_SIMPLE_TYPE>;
     IntArray ia;
 
     ia.reserve(20000);
@@ -225,7 +225,7 @@ GTEST_TEST(Utils, Array_001)
 
 GTEST_TEST(Utils, Array_002)
 {
-    using IntArray = Jam::SimpleArray<int>;
+    using IntArray = Rt2::SimpleArray<int>;
     IntArray ia;
 
     ia.reserve(20000);
@@ -238,10 +238,10 @@ GTEST_TEST(Utils, Array_002)
     for (uint32_t i = 0; i < 20000; ++i)
         EXPECT_EQ(i, ia[i]);
 
-#if JAM_DEBUG == 1
+#if RT_DEBUG == 1
     try
     {
-        Jam::Console::writeLine((int64_t)ia[ia.capacity()]);
+        Rt2::Console::writeLine((int64_t)ia[ia.capacity()]);
         FAIL();
     }
     catch (...)
@@ -250,7 +250,7 @@ GTEST_TEST(Utils, Array_002)
 
     try
     {
-        Jam::Console::writeLine((int64_t)ia[ia.capacity()]);
+        Rt2::Console::writeLine((int64_t)ia[ia.capacity()]);
         FAIL();
     }
     catch (...)
@@ -297,7 +297,7 @@ GTEST_TEST(Utils, Array_002)
 
 GTEST_TEST(Utils, Array_003)
 {
-    using IntArray = Jam::SimpleArray<int>;
+    using IntArray = Rt2::SimpleArray<int>;
     IntArray ia    = {0, 1, 2, 3, 4, 5, 6, 7};
     EXPECT_EQ(0, ia[0]);
     EXPECT_EQ(1, ia[1]);
@@ -335,7 +335,7 @@ GTEST_TEST(Utils, Array_003)
 
 GTEST_TEST(Utils, Array_004)
 {
-    using IntArray = Jam::Array<int, 2, Jam::NewAllocator<int, uint32_t, 2>>;
+    using IntArray = Rt2::Array<int, 2, Rt2::NewAllocator<int, uint32_t, 2>>;
     try
     {
         IntArray ia = {0, 1, 2, 3};
@@ -350,14 +350,14 @@ GTEST_TEST(Utils, Array_004)
 
 GTEST_TEST(Utils, HashTable_001)
 {
-    using IntTable = Jam::HashTable<uint32_t, void*>;
+    using IntTable = Rt2::HashTable<uint32_t, void*>;
     IntTable it;
     it.reserve(0x08);
     for (uint32_t i = 0; i < 0x10001; ++i)
         it.insert(i, &it);
 
     for (uint32_t i = 0; i < 0xFFFF; ++i)
-        EXPECT_NE(it.find(i), Jam::JtNpos32);
+        EXPECT_NE(it.find(i), Rt2::Npos32);
 
     EXPECT_EQ(it.capacity(), 0x20000);
 }

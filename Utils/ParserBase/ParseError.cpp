@@ -21,7 +21,7 @@
 */
 #include "Utils/ParserBase/ParseError.h"
 
-namespace Jam
+namespace Rt2
 {
     String ParseError::format(
         const int     stage,

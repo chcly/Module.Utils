@@ -25,7 +25,7 @@
 #include <iomanip>
 #include "Utils/String.h"
 
-namespace Jam
+namespace Rt2
 {
     enum ConsoleColor
     {

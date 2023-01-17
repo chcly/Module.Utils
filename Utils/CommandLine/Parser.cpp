@@ -28,7 +28,7 @@
 #include "Utils/Path.h"
 #include "Utils/TextStreamWriter.h"
 
-namespace Jam::CommandLine
+namespace Rt2::CommandLine
 {
     using namespace std;
 
@@ -45,8 +45,8 @@ namespace Jam::CommandLine
 
     bool Parser::setupParse(int argc, char** argv)
     {
-        JAM_ASSERT(argv)
-        JAM_ASSERT(argc >= 1)
+        RT_ASSERT(argv)
+        RT_ASSERT(argc >= 1)
 
         if (!_programName.empty())  // using as a check for multiple calls
             return false;

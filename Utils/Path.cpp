@@ -24,7 +24,7 @@
 #include "Utils/Definitions.h"
 #include "Utils/FileSystem.h"
 
-namespace Jam
+namespace Rt2
 {
     void PathUtil::construct(const String& str)
     {
@@ -32,19 +32,19 @@ namespace Jam
         String clean;
         StringUtils::replaceAll(clean, str, "\\", "/");
 
-        size_t n = JtNpos;
+        size_t n = Npos;
 
         // find the index of the last /
 
         for (int64_t i = (int64_t)clean.size() - 1;
-             n == JtNpos && i >= 0;
+             n == Npos && i >= 0;
              --i)
         {
             if (clean[i] == '/')
                 n = i;
         }
 
-        if (n == JtNpos)
+        if (n == Npos)
             _file = clean;
         else
         {

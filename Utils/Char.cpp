@@ -33,7 +33,7 @@
 #include "StreamMethods.h"
 #include "Utils/String.h"
 
-namespace Jam
+namespace Rt2
 {
     size_t Char::length(const char* input)
     {

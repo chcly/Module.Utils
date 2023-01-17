@@ -31,7 +31,7 @@
 
 #include "Utils/String.h"
 
-namespace Jam
+namespace Rt2
 {
     using FilePath = StdFileSystem::path;
 

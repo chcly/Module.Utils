@@ -22,7 +22,7 @@
 #pragma once
 #include "Utils/CommandLine/Token.h"
 
-namespace Jam::CommandLine
+namespace Rt2::CommandLine
 {
     class Scanner
     {

@@ -22,7 +22,7 @@
 #pragma once
 #include <type_traits>
 
-namespace Jam
+namespace Rt2
 {
     template <typename Ptr>
     class ScopePtr

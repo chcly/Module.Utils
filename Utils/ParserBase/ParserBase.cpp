@@ -28,7 +28,7 @@
 #include "Utils/ParserBase/TokenBase.h"
 #include "Utils/StreamMethods.h"
 
-namespace Jam
+namespace Rt2
 {
 
     void ParserBase::readToken(int32_t n)

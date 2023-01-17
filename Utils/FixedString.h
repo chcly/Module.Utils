@@ -25,7 +25,7 @@
 #include "Utils/Char.h"
 #include "Utils/Hash.h"
 
-namespace Jam
+namespace Rt2
 {
     template <const uint16_t L>
     class FixedString
@@ -40,12 +40,12 @@ namespace Jam
 
         void copy(const char*     src,
                   const uint16_t& size,
-                  const uint16_t& other = JtNpos16)
+                  const uint16_t& other = Npos16)
         {
             const uint16_t val = Min(size, Min(L, other));
 
             _size = 0;
-            _hash = JtNpos;
+            _hash = Npos;
 
             while (_size < val && src[_size])
             {
@@ -66,7 +66,7 @@ namespace Jam
 
         FixedString(const FixedString& rhs) :
             _size(0),
-            _hash(JtNpos)
+            _hash(Npos)
         {
             if (rhs.size())
                 copy(rhs.c_str(), rhs.size(), rhs.size());
@@ -76,17 +76,17 @@ namespace Jam
 
         explicit FixedString(const char* rhs) :
             _size(0),
-            _hash(JtNpos)
+            _hash(Npos)
         {
             if (rhs)
-                copy(rhs, JtNpos16, JtNpos16);
+                copy(rhs, Npos16, Npos16);
             else
                 _buffer[_size] = 0;
         }
 
         FixedString(const char* rhs, const uint16_t& size) :
             _size(0),
-            _hash(JtNpos)
+            _hash(Npos)
         {
             if (rhs)
                 copy(rhs, size, size);
@@ -209,25 +209,25 @@ namespace Jam
 
         char operator[](uint16_t i) const
         {
-            JAM_ASSERT(i < _size && i < L);
+            RT_ASSERT(i < _size && i < L);
             return _buffer[i];
         }
 
         char at(uint16_t i) const
         {
-            JAM_ASSERT(i < _size && i < L);
+            RT_ASSERT(i < _size && i < L);
             return _buffer[i];
         }
 
         char& operator[](uint16_t i)
         {
-            JAM_ASSERT(i < _size && i < L);
+            RT_ASSERT(i < _size && i < L);
             return _buffer[i];
         }
 
         char* at(uint16_t i)
         {
-            JAM_ASSERT(i < _size && i < L);
+            RT_ASSERT(i < _size && i < L);
             return _buffer[i];
         }
 

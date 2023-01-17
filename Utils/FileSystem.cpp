@@ -22,7 +22,7 @@
 #include "Utils/FileSystem.h"
 #include "Utils/Char.h"
 
-namespace Jam
+namespace Rt2
 {
     String FileSystem::normalize(const String& path)
     {

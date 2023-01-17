@@ -24,7 +24,7 @@
 #include <unordered_set>
 #include "Utils/Exception.h"
 
-namespace Jam
+namespace Rt2
 {
     /**
      * \brief Class to map a hash table along side an index-able array.
@@ -65,7 +65,7 @@ namespace Jam
             if (index < _list.size())
                 destination = _list.at(index);
             else
-                throw Jam::Exception("array index out of bounds");
+                throw Rt2::Exception("array index out of bounds");
         }
 
         const T& at(const size_t& index) const
@@ -93,7 +93,7 @@ namespace Jam
             if (it != _elements.end())
                 return it->second;
 
-            throw Jam::Exception("cache element not found");
+            throw Rt2::Exception("cache element not found");
         }
 
         size_t size() const

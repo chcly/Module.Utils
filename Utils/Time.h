@@ -29,7 +29,7 @@ source distribution.
 
 #include "Definitions.h"
 
-namespace Jam
+namespace Rt2
 {
     using Clock = std::chrono::high_resolution_clock;
 

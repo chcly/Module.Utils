@@ -21,7 +21,7 @@
 */
 #pragma once
 
-namespace Jam
+namespace Rt2
 {
 #if defined(DEBUG) || defined(_DEBUG)
     [[noreturn]] extern void AssertTrap(const char*   declaration,

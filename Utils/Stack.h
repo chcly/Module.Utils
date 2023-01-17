@@ -22,14 +22,14 @@
 #pragma once
 #include "Utils/Array.h"
 
-namespace Jam
+namespace Rt2
 {
 
     template <typename T, uint8_t Options = 0, typename Allocator = Allocator<T, uint32_t> >
     class Stack : public ArrayBase<T, Options, Allocator>
     {
     public:
-        JAM_DECLARE_TYPE(T)
+        RT_DECLARE_TYPE(T)
 
         typedef Stack<T, Options, Allocator>     SelfType;
         typedef ArrayBase<T, Options, Allocator> BaseType;
@@ -41,7 +41,7 @@ namespace Jam
 
         SizeType actualSize() const
         {
-            JAM_ASSERT(_first <= _last);
+            RT_ASSERT(_first <= _last);
             return _last - _first;
         }
 
@@ -122,13 +122,13 @@ namespace Jam
 
         ReferenceType operator[](SizeType idx)
         {
-            JAM_ASSERT(idx < this->_capacity)
+            RT_ASSERT(idx < this->_capacity)
             return this->_data[idx];
         }
 
         ConstReferenceType operator[](SizeType idx) const
         {
-            JAM_ASSERT(idx < this->_capacity)
+            RT_ASSERT(idx < this->_capacity)
             return this->_data[idx];
         }
     };

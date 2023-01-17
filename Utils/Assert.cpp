@@ -44,14 +44,14 @@
 
 
 
-#if JAM_DEBUG == 1
+#if RT_DEBUG == 1
 #include "Utils/Console.h"
 #include "Utils/Exception.h"
 #endif
 
-namespace Jam
+namespace Rt2
 {
-#if JAM_DEBUG == 1
+#if RT_DEBUG == 1
     [[noreturn]] void AssertTrap(const char*         declaration,
                                  const char*         file,
                                  const unsigned long line,
