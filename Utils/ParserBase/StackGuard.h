@@ -20,7 +20,7 @@
 -------------------------------------------------------------------------------
 */
 #pragma once
-#include "Math/Integer.h"
+#include "Utils/Definitions.h"
 #include "Utils/Exception.h"
 
 namespace Jam
@@ -62,4 +62,5 @@ namespace Jam
     {
         return _depth;
     }
+
 }  // namespace Jam

@@ -26,15 +26,8 @@
 #include "Utils/FileSystem.h"
 #include "Utils/Path.h"
 
-/**
- * \brief Provides classes that handle parsing command line options.
- */
 namespace Jam::CommandLine
 {
-    /**
-     * \brief Is a basic command line parser that matches
-     * arguments supplied by main with predetermined rules.
-     */
     class Parser
     {
     public:
@@ -62,11 +55,9 @@ namespace Jam::CommandLine
 
         int parseOptions(Token& token, String& tmpBuffer);
 
-
         bool setupParse(int argc, char** argv);
 
         int parseImpl();
-
 
     public:
         Parser() = default;
@@ -78,39 +69,21 @@ namespace Jam::CommandLine
 
         void logInput() const;
 
-        StringArray& arguments()
-        {
-            return _argumentList;
-        }
+        StringArray& arguments();
 
         String programPath() const
         {
             return _programName.fullPath();
         }
 
-        /// <summary>
-        /// Returns only the file name portion of the program that was supplied to main via argv[0]
-        /// </summary>
         String programName() const;
 
-        /// <summary>
-        /// Extracts the directory from the supplied path to main.
-        /// </summary>
-        /// <returns>The directory name of the program from argv[0]</returns>
         String programDirectory() const;
 
-        /// <summary>
-        /// Returns the current working directory for this process.
-        /// </summary>
-        /// <returns>The current working directory.</returns>
         static String currentDirectory();
 
-        /// <param name="enumId">The switch id</param>
-        /// <returns>true if it is supplied on the command line false otherwise</returns>
         bool isPresent(const uint32_t& enumId) const;
 
-        /// <param name="enumId">The switch id</param>
-        /// <returns> the option at the enumId or null if the id is out of bounds</returns>
         ParseOption* option(const uint32_t& enumId) const;
 
         int32_t int32(const uint32_t& enumId,
@@ -131,4 +104,9 @@ namespace Jam::CommandLine
 
         void usage(String& dest) const;
     };
+
+    StringArray& Parser::arguments()
+    {
+        return _argumentList;
+    }
 }  // namespace Jam::CommandLine

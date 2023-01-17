@@ -343,8 +343,8 @@ GTEST_TEST(Utils, Array_004)
     }
     catch (...)
     {
-        // empty
-        // just that it throws an exception
+        // empty. just care that it throws an exception
+        // because to much was allocated
     }
 }
 
@@ -355,7 +355,9 @@ GTEST_TEST(Utils, HashTable_001)
     it.reserve(0x08);
     for (uint32_t i = 0; i < 0x10001; ++i)
         it.insert(i, &it);
+
     for (uint32_t i = 0; i < 0xFFFF; ++i)
         EXPECT_NE(it.find(i), Jam::JtNpos32);
+
     EXPECT_EQ(it.capacity(), 0x20000);
 }

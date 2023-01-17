@@ -206,6 +206,7 @@ namespace Jam::CommandLine
         Console::write(oss.str());
     }
 
+
     String Parser::programName() const
     {
         return _programName.fileName();
