@@ -39,7 +39,7 @@ namespace Rt2
 
     void Timer::reset()
     {
-#if RT2_PLATFORM == RT2_PLATFORM_WINDOWS
+#if RT_PLATFORM == RT_PLATFORM_WINDOWS
         QueryPerformanceFrequency((LARGE_INTEGER*)&_private.freq);
 
         ULONG_PTR proc, sys;
@@ -59,7 +59,7 @@ namespace Rt2
 
     uint64_t Timer::getMilliseconds()
     {
-#if RT2_PLATFORM == RT2_PLATFORM_WINDOWS
+#if RT_PLATFORM == RT_PLATFORM_WINDOWS
 
         const HANDLE thread = GetCurrentThread();
 
@@ -82,7 +82,7 @@ namespace Rt2
 
     uint64_t Timer::getMicroseconds()
     {
-#if RT2_PLATFORM == RT2_PLATFORM_WINDOWS
+#if RT_PLATFORM == RT_PLATFORM_WINDOWS
         const HANDLE    thread       = GetCurrentThread();
         const DWORD_PTR affinityMask = SetThreadAffinityMask(thread, _private.mask);
 
@@ -114,7 +114,7 @@ namespace Rt2
 
     uint64_t Timer::tickCount()
     {
-#if RT2_PLATFORM == RT2_PLATFORM_WINDOWS
+#if RT_PLATFORM == RT_PLATFORM_WINDOWS
         return ::GetTickCount64();
 #else
         static timeval now;
@@ -123,12 +123,12 @@ namespace Rt2
 #endif
     }
 
-    void Timer::sleep(uint32_t milliseconds)
+    void Timer::sleep(const uint32_t milliseconds)
     {
-#if RT2_PLATFORM == RT2_PLATFORM_WINDOWS
+#if RT_PLATFORM == RT_PLATFORM_WINDOWS
         ::Sleep(milliseconds);
 #else
-        usleep(ms);
+        usleep(milliseconds);
 #endif
     }
 
