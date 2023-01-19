@@ -23,8 +23,7 @@
 #include <cstdint>
 #include "Utils/Definitions.h"
 
-#if RT2_PLATFORM == RT2_PLATFORM_WINDOWS
-#else
+#if RT_PLATFORM == RT_PLATFORM_UNIX
 #include <sys/time.h>
 #include <unistd.h>
 #endif
@@ -52,7 +51,6 @@ namespace Rt2
         };
 
 #else
-
         struct TimerPrivate
         {
             TimerPrivate() :
@@ -73,6 +71,7 @@ namespace Rt2
         void reset();
 
         uint64_t getMilliseconds();
+
         uint64_t getMicroseconds();
 
         static uint64_t milliseconds();

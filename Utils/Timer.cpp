@@ -21,13 +21,13 @@
 */
 #include "Utils/Timer.h"
 #include "Utils/Definitions.h"
+#include <ctime>
 
 #if RT_PLATFORM == RT_PLATFORM_WINDOWS
 #include <Windows.h>
 #else
 #include <sys/time.h>
 #include <unistd.h>
-#include <ctime>
 #endif
 
 namespace Rt2
