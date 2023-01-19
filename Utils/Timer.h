@@ -34,7 +34,7 @@ namespace Rt2
     class Timer
     {
     private:
-#if RT2_PLATFORM == RT2_PLATFORM_WINDOWS
+#if RT_PLATFORM == RT_PLATFORM_WINDOWS
         struct TimerPrivate
         {
             TimerPrivate() :
