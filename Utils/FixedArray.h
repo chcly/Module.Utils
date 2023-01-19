@@ -20,6 +20,7 @@
 -------------------------------------------------------------------------------
 */
 #pragma once
+#include "Utils/Exception.h"
 
 namespace Rt2
 {
@@ -33,6 +34,7 @@ namespace Rt2
         using ConstValueType     = const T;
         using ConstPointerType   = const T*;
         using ConstReferenceType = const T&;
+        using SizeType           = uint16_t;
 
         static const uint16_t limit;
 
@@ -55,6 +57,15 @@ namespace Rt2
                 _data[_size++] = rhs;
             else
                 throw Exception("index out of bounds");
+        }
+
+        void pop_back()
+        {
+            if (_size > 0)
+            {
+                _data[_size-1].~T();
+                --_size;
+            }
         }
 
         uint16_t find(ConstReferenceType v)
@@ -98,7 +109,7 @@ namespace Rt2
 
         ConstPointerType end() const
         {
-            return end();
+            return _data + _size;
         }
 
         void resize(const uint16_t size)
@@ -189,4 +200,4 @@ namespace Rt2
     template <typename T, const uint16_t L>
     const uint16_t FixedArray<T, L>::limit = L;
 
-}  // namespace Jam
+}  // namespace Rt2

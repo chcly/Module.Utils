@@ -105,7 +105,7 @@ namespace Rt2::CommandLine
         void usage(String& dest) const;
     };
 
-    StringArray& Parser::arguments()
+    inline StringArray& Parser::arguments()
     {
         return _argumentList;
     }

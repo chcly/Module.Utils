@@ -20,8 +20,9 @@
 -------------------------------------------------------------------------------
 */
 #pragma once
-
+#include <stdio.h>
 #include "Utils/Allocator.h"
+#include "Utils/Definitions.h"
 #include "Utils/Hash.h"
 
 namespace Rt2
@@ -64,12 +65,16 @@ namespace Rt2
         using SelfType       = HashTable<Key, Value, Alloc>;
 
     public:
-        using Pair = Entry<Key, Value>;
-        RT_DECLARE_TYPE(Pair)
-
-        typedef size_t* IndexArray;
-        using PairKeyType   = Key;
-        using PairValueType = Value;
+        using Pair               = Entry<Key, Value>;
+        using ValueType          = Pair;
+        using ReferenceType      = Pair&;
+        using PointerType        = Pair*;
+        using ConstValueType     = const Pair;
+        using ConstPointerType   = const Pair*;
+        using ConstReferenceType = const Pair&;
+        using IndexArray         = size_t*;
+        using PairKeyType        = Key;
+        using PairValueType      = Value;
 
     private:
         Alloc          _alloc;
@@ -392,4 +397,4 @@ namespace Rt2
         }
     };
 
-}  // namespace Jam
+}  // namespace Rt2
