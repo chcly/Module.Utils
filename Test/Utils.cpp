@@ -20,6 +20,29 @@
 -------------------------------------------------------------------------------
 */
 #include <cstdio>
+
+/*
+ * [x] Allocator
+ * [x] Array
+ * [x] ArrayBase
+ * [x] Char
+ * [ ] Console
+ * [ ] FileSystem
+ * [x] FixedArray
+ * [ ] FixedString
+ * [ ] Hash
+ * [x] HashMap
+ * [ ] IndexCache
+ * [ ] Path
+ * [ ] Queue
+ * [ ] Set
+ * [ ] Stack
+ * [ ] String
+ * [ ] StringBuilder
+ * [ ] Time
+ * [ ] Timer
+ */
+
 #include "Utils/Allocator.h"
 #include "Utils/Array.h"
 #include "Utils/Char.h"
@@ -27,9 +50,267 @@
 #include "Utils/HashMap.h"
 #include "gtest/gtest.h"
 
+using namespace Rt2;
+
+
+GTEST_TEST(Utils, Char_bool)
+{
+    bool test = Char::toBool("Hello World");
+    EXPECT_EQ(false, test);
+
+    test = Char::toBool("true");
+    EXPECT_EQ(true, test);
+
+    test = Char::toBool("false");
+    EXPECT_EQ(false, test);
+
+    test = Char::toBool("yes");
+    EXPECT_EQ(true, test);
+
+    test = Char::toBool("no");
+    EXPECT_EQ(false, test);
+
+    test = Char::toBool("1");
+    EXPECT_EQ(true, test);
+}
+
+GTEST_TEST(Utils, Char_I16)
+{
+    I16 test = Char::toInt16("Hello World");
+    EXPECT_EQ(0, test);
+
+    test = Char::toInt16("-32768");
+    EXPECT_EQ(std::numeric_limits<I16>::min(), test);
+
+    test = Char::toInt16("3276999");
+    EXPECT_EQ(std::numeric_limits<I16>::max(), test);
+
+    test = Char::toInt16("-987532767");
+    EXPECT_EQ(std::numeric_limits<I16>::min(), test);
+
+    test = Char::toInt16("-2147483648087655446879898769876576");
+    EXPECT_EQ(std::numeric_limits<I16>::min(), test);
+}
+
+GTEST_TEST(Utils, Char_U16)
+{
+    U16 test = Char::toUint16("Hello World");
+    EXPECT_EQ(0, test);
+
+    test = Char::toUint16("-65536");
+    EXPECT_EQ(0xFFFF, test);
+
+    test = Char::toUint16("65536");
+    EXPECT_EQ(0xFFFF, test);
+
+    test = Char::toUint16("-987532767");
+    EXPECT_EQ(0xFFFF, test);
+
+    test = Char::toUint16("2147483648087655446879898769876576");
+    EXPECT_EQ(0xFFFF, test);
+
+    test = Char::toUint16("65534");
+    EXPECT_EQ(0xFFFE, test);
+}
+
+GTEST_TEST(Utils, Char_I32)
+{
+    int test = Char::toInt32("Hello World");
+    EXPECT_EQ(0, test);
+
+    test = Char::toInt32("-2147483648");
+    EXPECT_EQ(std::numeric_limits<int>::min(), test);
+
+    test = Char::toInt32("2147483647");
+    EXPECT_EQ(std::numeric_limits<int>::max(), test);
+
+    test = Char::toInt32("2147483648087655446879898769876576");
+    EXPECT_EQ(std::numeric_limits<int>::max(), test);
+
+    test = Char::toInt32("-2147483648087655446879898769876576");
+    EXPECT_EQ(std::numeric_limits<int>::min(), test);
+}
+
+GTEST_TEST(Utils, Char_U32)
+{
+    U32 test = Char::toUint32("Hello World");
+    EXPECT_EQ(0, test);
+
+    test = Char::toUint32("-4294967294");
+    EXPECT_EQ(0xFFFFFFFF, test);
+
+    test = Char::toUint32("4294967294");
+    EXPECT_EQ(0xFFFFFFFE, test);
+
+    test = Char::toUint32("2147483648087655446879898769876576");
+    EXPECT_EQ(0xFFFFFFFF, test);
+
+    test = Char::toUint32("-2147483648087655446879898769876576");
+    EXPECT_EQ(0xFFFFFFFF, test);
+}
+
+GTEST_TEST(Utils, Char_I64)
+{
+    I64 test = Char::toInt32("Hello World");
+    EXPECT_EQ(0, test);
+
+    test = Char::toInt64("-18446744073709551616");
+    EXPECT_EQ(std::numeric_limits<I64>::min(), test);
+
+    test = Char::toInt64("18446744073709551617");
+    EXPECT_EQ(std::numeric_limits<I64>::max(), test);
+
+    test = Char::toInt64("2147483648087655446879898769876576");
+    EXPECT_EQ(std::numeric_limits<I64>::max(), test);
+
+    test = Char::toInt64("-2147483648087655446879898769876576");
+    EXPECT_EQ(std::numeric_limits<I64>::min(), test);
+}
+
+GTEST_TEST(Utils, Char_U64)
+{
+    U64 test = Char::toUint64("Hello World");
+    EXPECT_EQ(0, test);
+
+    test = Char::toUint64("-18446744073709551616");
+    EXPECT_EQ(0xFFFFFFFFFFFFFFFF, test);
+
+    test = Char::toUint64("18446744073709551616");
+    EXPECT_EQ(0xFFFFFFFFFFFFFFFF, test);
+
+    test = Char::toUint64("18446744073709551614");
+    EXPECT_EQ(0xFFFFFFFFFFFFFFFE, test);
+
+    test = Char::toUint64("2147483648087655446879898769876576");
+    EXPECT_EQ(0xFFFFFFFFFFFFFFFF, test);
+
+    test = Char::toUint64("-2147483648087655446879898769876576");
+    EXPECT_EQ(0xFFFFFFFFFFFFFFFF, test);
+}
+
+
+GTEST_TEST(Utils, Char_stringI16)
+{
+    {
+        const String iString = "123";
+
+        I16 v = Char::toInt16(iString);
+        EXPECT_EQ(123, v);
+
+        String r;
+        Char::toString(r, v);
+        EXPECT_EQ(3, r.size());
+
+        EXPECT_TRUE(Char::equals("123", r.c_str(), 3));
+    }
+
+    {
+        const String iString = "9985287698765975976";
+
+        I16 v = Char::toInt16(iString);
+        EXPECT_EQ(32767, v);
+
+        String r;
+        Char::toString(r, v);
+        EXPECT_EQ(5, r.size());
+        EXPECT_TRUE(Char::equals("32767", r.c_str(), 5));
+    }
+
+    {
+        const String iString = "-9985287698765975976";
+
+        I16 v = Char::toInt16(iString);
+        EXPECT_EQ(-32767 - 1, v);
+
+        String r;
+        Char::toString(r, v);
+        EXPECT_EQ(6, r.size());
+        EXPECT_TRUE(Char::equals("-32768", r.c_str(), 6));
+    }
+}
+
+GTEST_TEST(Utils, Char_stringI32)
+{
+    {
+        const String iString = "123";
+
+        I32 v = Char::toInt32(iString);
+        EXPECT_EQ(123, v);
+
+        String r;
+        Char::toString(r, v);
+        EXPECT_EQ(3, r.size());
+        EXPECT_TRUE(Char::equals("123", r.c_str(), 3));
+    }
+
+    {
+        const String iString = "9985287698765975976";
+
+        I32 v = Char::toInt32(iString);
+        EXPECT_EQ(2147483647, v);
+
+        String r;
+        Char::toString(r, v);
+        EXPECT_EQ(10, r.size());
+        EXPECT_TRUE(Char::equals("2147483647", r.c_str(), 10));
+    }
+
+    {
+        const String iString = "-9985287698765975976";
+
+        I32 v = Char::toInt32(iString);
+        EXPECT_EQ(-2147483647 - 1, v);
+
+        String r;
+        Char::toString(r, v);
+        EXPECT_EQ(11, r.size());
+        EXPECT_TRUE(Char::equals("-2147483648", r.c_str(), 11));
+    }
+}
+
+GTEST_TEST(Utils, Char_stringI64)
+{
+    {
+        const String iString = "123";
+
+        I64 v = Char::toInt64(iString);
+        EXPECT_EQ(123, v);
+
+        String r;
+        Char::toString(r, v);
+        EXPECT_EQ(3, r.size());
+        EXPECT_TRUE(Char::equals("123", r.c_str(), 3));
+    }
+
+    {
+        const String iString = "9985287698765975988875454545476";
+
+        I64 v = Char::toInt64(iString);
+        EXPECT_EQ(9223372036854775807, v);
+
+        String r;
+        Char::toString(r, v);
+        EXPECT_EQ(19, r.size());
+        EXPECT_TRUE(Char::equals("9223372036854775807", r.c_str(), 19));
+    }
+
+    {
+        const String iString = "-9985287698765975988875454545476";
+
+        I64 v = Char::toInt64(iString);
+        EXPECT_EQ(-9223372036854775807 - 1, v);
+
+        String r;
+        Char::toString(r, v);
+        EXPECT_EQ(20, r.size());
+        EXPECT_TRUE(Char::equals("-9223372036854775808", r.c_str(), 20));
+    }
+}
+
+
 GTEST_TEST(Utils, FixedArray_001)
 {
-    Rt2::FixedArray<int, 10> a = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    FixedArray<int, 10> a = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     EXPECT_EQ(a[0], 0);
     EXPECT_EQ(a[1], 1);
     EXPECT_EQ(a[2], 2);
@@ -40,16 +321,16 @@ GTEST_TEST(Utils, FixedArray_001)
     EXPECT_EQ(a[7], 7);
     EXPECT_EQ(a[8], 8);
     EXPECT_EQ(a[9], 9);
-    Rt2::FixedArray<char, 9> b = {'h', 'e', 'l', 'l', 'o', '.', '.', '.', 0};
+    FixedArray<char, 9> b = {'h', 'e', 'l', 'l', 'o', '.', '.', '.', 0};
     EXPECT_TRUE(Rt2::Char::equals(b.ptr(), "hello...", 8));
-    Rt2::FixedArray<char, 9> c = b;
+    FixedArray<char, 9> c = b;
     EXPECT_TRUE(Rt2::Char::equals(c.ptr(), "hello...", 8));
 }
 
 GTEST_TEST(Utils, FixedArray_002)
 {
-    Rt2::FixedArray<int, 10> a;
-    for (uint16_t i = 0; i < Rt2::FixedArray<int, 10>::capacity(); ++i)
+    FixedArray<int, 10> a;
+    for (uint16_t i = 0; i < FixedArray<int, 10>::capacity(); ++i)
         a.push_back(i);
 
     EXPECT_EQ(a[0], 0);
@@ -65,7 +346,7 @@ GTEST_TEST(Utils, FixedArray_002)
 
     try
     {
-        Rt2::FixedArray<int, 10> b;
+        FixedArray<int, 10> b;
         for (uint16_t i = 0; i < 11; ++i)
             b.push_back(i);
         FAIL();
@@ -78,7 +359,7 @@ GTEST_TEST(Utils, FixedArray_002)
 
 GTEST_TEST(Utils, FixedArray_003)
 {
-    Rt2::FixedArray<int, 10> a;
+    FixedArray<int, 10> a;
     a.resize(5);
     for (uint16_t i = 0; i < 5; ++i)
         a[i] = (i);
@@ -91,7 +372,7 @@ GTEST_TEST(Utils, FixedArray_003)
 
     try
     {
-        Rt2::FixedArray<int, 10> b;
+        FixedArray<int, 10> b;
         b.resize(5);
         for (uint16_t i = 0; i < 6; ++i)
             b[i] = i;
@@ -105,7 +386,7 @@ GTEST_TEST(Utils, FixedArray_003)
 
 GTEST_TEST(Utils, FixedArray_004)
 {
-    Rt2::FixedArray<int, 10> a = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    FixedArray<int, 10> a = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
     int i = 0;
     for (const auto& elm : a)
@@ -117,7 +398,7 @@ GTEST_TEST(Utils, FixedArray_004)
 
 GTEST_TEST(Utils, FixedArray_005)
 {
-    Rt2::FixedArray<int, 10> a = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    FixedArray<int, 10> a = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     EXPECT_EQ(10, a.capacity());
     EXPECT_EQ(10, a.size());
     a.remove(5);
@@ -141,7 +422,7 @@ GTEST_TEST(Utils, FixedArray_005)
 
 GTEST_TEST(Utils, FixedArray_006)
 {
-    Rt2::FixedArray<int, 10> a = {};
+    FixedArray<int, 10> a = {};
     for (uint16_t i = 0; i < 10; ++i)
         a.push_back(i);
 
@@ -183,7 +464,7 @@ GTEST_TEST(Utils, Allocator_001)
 {
     try
     {
-        Rt2::Allocator<Complex, size_t, 32> alloc;
+        Allocator<Complex, size_t, 32> alloc;
         alloc.allocateArray(33);
         FAIL();
     }
@@ -195,7 +476,7 @@ GTEST_TEST(Utils, Allocator_001)
 
 GTEST_TEST(Utils, Allocator_002)
 {
-    using Alloc = Rt2::Allocator<Complex, size_t>;
+    using Alloc = Allocator<Complex, size_t>;
     Alloc al;
 
     Complex* c = al.allocate();
@@ -208,7 +489,7 @@ GTEST_TEST(Utils, Allocator_002)
 
 GTEST_TEST(Utils, Array_001)
 {
-    using IntArray = Rt2::Array<int, Rt2::AOP_SIMPLE_TYPE>;
+    using IntArray = Array<int, AOP_SIMPLE_TYPE>;
     IntArray ia;
 
     ia.reserve(20000);
@@ -225,7 +506,7 @@ GTEST_TEST(Utils, Array_001)
 
 GTEST_TEST(Utils, Array_002)
 {
-    using IntArray = Rt2::SimpleArray<int>;
+    using IntArray = SimpleArray<int>;
     IntArray ia;
 
     ia.reserve(20000);
@@ -241,7 +522,7 @@ GTEST_TEST(Utils, Array_002)
 #if RT_DEBUG == 1
     try
     {
-        Rt2::Console::writeLine((int64_t)ia[ia.capacity()]);
+        Console::writeLine((int64_t)ia[ia.capacity()]);
         FAIL();
     }
     catch (...)
@@ -250,7 +531,7 @@ GTEST_TEST(Utils, Array_002)
 
     try
     {
-        Rt2::Console::writeLine((int64_t)ia[ia.capacity()]);
+        Console::writeLine((int64_t)ia[ia.capacity()]);
         FAIL();
     }
     catch (...)
@@ -297,7 +578,7 @@ GTEST_TEST(Utils, Array_002)
 
 GTEST_TEST(Utils, Array_003)
 {
-    using IntArray = Rt2::SimpleArray<int>;
+    using IntArray = SimpleArray<int>;
     IntArray ia    = {0, 1, 2, 3, 4, 5, 6, 7};
     EXPECT_EQ(0, ia[0]);
     EXPECT_EQ(1, ia[1]);
@@ -335,7 +616,7 @@ GTEST_TEST(Utils, Array_003)
 
 GTEST_TEST(Utils, Array_004)
 {
-    using IntArray = Rt2::Array<int, 2, Rt2::NewAllocator<int, uint32_t, 2>>;
+    using IntArray = Array<int, 2, NewAllocator<int, uint32_t, 2>>;
     try
     {
         IntArray ia = {0, 1, 2, 3};
@@ -350,7 +631,7 @@ GTEST_TEST(Utils, Array_004)
 
 GTEST_TEST(Utils, HashTable_001)
 {
-    using IntTable = Rt2::HashTable<uint32_t, void*>;
+    using IntTable = HashTable<uint32_t, void*>;
     IntTable it;
     it.reserve(0x08);
     for (uint32_t i = 0; i < 0x10001; ++i)
