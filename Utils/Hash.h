@@ -21,7 +21,9 @@
 */
 #pragma once
 
+#include "Utils/String.h"
 #include "Utils/Definitions.h"
+
 namespace Rt2
 {
     using hash_t = size_t;
@@ -31,6 +33,7 @@ namespace Rt2
     extern hash_t Hash(const uint32_t& key);
     extern hash_t Hash(const uint64_t& key);
     extern hash_t Hash(const void* key);
+    extern hash_t Hash(const String& key);
 
     extern void NextPow2(size_t& x);
 
@@ -40,4 +43,4 @@ namespace Rt2
         return x && (x & (x - 1)) == 0;
     }
 
-}  // namespace Jam
+}  // namespace Rt2

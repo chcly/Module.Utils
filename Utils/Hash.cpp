@@ -78,6 +78,11 @@ namespace Rt2
         return hash;
     }
 
+    hash_t Hash(const String& key)
+    {
+        return Hash(key.c_str(), key.size());
+    }
+
     hash_t Hash(const uint64_t& key)
     {
         return Hash((void*)key);

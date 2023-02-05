@@ -21,7 +21,7 @@
 */
 #pragma once
 
-#include "Utils/Array.h"
+#include "Utils/ArrayType.h"
 #include "Utils/Traits.h"
 
 namespace Rt2

@@ -29,7 +29,6 @@
 #include <iomanip>
 #include <limits>
 #include <sstream>
-
 #include "StreamMethods.h"
 #include "Utils/String.h"
 
@@ -42,13 +41,7 @@ namespace Rt2
 
     bool Char::equals(const char* a, const char* b, const size_t max)
     {
-        if (!a || !b)
-            return false;
-
-        if (*a != *b)
-            return false;
-
-        return strncmp(a, b, std::min(max, length(b))) == 0;
+        return equals(a, max, b, length(b));
     }
 
     bool Char::equals(const char*  a,
@@ -239,7 +232,7 @@ namespace Rt2
     void Char::toString(String& dest, const double v)
     {
         std::stringstream stream;
-        stream << v;
+        stream << std::fixed << v;
         dest = stream.str();
     }
 
@@ -507,4 +500,4 @@ namespace Rt2
             return 0;
         }
     }
-}  // namespace Jam
+}  // namespace Rt2
