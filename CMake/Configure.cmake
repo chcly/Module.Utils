@@ -26,11 +26,11 @@ endif()
 include(StaticRuntime)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-option(InternalUtils_BUILD_TEST          "Build the unit test program." ON)
-option(InternalUtils_AUTO_RUN_TEST       "Automatically run the test program." OFF)
-option(InternalUtils_USE_STATIC_RUNTIME  "Build with the MultiThreaded(Debug) runtime library." ON)
+option(Utils_BUILD_TEST          "Build the unit test program." ON)
+option(Utils_AUTO_RUN_TEST       "Automatically run the test program." OFF)
+option(Utils_USE_STATIC_RUNTIME  "Build with the MultiThreaded(Debug) runtime library." ON)
 
-if (InternalUtils_USE_STATIC_RUNTIME)
+if (Utils_USE_STATIC_RUNTIME)
     set_static_runtime()
 else()
     set_dynamic_runtime()
@@ -40,8 +40,8 @@ endif()
 
 set(BUILD_GMOCK   OFF CACHE BOOL "" FORCE)
 set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
-set(GTEST_DIR     ${InternalUtils_SOURCE_DIR}/Test/googletest)
-set(GTEST_INCLUDE ${InternalUtils_SOURCE_DIR}/Test/googletest/googletest/include)
+set(GTEST_DIR     ${Utils_SOURCE_DIR}/Test/googletest)
+set(GTEST_INCLUDE ${Utils_SOURCE_DIR}/Test/googletest/googletest/include)
 set(GTEST_LIBRARY gtest_main)
 
 
