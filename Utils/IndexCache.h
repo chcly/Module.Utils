@@ -65,7 +65,7 @@ namespace Rt2
             if (index < _list.size())
                 destination = _list.at(index);
             else
-                throw Rt2::Exception("array index out of bounds");
+                throw Exception("array index out of bounds");
         }
 
         const T& at(const size_t& index) const
@@ -93,7 +93,7 @@ namespace Rt2
             if (it != _elements.end())
                 return it->second;
 
-            throw Rt2::Exception("cache element not found");
+            throw Exception("cache element not found");
         }
 
         size_t size() const

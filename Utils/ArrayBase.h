@@ -279,6 +279,7 @@ namespace Rt2
     protected:
         ArrayBase() = default;
 
+        [[deprecated("Avoid using array copy and assignment operations if it is possible to avoid")]]
         ArrayBase(const ArrayBase& o)
         {
             replicate(o);
@@ -312,6 +313,14 @@ namespace Rt2
             }
         }
 
+
+        [[deprecated("Avoid using array copy and assignment operations if it is possible to avoid")]]
+        SelfType& operator=(const SelfType& rhs)
+        {
+            replicate(rhs);
+            return *this;
+        }
+
         void destroy()
         {
             if (_data)
@@ -324,4 +333,4 @@ namespace Rt2
         }
     };
 
-}  // namespace Jam
+}  // namespace Rt2

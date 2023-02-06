@@ -95,7 +95,7 @@ namespace Rt2
 #endif
     }
 
-    void CrtBreakOn(uint64_t alloc)
+    void CrtBreakOn(const long alloc)
     {
 #ifdef _DEBUG
 #ifdef _WIN32

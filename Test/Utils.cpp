@@ -36,7 +36,7 @@
  * [ ] Path
  * [ ] Queue
  * [ ] Set
- * [ ] Stack
+ * [x] Stack
  * [ ] String
  * [ ] StringBuilder
  * [ ] Time
@@ -48,9 +48,97 @@
 #include "Utils/Char.h"
 #include "Utils/FixedArray.h"
 #include "Utils/HashMap.h"
+#include "Utils/Stack.h"
 #include "gtest/gtest.h"
 
 using namespace Rt2;
+
+
+using IntStack = Stack<int>;
+
+GTEST_TEST(Stack, Stack_001)
+{
+    IntStack a;
+    EXPECT_EQ(0, a.size());
+    EXPECT_EQ(0, a.topI());
+    EXPECT_EQ(0, a.capacity());
+    EXPECT_EQ(nullptr, a.data());
+}
+
+GTEST_TEST(Stack, Stack_002)
+{
+    IntStack a;
+    a.reserve(16);
+
+    EXPECT_EQ(0, a.size());
+    EXPECT_EQ(0, a.topI());
+    EXPECT_EQ(17, a.capacity());
+    EXPECT_NE(nullptr, a.data());
+}
+
+
+GTEST_TEST(Stack, Stack_003)
+{
+    IntStack a;
+    int        i;
+    for (i = 0; i < 16; ++i)
+    {
+        a.push(i + 1);
+        EXPECT_EQ(i + 1, a.top());
+    }
+
+    EXPECT_EQ(16, a.size());
+
+    for (i = 0; i < 16; ++i)
+    {
+        int t = a.top();
+        a.pop();
+        EXPECT_EQ(16 - i, t);
+    }
+
+    EXPECT_EQ(0, a.size());
+}
+
+
+GTEST_TEST(Stack, Stack_004)
+{
+    IntStack a;
+    int i;
+
+    for (i = 0; i < 16; ++i)
+        a.push(i);
+
+    Stack b(a);
+
+    EXPECT_EQ(a.size(), b.size());
+
+
+    const IntStack::PointerType na = a.data();
+    const IntStack::PointerType nb = b.data();
+
+    for (i = 0; i < 16; ++i)
+        EXPECT_EQ(na[i], nb[i]);
+}
+
+GTEST_TEST(Stack, Stack_005)
+{
+    IntStack a, b;
+    int   i;
+
+    for (i = 0; i < 16; ++i)
+    {
+        a.push(i);
+        b.push(16 - i);
+    }
+
+    b = a;
+    EXPECT_EQ(a.size(), b.size());
+
+
+    for (i = 0; i < 16; ++i)
+        EXPECT_EQ(a[i], b[i]);
+}
+
 
 
 GTEST_TEST(Utils, Char_bool)
@@ -641,4 +729,30 @@ GTEST_TEST(Utils, HashTable_001)
         EXPECT_NE(it.find(i), Rt2::Npos32);
 
     EXPECT_EQ(it.capacity(), 0x20000);
+}
+
+
+GTEST_TEST(Utils, HashTable_002)
+{
+    using Table = HashTable<String, int>;
+
+    Table table;
+
+    table.insert("aaaaaaaaaaaa1", 1);
+    table.insert("aaaaaaaaaaaa2", 2);
+    table.insert("aaaaaaaaaaaa3", 3);
+    table.insert("aaaaaaa3aaaaa", 4);
+
+    EXPECT_EQ(table.capacity(), 32);
+    EXPECT_EQ(table.size(), 4);
+
+    EXPECT_NE(table.find("aaaaaaaaaaaa1"), Npos);
+    EXPECT_NE(table.find("aaaaaaaaaaaa2"), Npos);
+    EXPECT_NE(table.find("aaaaaaaaaaaa3"), Npos);
+    EXPECT_NE(table.find("aaaaaaa3aaaaa"), Npos);
+
+    EXPECT_EQ(table["aaaaaaaaaaaa1"], 1);
+    EXPECT_EQ(table["aaaaaaaaaaaa2"], 2);
+    EXPECT_EQ(table["aaaaaaaaaaaa3"], 3);
+    EXPECT_EQ(table["aaaaaaa3aaaaa"], 4);
 }

@@ -25,7 +25,7 @@
 namespace Rt2
 {
     extern void CrtTestMemory();
-    extern void CrtBreakOn(uint64_t alloc);
+    extern void CrtBreakOn(long alloc);
     extern void CrtDump();
 
 

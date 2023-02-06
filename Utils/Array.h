@@ -250,7 +250,7 @@ namespace Rt2
         SimpleArray(const SimpleArray& o) = default;
 
         SimpleArray(std::initializer_list<T> o) :
-            Rt2::Array<T, AOP_SIMPLE_TYPE, Allocator>(o)
+            Array<T, AOP_SIMPLE_TYPE, Allocator>(o)
         {
         }
     };

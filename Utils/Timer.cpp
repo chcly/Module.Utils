@@ -115,7 +115,7 @@ namespace Rt2
     uint64_t Timer::tickCount()
     {
 #if RT_PLATFORM == RT_PLATFORM_WINDOWS
-        return ::GetTickCount64();
+        return GetTickCount64();
 #else
         static timeval now;
         gettimeofday(&now, nullptr);
@@ -126,7 +126,7 @@ namespace Rt2
     void Timer::sleep(const uint32_t milliseconds)
     {
 #if RT_PLATFORM == RT_PLATFORM_WINDOWS
-        ::Sleep(milliseconds);
+        Sleep(milliseconds);
 #else
         usleep(milliseconds);
 #endif
