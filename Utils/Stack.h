@@ -131,6 +131,15 @@ namespace Rt2
             RT_ASSERT(idx < this->_capacity)
             return this->_data[idx];
         }
+
+        [[deprecated("Avoid using array copy and assignment operations if it is possible to avoid")]]
+
+        SelfType&
+        operator=(const SelfType& rhs)
+        {
+            replicate(rhs);
+            return *this;
+        }
     };
 
-}  // namespace Jam
+}  // namespace Rt2
