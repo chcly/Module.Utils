@@ -341,7 +341,7 @@ namespace Rt2
 #pragma omp parallel for num_threads(4)
                 for (int64_t i = from; i < (int64_t)to; ++i)
                 {
-                    _indices[i] = _next[i] = JtNpos;
+                    _indices[i] = _next[i] = Npos;
                 }
             }
 #else

@@ -25,15 +25,21 @@
 namespace Rt2
 {
 
-    template <typename T, uint8_t Options = 0, typename Allocator = Allocator<T, uint32_t> >
+    template <typename T,
+              uint8_t Options    = 0,
+              typename Allocator = Allocator<T, uint32_t> >
     class Stack : public ArrayBase<T, Options, Allocator>
     {
     public:
-        RT_DECLARE_TYPE(T)
-
-        typedef Stack<T, Options, Allocator>     SelfType;
-        typedef ArrayBase<T, Options, Allocator> BaseType;
-        typedef typename SelfType::SizeType      SizeType;
+        using ValueType          = T;
+        using ReferenceType      = T&;
+        using PointerType        = T*;
+        using ConstValueType     = const T;
+        using ConstPointerType   = const T*;
+        using ConstReferenceType = const T&;
+        using SelfType           = Stack<T, Options, Allocator>;
+        using BaseType           = ArrayBase<T, Options, Allocator>;
+        using SizeType           = typename SelfType::SizeType;
 
     private:
         SizeType _first{};
@@ -132,14 +138,6 @@ namespace Rt2
             return this->_data[idx];
         }
 
-        [[deprecated("Avoid using array copy and assignment operations if it is possible to avoid")]]
-
-        SelfType&
-        operator=(const SelfType& rhs)
-        {
-            replicate(rhs);
-            return *this;
-        }
     };
 
 }  // namespace Rt2

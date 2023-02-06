@@ -41,6 +41,8 @@
  * [ ] StringBuilder
  * [ ] Time
  * [ ] Timer
+ * [ ] Fill
+ * [ ] Copy
  */
 
 #include "Utils/Allocator.h"
