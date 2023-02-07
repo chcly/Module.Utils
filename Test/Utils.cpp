@@ -33,7 +33,7 @@
  * [ ] Hash
  * [x] HashMap
  * [ ] IndexCache
- * [ ] Path
+ * [x] Path
  * [ ] Queue
  * [ ] Set
  * [x] Stack
