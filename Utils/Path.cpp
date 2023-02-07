@@ -95,10 +95,17 @@ namespace Rt2
         construct(fileName);
     }
 
-    String PathUtil::primaryExtension()
+    String PathUtil::lastExtension() const
     {
         if (!_extension.empty())
-            return _extension.back();
+            return "." + _extension.back();
+        return "";
+    }
+
+    String PathUtil::firstExtension() const
+    {
+        if (!_extension.empty())
+            return "." + _extension.front();
         return "";
     }
 
@@ -225,4 +232,4 @@ namespace Rt2
         ut.fileName(srcPath);
         return PathUtil(ut.fullPath());
     }
-}  // namespace Jam
+}  // namespace Rt2

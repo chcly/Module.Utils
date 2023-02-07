@@ -95,7 +95,9 @@ namespace Rt2
          */
         String fullExtension() const;
 
-        String primaryExtension();
+        String lastExtension() const;
+
+        String firstExtension() const;
 
         void appendDirectory(const PathUtil& filePath);
 

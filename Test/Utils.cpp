@@ -50,6 +50,7 @@
 #include "Utils/Char.h"
 #include "Utils/FixedArray.h"
 #include "Utils/HashMap.h"
+#include "Utils/Path.h"
 #include "Utils/Stack.h"
 #include "gtest/gtest.h"
 
@@ -58,7 +59,136 @@ using namespace Rt2;
 
 using IntStack = Stack<int>;
 
-GTEST_TEST(Stack, Stack_001)
+GTEST_TEST(Utils, String_SplitCR)
+{
+    String      inp = "A\rB\rC\r";
+    StringArray a0;
+    StringUtils::splitLine(a0, inp);
+
+    EXPECT_EQ(3, a0.size());
+    EXPECT_EQ("A", a0[0]);
+    EXPECT_EQ("B", a0[1]);
+    EXPECT_EQ("C", a0[2]);
+
+    inp = "A\nB\nC\n";
+
+    StringArray a1;
+    StringUtils::splitLine(a1, inp);
+
+    EXPECT_EQ(3, a1.size());
+    EXPECT_EQ("A", a1[0]);
+    EXPECT_EQ("B", a1[1]);
+    EXPECT_EQ("C", a1[2]);
+
+    inp = "A\rB\nC\r";
+
+    StringArray a2;
+    StringUtils::splitLine(a2, inp);
+
+    EXPECT_EQ(3, a2.size());
+    EXPECT_EQ("A", a2[0]);
+    EXPECT_EQ("B", a2[1]);
+    EXPECT_EQ("C", a2[2]);
+
+    inp = "A\r\nB\nC\r\n";
+
+    StringArray a3;
+    StringUtils::splitLine(a3, inp);
+
+    EXPECT_EQ(3, a3.size());
+    EXPECT_EQ("A", a3[0]);
+    EXPECT_EQ("B", a3[1]);
+    EXPECT_EQ("C", a3[2]);
+}
+
+GTEST_TEST(Utils, Path_LocaFile)
+{
+    const PathUtil f0 = PathUtil("Z:\\A\\AAA\\BBB\\CCC\\A.ext1.extLast");
+
+    EXPECT_EQ(f0.fullPath(), "Z:/A/AAA/BBB/CCC/A.ext1.extLast");
+    EXPECT_TRUE(f0.hasDirectory());
+    EXPECT_EQ(f0.fullExtension(), ".ext1.extLast");
+    EXPECT_EQ(f0.lastExtension(), ".extLast");
+    EXPECT_EQ(f0.firstExtension(), ".ext1");
+
+
+    StringDeque d0;
+    f0.directoryList(d0);
+
+    EXPECT_EQ(d0.at(0), "A");
+    EXPECT_EQ(d0.at(1), "AAA");
+    EXPECT_EQ(d0.at(2), "BBB");
+    EXPECT_EQ(d0.at(3), "CCC");
+
+    const PathUtil f1 = PathUtil("/A/AAA/BBB/CCC/A.ext1.extLast");
+
+    EXPECT_EQ(f1.fullPath(), "/A/AAA/BBB/CCC/A.ext1.extLast");
+    EXPECT_TRUE(f1.hasDirectory());
+
+    StringDeque d1;
+    f1.directoryList(d1);
+
+    EXPECT_EQ(d1.at(0), "A");
+    EXPECT_EQ(d1.at(1), "AAA");
+    EXPECT_EQ(d1.at(2), "BBB");
+    EXPECT_EQ(d1.at(3), "CCC");
+
+    const PathUtil f2 = PathUtil("Z:\\A\\AAA\\BBB\\CCC\\A.ext1.extLast");
+
+    EXPECT_EQ(f2.parentDir(0), "Z:/A/AAA/BBB/CCC/");
+    EXPECT_EQ(f2.parentDir(1), "Z:/A/AAA/BBB/");
+    EXPECT_EQ(f2.parentDir(2), "Z:/A/AAA/");
+    EXPECT_EQ(f2.parentDir(3), "Z:/A/");
+    EXPECT_EQ(f2.parentDir(4), "Z:/");
+    EXPECT_EQ(f2.parentDir(5), "Z:/");
+    EXPECT_EQ(f2.parentDir(6), "Z:/");
+
+    PathUtil newPath = f2.parentPath(2);
+    newPath.appendDirectory(PathUtil("/DDD/EEE/"));
+    newPath.fileName(f2.fileName());
+
+    EXPECT_EQ(newPath.fullPath(), "Z:/A/AAA/DDD/EEE/A.ext1.extLast");
+
+    const PathUtil f3 = PathUtil("A/AAA/BBB/CCC/A.ext1.extLast");
+
+    EXPECT_EQ(f3.parentDir(0), "/A/AAA/BBB/CCC/");
+    EXPECT_EQ(f3.parentDir(1), "/A/AAA/BBB/");
+    EXPECT_EQ(f3.parentDir(2), "/A/AAA/");
+    EXPECT_EQ(f3.parentDir(3), "/A/");
+    EXPECT_EQ(f3.parentDir(4), "/");
+    EXPECT_EQ(f3.parentDir(5), "/");
+    EXPECT_EQ(f3.parentDir(6), "/");
+
+    PathUtil newPath1 = f3.parentPath(2);
+    newPath1.appendDirectory(PathUtil("DDD/EEE/"));
+    newPath1.fileName(f3.fileName());
+
+    EXPECT_EQ(newPath1.fullPath(), "/A/AAA/DDD/EEE/A.ext1.extLast");
+
+    const PathUtil f4 = PathUtil("A.b.c.d.e.f");
+    EXPECT_EQ(f4.firstExtension(), ".b");
+    EXPECT_EQ(f4.lastExtension(), ".f");
+    EXPECT_EQ(f4.fullExtension(), ".b.c.d.e.f");
+}
+
+GTEST_TEST(Utils, String_Trim)
+{
+    String inp = "     A B C       ";
+    StringUtils::trimWs(inp, inp);
+
+    EXPECT_EQ("A B C", inp);
+
+    inp = "\t\t\t\tA\tB\tC\t\t\t\t\t";
+    StringUtils::trimWs(inp, inp);
+    EXPECT_EQ("A\tB\tC", inp);
+
+    inp = " \t \t \tA\tB C \t \t  \t";
+    StringUtils::trimWs(inp, inp);
+    EXPECT_EQ("A\tB C", inp);
+}
+
+
+GTEST_TEST(Utils, Stack_001)
 {
     IntStack a;
     EXPECT_EQ(0, a.size());
@@ -67,7 +197,7 @@ GTEST_TEST(Stack, Stack_001)
     EXPECT_EQ(nullptr, a.data());
 }
 
-GTEST_TEST(Stack, Stack_002)
+GTEST_TEST(Utils, Stack_002)
 {
     IntStack a;
     a.reserve(16);
@@ -79,10 +209,10 @@ GTEST_TEST(Stack, Stack_002)
 }
 
 
-GTEST_TEST(Stack, Stack_003)
+GTEST_TEST(Utils, Stack_003)
 {
     IntStack a;
-    int        i;
+    int      i;
     for (i = 0; i < 16; ++i)
     {
         a.push(i + 1);
@@ -102,10 +232,10 @@ GTEST_TEST(Stack, Stack_003)
 }
 
 
-GTEST_TEST(Stack, Stack_004)
+GTEST_TEST(Utils, Stack_004)
 {
     IntStack a;
-    int i;
+    int      i;
 
     for (i = 0; i < 16; ++i)
         a.push(i);
@@ -122,10 +252,10 @@ GTEST_TEST(Stack, Stack_004)
         EXPECT_EQ(na[i], nb[i]);
 }
 
-GTEST_TEST(Stack, Stack_005)
+GTEST_TEST(Utils, Stack_005)
 {
     IntStack a, b;
-    int   i;
+    int      i;
 
     for (i = 0; i < 16; ++i)
     {
