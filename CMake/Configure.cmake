@@ -24,11 +24,16 @@ if (NOT GitUpdate_SUCCESS)
 endif()
 
 include(StaticRuntime)
+include(ExternalTarget)
+include(GTestUtils)
+
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 option(Utils_BUILD_TEST          "Build the unit test program." ON)
 option(Utils_AUTO_RUN_TEST       "Automatically run the test program." OFF)
 option(Utils_USE_STATIC_RUNTIME  "Build with the MultiThreaded(Debug) runtime library." ON)
+option(Utils_JUST_MY_CODE   "Enable the /JMC flag" ON)
+option(Utils_OPEN_MP        "Enable low-level fill and copy using OpenMP" ON)
 
 if (Utils_USE_STATIC_RUNTIME)
     set_static_runtime()
@@ -36,15 +41,50 @@ else()
     set_dynamic_runtime()
 endif()
 
-
-
-set(BUILD_GMOCK   OFF CACHE BOOL "" FORCE)
-set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
-set(GTEST_DIR     ${Utils_SOURCE_DIR}/Test/googletest)
-set(GTEST_INCLUDE ${Utils_SOURCE_DIR}/Test/googletest/googletest/include)
-set(GTEST_LIBRARY gtest_main)
+configure_gtest(${Utils_SOURCE_DIR}/Test/googletest 
+                ${Utils_SOURCE_DIR}/Test/googletest/googletest/include)
 
 
 
+set(ExtraFlags )
+if (MSVC)
+    # globally disable scoped enum warnings
+    set(ExtraFlags "${ExtraFlags} /wd26812")
+    
+    
+    set(ExtraFlags "${ExtraFlags} /W3")
+
+
+    if (Utils_JUST_MY_CODE)
+        # Enable just my code...
+        set(ExtraFlags "${ExtraFlags} /JMC")
+    endif ()
+
+    set(ExtraFlags "${ExtraFlags} /fp:precise")
+    set(ExtraFlags "${ExtraFlags} /fp:except")
+
+    if (Utils_OPEN_MP)
+        add_definitions(-DRT_OPEN_MP=1)
+        set(ExtraFlags "${ExtraFlags} /openmp")
+    endif()
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ExtraFlags}")
+
+else ()
+    set(ExtraFlags "${ExtraFlags} -Os")
+    set(ExtraFlags "${ExtraFlags} -O3")
+    set(ExtraFlags "${ExtraFlags} -fPIC")
+
+    if (Utils_OPEN_MP)
+        add_definitions(-DRT_OPEN_MP=1)
+        set(ExtraFlags "${ExtraFlags} -fopenmp")
+    endif()
+    
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ExtraFlags}")
+    set(Utils_EXTRA "stdc++fs")
+endif ()
+
+message(STATUS "Extra global flags: ${ExtraFlags}")
+message(STATUS "Global flags: ${CMAKE_CXX_FLAGS}")
 
 set(Configure_SUCCEEDED TRUE)

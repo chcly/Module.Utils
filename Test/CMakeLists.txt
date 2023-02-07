@@ -36,26 +36,11 @@ add_executable(
     ${TestTargetName}
     ${TestTarget_SOURCE}
 )
-target_link_libraries(${TestTargetName} ${GTEST_LIBRARY} ${Utils_LIBRARY})
 
-if (TargetFolders)
-    set_target_properties(${TestTargetName} PROPERTIES FOLDER "${TargetGroup}")
-endif()
+target_link_libraries(${TestTargetName} ${GTEST_LIBRARY} ${Utils_LIBRARY})
+set_target_properties(${TestTargetName} PROPERTIES FOLDER "${TargetGroup}")
 
 
 if (Utils_AUTO_RUN_TEST)
-
-   add_custom_command(TARGET 
-        ${TestTargetName} POST_BUILD
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMAND  $<TARGET_FILE:${TestTargetName}>
-    )
-        
-    set_target_properties(
-        ${TestTargetName} 
-        PROPERTIES 
-        VS_DEBUGGER_WORKING_DIRECTORY  
-        ${CMAKE_CURRENT_SOURCE_DIR}
-    )
-
+    run_test(${TestTargetName})
 endif()

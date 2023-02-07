@@ -38,7 +38,7 @@ else()
     set(TargetGroup )
 
     set(Utils_INCLUDE  ${Utils_SOURCE_DIR})
-    set(Utils_LIBRARY  ${TargetName})
+    set(Utils_LIBRARY  ${TargetName} ${Utils_EXTRA})
 
 endif()
 
@@ -46,9 +46,7 @@ add_subdirectory(Utils)
 
 if (Utils_BUILD_TEST)
     if (NOT Utils_ExternalTarget)
-        add_subdirectory(${GTEST_DIR})
-        set_target_properties(gtest_main PROPERTIES FOLDER "${TargetGroup}")
-        set_target_properties(gtest      PROPERTIES FOLDER "${TargetGroup}")
+        add_gtest_source(Extern/ThirdParty)
     endif()
     
     set(TargetGroup Units)
