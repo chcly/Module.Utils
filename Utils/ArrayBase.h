@@ -279,9 +279,10 @@ namespace Rt2
     protected:
         ArrayBase() = default;
 
-        [[deprecated("Avoid using array copy and assignment operations if it is possible to avoid")]]
         ArrayBase(const ArrayBase& o)
         {
+            // Avoid using array copy and assignment operations
+            // if it is possible to avoid
             replicate(o);
         }
 
@@ -302,6 +303,7 @@ namespace Rt2
                 {
                     reserve(rhs._capacity);
                     ConstPointerType pt = rhs.data();
+
                     for (_size = 0; _size < rhs._size && _data; ++_size)
                         _data[_size] = pt[_size];
                 }
@@ -314,11 +316,10 @@ namespace Rt2
         }
 
 
-        [[deprecated("Avoid using array copy and assignment operations if it is possible to avoid")]]
-
-        SelfType&
-        operator=(const SelfType& rhs)
+        SelfType& operator=(const SelfType& rhs)
         {
+            // Avoid using array copy and assignment operations
+            // if it is possible to avoid
             replicate(rhs);
             return *this;
         }
