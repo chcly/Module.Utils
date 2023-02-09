@@ -4,14 +4,12 @@ include (GroupSet)
 set_group(Utils_HDR
     Header:*.h
     Header/CommandLine:CommandLine/*.h
-    Header/ParserBase:ParserBase/*.h
     Header/LeakCheck:Win32/*.h
     )
 set_group(Utils_SRC
     Source:*.hint
     Source:*.cpp
     Source/CommandLine:CommandLine/*.cpp
-    Source/ParserBase:ParserBase/*.cpp
     Source/LeakCheck:Win32/*.cpp
     )
 
