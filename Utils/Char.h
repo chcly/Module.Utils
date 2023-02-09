@@ -198,7 +198,7 @@ namespace Rt2
 
     inline bool isUpper(const int ch)
     {
-        return (ch >= 'a' && ch <= 'z');
+        return (ch >= 'A' && ch <= 'Z');
     }
 
     inline bool isLetter(const int ch)
