@@ -191,9 +191,19 @@ namespace Rt2
         return ch >= '0' && ch <= '9';
     }
 
+    inline bool isLower(const int ch)
+    {
+        return (ch >= 'a' && ch <= 'z');
+    }
+
+    inline bool isUpper(const int ch)
+    {
+        return (ch >= 'a' && ch <= 'z');
+    }
+
     inline bool isLetter(const int ch)
     {
-        return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
+        return isLower(ch) || isUpper(ch);
     }
 
     using Ch = Char;
