@@ -133,6 +133,8 @@ namespace Rt2
             ((oss << std::forward<Args>(args)), ...);
             write(oss.str());
         }
+
+        static void put(char c);
     };
 
     using Out = Console;
