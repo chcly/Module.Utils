@@ -395,6 +395,11 @@ namespace Rt2
         writeLine("");
     }
 
+    void Console::put(char c)
+    {
+        std::cout.put(c);
+    }
+
     // This meant to be switched off later
 #define USE_EXCEPTION_BREAK
     void Console::debugBreak()

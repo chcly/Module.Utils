@@ -20,26 +20,32 @@
 # ------------------------------------------------------------------------------
 set(TestTargetName ${TargetName}Test)
 
+include(TestDirectory)
+gen_path_to_here()
+
 set(TestTarget_SOURCE
     Utils.cpp
 )
 
-set(ABSOLUTE_TEST_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-configure_file(
-	${CMAKE_CURRENT_SOURCE_DIR}/TestDirectory.h.in
-	${CMAKE_CURRENT_BINARY_DIR}/TestDirectory.h
-)
-
-include_directories(. ${GTEST_INCLUDE} ${CMAKE_CURRENT_BINARY_DIR} ${Utils_INCLUDE})
+include_directories(
+    ${GTEST_INCLUDE} 
+    ${Utils_INCLUDE})
 
 add_executable(
     ${TestTargetName}
     ${TestTarget_SOURCE}
 )
 
-target_link_libraries(${TestTargetName} ${GTEST_LIBRARY} ${Utils_LIBRARY})
-set_target_properties(${TestTargetName} PROPERTIES FOLDER "${TargetGroup}")
+target_link_libraries(
+    ${TestTargetName} 
+    ${GTEST_LIBRARY} 
+    ${Utils_LIBRARY})
 
+
+set_target_properties(
+    ${TestTargetName} 
+    PROPERTIES FOLDER "${TargetGroup}"
+)
 
 if (Utils_AUTO_RUN_TEST)
     run_test(${TestTargetName})
