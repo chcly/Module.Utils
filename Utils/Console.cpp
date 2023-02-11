@@ -447,6 +447,9 @@ namespace Rt2
             pclose(fp);
             dest = out.str();
         }
+        else
+            Console::writeLine("Failed to launch: ", ss.str());
+
     }
 
 // This meant to be switched off later
