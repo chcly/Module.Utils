@@ -206,6 +206,18 @@ namespace Rt2
         return isLower(ch) || isUpper(ch);
     }
 
+    inline bool isPrintable(const int constant)
+    {
+        return constant >= 32 && constant < 128;
+    }
+
+    inline bool isPrintableAscii(const int constant)
+    {
+        return isPrintable(constant) ||
+               isWhiteSpace(constant) ||
+               isNewLine(constant);
+    }
+
     using Ch = Char;
 
     // clang-format off

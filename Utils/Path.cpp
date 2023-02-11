@@ -50,11 +50,12 @@ namespace Rt2
         {
             _file      = clean.substr(n + 1, clean.size());
             _directory = clean.substr(0, n + 1);
+            _root.clear();
 
             if (_directory[0] == '/')
             {
                 // UNIX
-                _root.clear();
+                _root      = "/";
                 _directory = _directory.substr(1, _directory.size());
             }
             else if (_directory.size() > 1 && isLetter(_directory[0]) && _directory[1] == ':')
@@ -190,11 +191,13 @@ namespace Rt2
         if (_directory.empty())
             return Su::join(_file, ext);
 
-        return Su::join(_root, '/', _directory, _file, ext);
+        return Su::join(rootedDir(), _file, ext);
     }
 
     String PathUtil::rootedDir() const
     {
+        if (_root == "/")
+            return Su::join('/', _directory);
         return Su::join(_root, '/', _directory);
     }
 
@@ -224,6 +227,16 @@ namespace Rt2
         }
 
         appendDirectory(PathUtil(temp));
+    }
+
+    bool PathUtil::isAbsolute() const
+    {
+        return !_root.empty();
+    }
+
+    bool PathUtil::hasExtensions() const
+    {
+        return !_extension.empty();
     }
 
     PathUtil PathUtil::construct(const String& path, const String& srcPath)

@@ -1,11 +1,13 @@
+#include "Utils/Console.h"
+#include <bitset>
+#include <iostream>
+#include <sstream>
+#include "Char.h"
+#include "Path.h"
+#include "Utils/Definitions.h"
 #ifdef _WIN32
     #include <Windows.h>
 #endif
-
-#include <iostream>
-#include <sstream>
-#include "Utils/Console.h"
-#include "Utils/Definitions.h"
 
 namespace Rt2
 {
@@ -286,7 +288,7 @@ namespace Rt2
         if (p)
             hexdump(std::cout, p, len);
     }
-    
+
     void printBinLine(OStream&     dest,
                       const char*  buffer,
                       const size_t offs,
@@ -346,7 +348,7 @@ namespace Rt2
     {
         bindump(str.c_str(), (uint32_t)str.size());
     }
-    
+
     void Console::bindump(const OutputStringStream& str)
     {
         bindump(str.str());
@@ -400,7 +402,54 @@ namespace Rt2
         std::cout.put(c);
     }
 
-    // This meant to be switched off later
+    void Console::execute(const String& exe, const OutputStringStream& args, String& dest)
+    {
+#ifdef _WIN32
+    #define popen _popen
+    #define pclose _pclose
+#endif
+        PathUtil prgDir(exe);
+
+#ifdef _WIN32
+        if (!prgDir.hasExtensions())
+            prgDir = PathUtil(exe + ".exe");
+#endif
+        if (!prgDir.exists() || !prgDir.isAbsolute())
+            return;
+
+        StringStream ss;
+        ss << prgDir.fullPath() << ' ' << args.str();
+
+        if (FILE* fp = popen(ss.str().c_str(), "r"))
+        {
+            StringStream out;
+            char         buf[128]{};
+            char         ascii[128]{};
+            while (!feof(fp))
+            {
+                if (size_t br = fread(buf, 1, 127, fp);
+                    br < 128)
+                {
+                    size_t n = 0;
+                    for (size_t i = 0; i < br; ++i)
+                    {
+                        if (isPrintableAscii(buf[i]))
+                        {
+                            ascii[n++] = buf[i];
+                            ascii[n]   = 0;
+                        }
+                    }
+                    buf[br] = 0;
+                    if (n > 0)
+                        out << ascii;
+                }
+            }
+            pclose(fp);
+            dest = out.str();
+        }
+    }
+
+// This meant to be switched off later
 #define USE_EXCEPTION_BREAK
     void Console::debugBreak()
     {
@@ -412,4 +461,4 @@ namespace Rt2
     #endif
 #endif  // USE_EXCEPTION_BREAK
     }
-}  // namespace Jam
+}  // namespace Rt2

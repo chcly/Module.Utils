@@ -20,7 +20,6 @@
 -------------------------------------------------------------------------------
 */
 #pragma once
-#include <bitset>
 #include <cstdint>
 #include <iomanip>
 #include "Utils/String.h"
@@ -135,10 +134,23 @@ namespace Rt2
         }
 
         static void put(char c);
+
+        static void execute(const String& exe, const OutputStringStream& args, String& dest);
+
+        template <typename... Args>
+        static String launch(const String& exe, Args&&... args)
+        {
+            OutputStringStream out;
+            ((out << std::forward<Args>(args)), ...);
+
+            String output;
+            execute(exe, out, output);
+            return output;
+        }
+
+        using Out = Console;
+        using Con = Console;
+        using Dbg = Console;
+
     };
-
-    using Out = Console;
-    using Con = Console;
-    using Dbg = Console;
-
-}  // namespace Jam
+}  // namespace Rt2

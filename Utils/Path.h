@@ -105,6 +105,10 @@ namespace Rt2
 
         bool empty() const;
 
+        bool isAbsolute() const;
+
+        bool hasExtensions() const;
+
         static PathUtil construct(const String& path, const String& srcPath);
     };
 
@@ -113,4 +117,4 @@ namespace Rt2
         return _file.empty();
     }
 
-}  // namespace Jam
+}  // namespace Rt2
