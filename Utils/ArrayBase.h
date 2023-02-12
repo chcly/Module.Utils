@@ -21,6 +21,7 @@
 */
 #pragma once
 
+#include <functional>
 #include "Traits.h"
 #include "Utils/Allocator.h"
 #include "Utils/Definitions.h"
@@ -57,6 +58,7 @@ namespace Rt2
         using ConstValueType     = const T;
         using ConstPointerType   = const T*;
         using ConstReferenceType = const T&;
+        using CompareFunc        = std::function<bool(ConstReferenceType a, ConstReferenceType b)>;
 
         /**
          * \brief Defines shorthand access to the current template type.
@@ -82,6 +84,19 @@ namespace Rt2
             {
                 if (_data[i] == v)
                     return i;
+            }
+            return Allocator::npos;
+        }
+
+        SizeType find(ConstReferenceType v, CompareFunc cmp) const
+        {
+            if (cmp)
+            {
+                for (SizeType i = 0; i < _size; ++i)
+                {
+                    if (cmp(_data[i], v))
+                        return i;
+                }
             }
             return Allocator::npos;
         }
@@ -314,7 +329,6 @@ namespace Rt2
                 }
             }
         }
-
 
         SelfType& operator=(const SelfType& rhs)
         {
