@@ -20,6 +20,8 @@
 -------------------------------------------------------------------------------
 */
 #pragma once
+#include <iomanip>
+
 #include "Utils/String.h"
 
 namespace Rt2::WriteUtils

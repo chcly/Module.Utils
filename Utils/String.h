@@ -136,6 +136,12 @@ namespace Rt2
 
         static String toUpperFirst(const String& in);
 
+        static void scramble(String& destination, size_t value, const bool randomize=true);
+
+        static String scramble(const String& value, bool randomize=true);
+
+        static void generate(String& destination, int& counter, void* seed);
+
         template <typename... Args>
         static String join(Args&&... args)
         {
@@ -154,4 +160,4 @@ namespace Rt2
 
     using Su = StringUtils;
 
-}  // namespace Jam
+}  // namespace Rt2

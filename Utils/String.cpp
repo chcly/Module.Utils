@@ -23,6 +23,8 @@
 #include "Utils/Char.h"
 #include "Utils/Definitions.h"
 
+#define NOW std::chrono::high_resolution_clock::now().time_since_epoch().count()
+
 namespace Rt2
 {
     void StringUtils::replaceAll(String&       dest,
@@ -99,6 +101,85 @@ namespace Rt2
         if (!a.empty())
             a[0] = (char)std::toupper((int)a[0]);
         return a;
+    }
+    
+    // clang-format off
+    constexpr char BaseChars[] = {
+        'D', 'c', 'U', 'y', '3', 'b', 'C', 'g',
+        'p', 'J', '9', 'L', 'p', 'J', '0', 'A',
+        'W', 'o', 'x', 'O', 'a', 'N', 'u', '8',
+        'n', 'x', '7', 's', 'E', 'z', 'h', 'E',
+        'q', 'Z', 'L', '4', 'F', '2', 'Q', 'i',
+        'S', 'K', 'w', 'G', 'r', 'f', '1', 'Z',
+        'd', 't', 'Y', '5', 'I', '3', 'K', 't',
+        'B', '6', 'a', 'R', 'l', 'H', 'm', 'M',
+    };
+    // clang-format on
+
+    constexpr size_t BaseCharsSize = sizeof BaseChars;
+
+    void StringUtils::scramble(String& destination, size_t value, const bool randomize)
+    {
+        destination.clear();
+
+        if (randomize)
+            srand(NOW % 65536);
+
+        while (value > 0)
+        {
+            const size_t q = value >> 6;
+
+            size_t r;
+            if (randomize)
+            {
+                const size_t ra = (size_t)rand();
+
+                r = (value + ra) % BaseCharsSize;
+            }
+            else
+                r = value % BaseCharsSize;
+            destination.push_back(BaseChars[r]);
+            value = q;
+        }
+    }
+
+    union Merge
+    {
+        uint32_t i{0};
+        uint8_t  b[8];
+
+        explicit operator size_t() const
+        {
+            return i;
+        }
+    };
+
+    String StringUtils::scramble(const String& value, bool randomize)
+    {
+        OutputStringStream oss;
+        Merge              m;
+        for (size_t i = 0; i < value.size(); ++i)
+        {
+            m.b[i % 8] = (uint8_t)value[i];
+            if (i % 8 == 7)
+            {
+                String t;
+                scramble(t, (size_t)m, randomize);
+                oss << t;
+            }
+        }
+        return oss.str();
+    }
+
+    void StringUtils::generate(String& destination, int& counter, void* seed)
+    {
+        // this 'should' be a GUID
+        String sa, sb, sc, sd;
+        scramble(sa, size_t(17) * ++counter);
+        scramble(sb, NOW);
+        scramble(sc, (size_t)seed);
+        scramble(sd, size_t(41) * ++counter);
+        join(destination, "L", sa, sb, sc, sd);
     }
 
     void StringUtils::splitLine(StringArray&  dest,
