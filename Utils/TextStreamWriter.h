@@ -21,45 +21,52 @@
 */
 #pragma once
 #include <iomanip>
-
 #include "Utils/String.h"
 
-namespace Rt2::WriteUtils
+namespace Rt2
 {
-    inline void indent(OStream& out, int n)
-    {
-        n = (int)std::min<size_t>(std::max<size_t>(n, 0), 80);
-        if (n > 0)
-            out << std::setw((size_t)(n - 1)) << ' ';
-    }
 
-    inline void newLine(OStream& out, int n)
+    class WriteUtils
     {
-        n = std::min(std::max(n, 0), 20);
-        while (n-- > 0)
-            out << std::endl;
-    }
+    public:
+        static void indent(OStream& out, int n)
+        {
+            n = (int)std::min<size_t>(std::max<size_t>(n, 0), 80);
+            if (n > 0)
+                out << std::setw((size_t)(n - 1)) << ' ';
+        }
 
-    inline void next(OStream& out, int n)
-    {
-        newLine(out, 1);
-        indent(out, n);
-    }
+        static void newLine(OStream& out, int n)
+        {
+            n = std::min(std::max(n, 0), 20);
+            while (n-- > 0)
+                out << std::endl;
+        }
 
-    template <typename... Args>
-    void write(OStream& out, const int n, Args&&... args)
-    {
-        indent(out, n);
-        ((out << std::forward<Args>(args)), ...);
-        newLine(out, 1);
-    }
+        static void next(OStream& out, int n)
+        {
+            newLine(out, 1);
+            indent(out, n);
+        }
 
-    template <typename... Args>
-    void writeLine(OStream& out, const int n, const int line, Args&&... args)
-    {
-        indent(out, n);
-        ((out << std::forward<Args>(args)), ...);
-        newLine(out, line);
-    }
+        template <typename... Args>
+        static void write(OStream& out, const int n, Args&&... args)
+        {
+            indent(out, n);
+            ((out << std::forward<Args>(args)), ...);
+            newLine(out, 1);
+        }
 
-}  // namespace Jam::WriteUtils
+        template <typename... Args>
+        static void writeLine(OStream& out, const int n, const int line, Args&&... args)
+        {
+            indent(out, n);
+            ((out << std::forward<Args>(args)), ...);
+            newLine(out, line);
+        }
+    };
+
+    using Ts = WriteUtils;
+    using Ws = WriteUtils;
+
+}  // namespace Rt2
