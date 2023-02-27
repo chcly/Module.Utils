@@ -128,21 +128,39 @@ namespace Rt2
             const String& a,
             const String& b);
 
-        static void toLower(String& dest, const String& in);
+        static void toLower(
+            String&       dest,
+            const String& in);
 
-        static void toUpper(String& dest, const String& in);
+        static void toUpper(
+            String&       dest,
+            const String& in);
 
-        static String toLowerFirst(const String& in);
+        static String toLowerFirst(
+            const String& in);
 
-        static String toUpperFirst(const String& in);
+        static String toUpperFirst(
+            const String& in);
 
-        static void copy(OStream &out, IStream &in, bool binary=true, bool newLine=true);
+        static void copy(
+            OStream& out,
+            IStream& in,
+            bool     binary  = true,
+            bool     newLine = true);
 
-        static void scramble(String& destination, size_t value, const bool randomize=true);
+        static void scramble(
+            String& destination,
+            size_t  value,
+            bool    randomize = true);
 
-        static String scramble(const String& value, bool randomize=true);
+        static String scramble(
+            const String& value,
+            bool          randomize = true);
 
-        static void generate(String& destination, int& counter, void* seed);
+        static void generate(
+            String& destination,
+            int&    counter,
+            void*   seed);
 
         template <typename... Args>
         static String join(Args&&... args)
@@ -157,6 +175,14 @@ namespace Rt2
         {
             ((out << std::forward<Args>(args)), ...);
             return out;
+        }
+
+        template < typename... Args>
+        static String csv(const char c, Args&&...args)
+        {
+            OutputStringStream out;
+            ((out << c << std::forward<Args>(args)), ...);
+            return out.str();
         }
     };
 

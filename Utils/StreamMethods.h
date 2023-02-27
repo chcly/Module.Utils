@@ -185,21 +185,15 @@ namespace Rt2
         T      _val;
 
     public:
-        explicit Attribute(const String& key,
-                           const T&      val) :
-            _key(key),
-            _val(val)
+        explicit Attribute(String key, T val) :
+            _key(std::move(key)),
+            _val(std::move(val))
         {
         }
 
         OStream& operator()(OStream& out) const
         {
-            return out << ' '
-                       << _key
-                       << '='
-                       << '"'
-                       << _val
-                       << '"';
+            return out << ' ' << _key << '=' << '"' << _val << '"';
         }
     };
 
