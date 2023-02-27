@@ -33,8 +33,9 @@
 
 namespace Rt2
 {
-    using FilePath       = StdFileSystem::path;
-    using DirectoryEntry = StdFileSystem::directory_entry;
+    using FilePath          = StdFileSystem::path;
+    using DirectoryEntry    = StdFileSystem::directory_entry;
+    using DirectoryIterator = StdFileSystem::directory_iterator;
 
     using PathArray           = std::deque<FilePath>;
     using DirectoryEntryArray = std::deque<DirectoryEntry>;
