@@ -58,7 +58,6 @@ namespace Rt2
                 '/',
                 input));
         }
-
         return normalize(value);
     }
 
@@ -69,17 +68,17 @@ namespace Rt2
 
     void FileSystem::list(const String& path, DirectoryEntryArray& dest)
     {
-        FilePath fp = {path};
-        if (is_directory(fp))
+        if (const FilePath fp = {path};
+            is_directory(fp))
         {
-            StdFileSystem::directory_iterator it{fp};
-            for(const auto &val : it)
+            const DirectoryIterator it{fp};
+            for (const auto& val : it)
             {
-                if (val.is_directory())
+                if (is_directory(val))
                     dest.push_front(val);
                 else
                     dest.push_back(val);
             }
         }
     }
-}  // namespace Jam
+}  // namespace Rt2
