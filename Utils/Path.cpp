@@ -30,7 +30,7 @@ namespace Rt2
     {
         // first swap all \ characters to / characters
         String clean;
-        StringUtils::replaceAll(clean, str, "\\", "/");
+        Su::replaceAll(clean, str, "\\", "/");
 
         size_t n = Npos;
 
@@ -54,7 +54,6 @@ namespace Rt2
 
             if (_directory[0] == '/')
             {
-                // UNIX
                 _root      = "/";
                 _directory = _directory.substr(1, _directory.size());
             }
@@ -69,6 +68,7 @@ namespace Rt2
             {
                 if (_directory.front() == '/')
                     _directory = _directory.substr(1, _directory.size());
+
                 if (_directory.back() != '/')
                     _directory.push_back('/');
             }
@@ -76,7 +76,7 @@ namespace Rt2
 
         if (!_file.empty())
         {
-            StringUtils::split(_extension, _file, ".");
+            Su::split(_extension, _file, ".");
 
             if (!_extension.empty())
             {
@@ -141,7 +141,7 @@ namespace Rt2
 
     void PathUtil::directoryList(StringDeque& dir) const
     {
-        StringUtils::split(dir, _directory, "/");
+        Su::split(dir, _directory, "/");
     }
 
     bool PathUtil::hasDirectory() const
@@ -155,7 +155,7 @@ namespace Rt2
             return rootedDir();
 
         StringArray dir;
-        StringUtils::split(dir, _directory, "/");
+        Su::split(dir, _directory, "/");
 
         size_t i = 0;
         while (!dir.empty() && i < n)

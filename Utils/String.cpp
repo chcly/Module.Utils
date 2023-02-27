@@ -102,7 +102,43 @@ namespace Rt2
             a[0] = (char)std::toupper((int)a[0]);
         return a;
     }
-    
+
+    void StringUtils::copy(OStream&   out,
+                           IStream&   in,
+                           const bool binary,
+                           const bool newLine)
+    {
+        if (binary)
+        {
+            in.seekg(0, std::ios::end);
+            const std::streamsize sz = in.tellg();
+            in.seekg(0, std::ios::beg);
+
+            if (sz > 0)
+            {
+                String str;
+                str.resize(sz);
+                in.read(str.data(), sz);
+                str[sz] = 0;
+
+                out.write(str.data(), sz);
+            }
+        }
+        else
+        {
+            in.seekg(0, std::ios::beg);
+            while (!in.eof())
+            {
+                if (const int ch = in.get();
+                    isPrintableAscii(ch))
+                {
+                    if (newLine || !isNewLine(ch))
+                        out.put((char)ch);
+                }
+            }
+        }
+    }
+
     // clang-format off
     constexpr char BaseChars[] = {
         'D', 'c', 'U', 'y', '3', 'b', 'C', 'g',
@@ -449,4 +485,4 @@ namespace Rt2
         }
     }
 
-}  // namespace Jam
+}  // namespace Rt2

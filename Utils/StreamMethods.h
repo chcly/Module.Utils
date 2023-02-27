@@ -177,6 +177,32 @@ namespace Rt2
         }
     };
 
+    template <typename T>
+    class Attribute : CallableStream<Attribute<T>>
+    {
+    private:
+        String _key;
+        T      _val;
+
+    public:
+        explicit Attribute(const String& key,
+                           const T&      val) :
+            _key(key),
+            _val(val)
+        {
+        }
+
+        OStream& operator()(OStream& out) const
+        {
+            return out << ' '
+                       << _key
+                       << '='
+                       << '"'
+                       << _val
+                       << '"';
+        }
+    };
+
     struct Tab : CallableStream<Tab>
     {
         mutable uint8_t w{4};
@@ -274,6 +300,11 @@ namespace Rt2
         }
     };
 
+    using AttrI32    = Attribute<I32>;
+    using AttrI16    = Attribute<I16>;
+    using AttrI8     = Attribute<I8>;
+    using AttrString = Attribute<String>;
+
     using SetD      = TPrintSet<double, '[', ',', ']', sizeof(double) << 1, 12>;
     using SetF      = TPrintSet<float, '[', ',', ']', 6, 3>;
     using SetI      = TPrintSet<int32_t, '[', ',', ']', 0, 8>;
@@ -293,4 +324,4 @@ namespace Rt2
     using PrintR32  = FPrintT<float, 5, 3>;
     using PrintR64  = FPrintT<double>;
 
-}  // namespace Jam
+}  // namespace Rt2

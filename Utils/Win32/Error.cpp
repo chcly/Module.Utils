@@ -19,37 +19,35 @@
   3. This notice may not be removed or altered from any source distribution.
 -------------------------------------------------------------------------------
 */
-#pragma once
-
 #ifdef _WIN32
-    #include <filesystem>
-    #define StdFileSystem std::filesystem
-#else
-    #include <experimental/filesystem>
-    #define StdFileSystem std::experimental::filesystem
-#endif
+    #include "Utils/Win32/Error.h"
+    #include <Windows.h>
+    #include "Utils/Console.h"
+    #include "Utils/StreamMethods.h"
 
-#include "Utils/String.h"
-
-namespace Rt2
+namespace Rt2::Win32
 {
-    using FilePath       = StdFileSystem::path;
-    using DirectoryEntry = StdFileSystem::directory_entry;
-
-    using PathArray           = std::deque<FilePath>;
-    using DirectoryEntryArray = std::deque<DirectoryEntry>;
-
-    class FileSystem
+    void LogError(const char* message, U32 res)
     {
-    public:
-        static String normalize(const String& path);
+        const U32 err = GetLastError();
+        LPSTR     buf = nullptr;
+        FormatMessage(
+            FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER,
+            nullptr,
+            err,
+            0,
+            (LPSTR)&buf,
+            0,
+            nullptr);
 
-        static FilePath normalize(const FilePath& path);
+        if (buf)
+        {
+            Console::writeError("code: ", Hex(err), ", ", buf, " ", message);
+            LocalFree(buf);
+        }
+        else
+            Console::writeError(message, ": (", res, ") ", err);
+    }
+}  // namespace Rt2::Win32
 
-        static FilePath absolute(const String& input);
-
-        static String currentPath();
-
-        static void list(const String& path, DirectoryEntryArray& dest);
-    };
-}  // namespace Rt2
+#endif

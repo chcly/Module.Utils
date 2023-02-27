@@ -67,4 +67,19 @@ namespace Rt2
         return StdFileSystem::current_path().string();
     }
 
+    void FileSystem::list(const String& path, DirectoryEntryArray& dest)
+    {
+        FilePath fp = {path};
+        if (is_directory(fp))
+        {
+            StdFileSystem::directory_iterator it{fp};
+            for(const auto &val : it)
+            {
+                if (val.is_directory())
+                    dest.push_front(val);
+                else
+                    dest.push_back(val);
+            }
+        }
+    }
 }  // namespace Jam

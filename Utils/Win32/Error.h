@@ -20,36 +20,12 @@
 -------------------------------------------------------------------------------
 */
 #pragma once
-
 #ifdef _WIN32
-    #include <filesystem>
-    #define StdFileSystem std::filesystem
-#else
-    #include <experimental/filesystem>
-    #define StdFileSystem std::experimental::filesystem
-#endif
+    #include "Utils/Definitions.h"
 
-#include "Utils/String.h"
-
-namespace Rt2
+namespace Rt2::Win32
 {
-    using FilePath       = StdFileSystem::path;
-    using DirectoryEntry = StdFileSystem::directory_entry;
+    extern void LogError(const char* message, U32 res);
+}  // namespace Rt2::Win32
 
-    using PathArray           = std::deque<FilePath>;
-    using DirectoryEntryArray = std::deque<DirectoryEntry>;
-
-    class FileSystem
-    {
-    public:
-        static String normalize(const String& path);
-
-        static FilePath normalize(const FilePath& path);
-
-        static FilePath absolute(const String& input);
-
-        static String currentPath();
-
-        static void list(const String& path, DirectoryEntryArray& dest);
-    };
-}  // namespace Rt2
+#endif

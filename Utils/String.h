@@ -136,6 +136,8 @@ namespace Rt2
 
         static String toUpperFirst(const String& in);
 
+        static void copy(OStream &out, IStream &in, bool binary=true, bool newLine=true);
+
         static void scramble(String& destination, size_t value, const bool randomize=true);
 
         static String scramble(const String& value, bool randomize=true);

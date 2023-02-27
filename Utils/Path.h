@@ -40,22 +40,10 @@ namespace Rt2
 
         PathUtil(const PathUtil& oth);
 
-        /**
-         * \brief Constructs the path with a file name.
-         * \param fileName The file path that will be broken up into sections.
-         */
         explicit PathUtil(const String& fileName);
 
-        /**
-         * \brief Provides access to the name portion of the file.
-         * \return The file name without an extension.
-         */
         const String& stem() const;
 
-        /**
-         * \brief Provides access to the directory portion of the file.
-         * \return a/b/c/d/
-         */
         const String& directory() const;
 
         void directoryList(StringDeque& dir) const;
@@ -66,33 +54,18 @@ namespace Rt2
 
         PathUtil parentPath(size_t n) const;
 
-        /**
-         * \return true if the file is present at the supplied path
-         */
         bool exists() const;
 
-        /**
-         * \return The full file path
-         */
         String fullPath() const;
 
-        /**
-         * \return The combination of all attached extensions
-         */
         String rootedDir() const;
 
-        /**
-         * \return The file base name and any extensions attached to it
-         */
         String fileName() const;
 
         void fileName(const PathUtil& file);
 
         void fileName(const String& file);
 
-        /**
-         * \return The combination of all attached extensions
-         */
         String fullExtension() const;
 
         String lastExtension() const;
