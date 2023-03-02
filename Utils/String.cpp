@@ -129,8 +129,7 @@ namespace Rt2
             in.seekg(0, std::ios::beg);
             while (!in.eof())
             {
-                if (const int ch = in.get();
-                    isPrintableAscii(ch))
+                if (const int ch = in.get(); isPrintableAscii(ch))
                 {
                     if (newLine || !isNewLine(ch))
                         out.put((char)ch);

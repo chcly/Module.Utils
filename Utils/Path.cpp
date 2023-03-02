@@ -98,16 +98,24 @@ namespace Rt2
 
     String PathUtil::lastExtension() const
     {
+        String ret;
         if (!_extension.empty())
-            return "." + _extension.back();
-        return "";
+        {
+            ret.push_back('.');
+            ret.append(_extension.back());
+        }
+        return ret;
     }
 
     String PathUtil::firstExtension() const
     {
+        String ret;
         if (!_extension.empty())
-            return "." + _extension.front();
-        return "";
+        {
+            ret.push_back('.');
+            ret.append(_extension.front());
+        }
+        return ret;
     }
 
     String PathUtil::fileName() const
