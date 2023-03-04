@@ -86,8 +86,8 @@ namespace Rt2::Directory
                     throw Exception("Malformed path");
                 return 1;
             case '.':
-                return 1;
-
+                if (state == 0)
+                    return 1;
             case PathSpecialChars:
             case UpperCaseAz:
             case LowerCaseAz:

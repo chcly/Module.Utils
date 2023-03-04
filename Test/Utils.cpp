@@ -154,6 +154,16 @@ GTEST_TEST(Utils, DirPath_004)
     EXPECT_TRUE(f2.canExecute());
 }
 
+
+GTEST_TEST(Utils, DirPath_005)
+{
+    using Path    = Directory::Path;
+    const Path f0 = Path(R"(Z:\A\A.A.A\B.B.B\C.C.C\A.ext1.extLast)");
+
+    EXPECT_EQ(f0.full(), "Z:/A/A.A.A/B.B.B/C.C.C/A.ext1.extLast");
+    EXPECT_EQ(f0.directory(), "A/A.A.A/B.B.B/C.C.C/");
+}
+
 GTEST_TEST(Utils, Path_LocaFile)
 {
     const PathUtil f0 = PathUtil(R"(Z:\A\AAA\BBB\CCC\A.ext1.extLast)");
