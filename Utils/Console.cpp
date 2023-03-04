@@ -172,6 +172,11 @@ namespace Rt2
 #endif
     }
 
+    void Console::write(IStream& stream)
+    {
+        Su::copy(std::cout, stream, false);
+    }
+
     void Console::write(const String& str)
     {
         SetColor();
@@ -449,7 +454,6 @@ namespace Rt2
         }
         else
             writeLine("Failed to launch: ", ss.str());
-
     }
 
 // This meant to be switched off later

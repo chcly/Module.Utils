@@ -43,7 +43,7 @@ namespace Rt2
     using OutputStringStream = std::ostringstream;
     using InputFileStream    = std::ifstream;
     using OutputFileStream   = std::ofstream;
-
+    
     class StringUtils
     {
     public:
@@ -71,6 +71,12 @@ namespace Rt2
             StringArray&  dest,
             const String& input,
             char          swap = '$');
+
+        static void combine(
+            String&            dest,
+            const StringDeque& input,
+            char               in  = 0,
+            char               out = 0);
 
         static void trimWs(
             String&       di,
@@ -128,6 +134,10 @@ namespace Rt2
             const String& a,
             const String& b);
 
+        static void reverse(
+            String&       dest,
+            const String& input);
+
         static void toLower(
             String&       dest,
             const String& in);
@@ -177,8 +187,8 @@ namespace Rt2
             return out;
         }
 
-        template < typename... Args>
-        static String csv(const char c, Args&&...args)
+        template <typename... Args>
+        static String csv(const char c, Args&&... args)
         {
             OutputStringStream out;
             ((out << c << std::forward<Args>(args)), ...);

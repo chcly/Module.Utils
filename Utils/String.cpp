@@ -22,8 +22,7 @@
 #include "Utils/String.h"
 #include "Utils/Char.h"
 #include "Utils/Definitions.h"
-
-#define NOW std::chrono::high_resolution_clock::now().time_since_epoch().count()
+#include "Utils/Time.h"
 
 namespace Rt2
 {
@@ -61,14 +60,24 @@ namespace Rt2
                 if (match)
                 {
                     oss << b;
-                    if (a.size() > 1)
-                        i += a.size() - 1;
+                    if (a.size() > 1) i += a.size() - 1;
                 }
                 else
                     oss << ch;
             }
         }
         dest = oss.str();
+    }
+
+    void StringUtils::reverse(String& dest, const String& input)
+    {
+        dest.clear();
+        String::const_reverse_iterator it = input.rbegin();
+        while (it != input.rend())
+        {
+            dest.push_back(*it);
+            ++it;
+        }
     }
 
     void StringUtils::toLower(String& dest, const String& in)
@@ -158,7 +167,7 @@ namespace Rt2
         destination.clear();
 
         if (randomize)
-            srand(NOW % 65536);
+            srand(Time::now16());
 
         while (value > 0)
         {
@@ -211,7 +220,7 @@ namespace Rt2
         // this 'should' be a GUID
         String sa, sb, sc, sd;
         scramble(sa, size_t(17) * ++counter);
-        scramble(sb, NOW);
+        scramble(sb, Time::now32());
         scramble(sc, (size_t)seed);
         scramble(sd, size_t(41) * ++counter);
         join(destination, "L", sa, sb, sc, sd);
@@ -232,6 +241,23 @@ namespace Rt2
         replaceAll(temp, temp, swap2, "\r\n");
         replaceAll(temp, temp, swap1, "\r\n");
         split(dest, temp, "\r\n");
+    }
+
+    void StringUtils::combine(String&            dest,
+                              const StringDeque& input,
+                              const char         in,
+                              const char         out)
+    {
+        for (const auto& el : input)
+        {
+            if (in != 0)
+                dest.push_back(in);
+
+            dest.append(el);
+
+            if (out != 0)
+                dest.push_back(out);
+        }
     }
 
     void StringUtils::split(StringArray&  destination,

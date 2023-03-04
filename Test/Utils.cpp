@@ -33,7 +33,7 @@
  * [ ] Hash
  * [x] HashMap
  * [ ] IndexCache
- * [x] Path
+ * [x] PathUtil
  * [ ] Queue
  * [ ] Set
  * [x] Stack
@@ -43,11 +43,14 @@
  * [ ] Timer
  * [ ] Fill
  * [ ] Copy
+ * [x] Path
  */
 
+#include "ThisDir.h"
 #include "Utils/Allocator.h"
 #include "Utils/Array.h"
 #include "Utils/Char.h"
+#include "Utils/Directory/Path.h"
 #include "Utils/FixedArray.h"
 #include "Utils/HashMap.h"
 #include "Utils/Path.h"
@@ -56,6 +59,169 @@
 
 using namespace Rt2;
 
+GTEST_TEST(Utils, DirPath_001)
+{
+    using Path    = Directory::Path;
+    const Path f0 = Path(R"(Z:\A\AAA\BBB\CCC\A.ext1.extLast)");
+
+    EXPECT_EQ(f0.full(), "Z:/A/AAA/BBB/CCC/A.ext1.extLast");
+    EXPECT_TRUE(f0.hasDirectory());
+
+    EXPECT_EQ(f0.fullDirectory(), "Z:/A/AAA/BBB/CCC/");
+    EXPECT_EQ(f0.extension(), ".ext1.extLast");
+    EXPECT_EQ(f0.lastExtension(), ".extLast");
+    EXPECT_EQ(f0.firstExtension(), ".ext1");
+
+    EXPECT_EQ(f0.stem(), "A");
+    EXPECT_EQ(f0.base(), "A.ext1.extLast");
+
+    EXPECT_EQ(f0.directory(), "A/AAA/BBB/CCC/");
+    EXPECT_EQ(f0.root(), "Z:/");
+
+    const Path f1 = Path("/A-1/A_A A/B B B/C C C/A.ext1.extLast");
+    EXPECT_EQ(f1.full(), "/A-1/A_A A/B B B/C C C/A.ext1.extLast");
+    EXPECT_TRUE(f1.hasDirectory());
+
+    EXPECT_EQ(f1.extension(), ".ext1.extLast");
+    EXPECT_EQ(f1.lastExtension(), ".extLast");
+    EXPECT_EQ(f1.firstExtension(), ".ext1");
+
+    EXPECT_EQ(f1.stem(), "A");
+    EXPECT_EQ(f1.base(), "A.ext1.extLast");
+
+    EXPECT_EQ(f1.directory(), "A-1/A_A A/B B B/C C C/");
+    EXPECT_EQ(f1.root(), "/");
+}
+
+GTEST_TEST(Utils, DirPath_002)
+{
+    using Path    = Directory::Path;
+    const Path f2 = Path();
+
+    EXPECT_TRUE(f2.full().empty());
+    EXPECT_FALSE(f2.hasDirectory());
+
+    EXPECT_TRUE(f2.extension().empty());
+    EXPECT_TRUE(f2.lastExtension().empty());
+    EXPECT_TRUE(f2.firstExtension().empty());
+
+    EXPECT_TRUE(f2.stem().empty());
+    EXPECT_TRUE(f2.base().empty());
+
+    EXPECT_TRUE(f2.directory().empty());
+    EXPECT_TRUE(f2.root().empty());
+
+    EXPECT_FALSE(f2.exists());
+    EXPECT_FALSE(f2.isDirectory());
+    EXPECT_FALSE(f2.isFile());
+    EXPECT_FALSE(f2.isSymLink());
+}
+
+GTEST_TEST(Utils, DirPath_003)
+{
+    using Path    = Directory::Path;
+    const Path f2 = Path(CurrentSourceDirectory);
+    EXPECT_TRUE(f2.exists());
+    EXPECT_TRUE(f2.isDirectory());
+    EXPECT_FALSE(f2.isFile());
+    EXPECT_FALSE(f2.isSymLink());
+
+    Directory::PathArray arr;
+    f2.list(arr);
+
+    for (const auto& path : arr)
+    {
+        if (path.isFile())
+        {
+            InputFileStream ifs;
+            path.open(ifs);
+            EXPECT_TRUE(ifs.is_open());
+        }
+    }
+}
+
+GTEST_TEST(Utils, DirPath_004)
+{
+    using Path    = Directory::Path;
+    const Path f2 = Path(TestFile("Utils.cpp"));
+    EXPECT_TRUE(f2.exists());
+    EXPECT_FALSE(f2.isDirectory());
+    EXPECT_TRUE(f2.isFile());
+    EXPECT_FALSE(f2.isSymLink());
+
+    EXPECT_TRUE(f2.canRead());
+    EXPECT_TRUE(f2.canWrite());
+    EXPECT_TRUE(f2.canExecute());
+}
+
+GTEST_TEST(Utils, Path_LocaFile)
+{
+    const PathUtil f0 = PathUtil(R"(Z:\A\AAA\BBB\CCC\A.ext1.extLast)");
+
+    EXPECT_EQ(f0.fullPath(), "Z:/A/AAA/BBB/CCC/A.ext1.extLast");
+    EXPECT_TRUE(f0.hasDirectory());
+    EXPECT_EQ(f0.fullExtension(), ".ext1.extLast");
+    EXPECT_EQ(f0.lastExtension(), ".extLast");
+    EXPECT_EQ(f0.firstExtension(), ".ext1");
+
+    StringDeque d0;
+    f0.directoryList(d0);
+
+    EXPECT_EQ(d0.at(0), "A");
+    EXPECT_EQ(d0.at(1), "AAA");
+    EXPECT_EQ(d0.at(2), "BBB");
+    EXPECT_EQ(d0.at(3), "CCC");
+
+    const PathUtil f1 = PathUtil("/A/AAA/BBB/CCC/A.ext1.extLast");
+
+    EXPECT_EQ(f1.fullPath(), "/A/AAA/BBB/CCC/A.ext1.extLast");
+    EXPECT_TRUE(f1.hasDirectory());
+
+    StringDeque d1;
+    f1.directoryList(d1);
+
+    EXPECT_EQ(d1.at(0), "A");
+    EXPECT_EQ(d1.at(1), "AAA");
+    EXPECT_EQ(d1.at(2), "BBB");
+    EXPECT_EQ(d1.at(3), "CCC");
+
+    const PathUtil f2 = PathUtil(R"(Z:\A\AAA\BBB\CCC\A.ext1.extLast)");
+
+    EXPECT_EQ(f2.parentDir(0), "Z:/A/AAA/BBB/CCC/");
+    EXPECT_EQ(f2.parentDir(1), "Z:/A/AAA/BBB/");
+    EXPECT_EQ(f2.parentDir(2), "Z:/A/AAA/");
+    EXPECT_EQ(f2.parentDir(3), "Z:/A/");
+    EXPECT_EQ(f2.parentDir(4), "Z:/");
+    EXPECT_EQ(f2.parentDir(5), "Z:/");
+    EXPECT_EQ(f2.parentDir(6), "Z:/");
+
+    PathUtil newPath = f2.parentPath(2);
+    newPath.appendDirectory(PathUtil("/DDD/EEE/"));
+    newPath.fileName(f2.fileName());
+
+    EXPECT_EQ(newPath.fullPath(), "Z:/A/AAA/DDD/EEE/A.ext1.extLast");
+
+    const PathUtil f3 = PathUtil("A/AAA/BBB/CCC/A.ext1.extLast");
+
+    EXPECT_EQ(f3.parentDir(0), "/A/AAA/BBB/CCC/");
+    EXPECT_EQ(f3.parentDir(1), "/A/AAA/BBB/");
+    EXPECT_EQ(f3.parentDir(2), "/A/AAA/");
+    EXPECT_EQ(f3.parentDir(3), "/A/");
+    EXPECT_EQ(f3.parentDir(4), "/");
+    EXPECT_EQ(f3.parentDir(5), "/");
+    EXPECT_EQ(f3.parentDir(6), "/");
+
+    PathUtil newPath1 = f3.parentPath(2);
+    newPath1.appendDirectory(PathUtil("DDD/EEE/"));
+    newPath1.fileName(f3.fileName());
+
+    EXPECT_EQ(newPath1.fullPath(), "/A/AAA/DDD/EEE/A.ext1.extLast");
+
+    const PathUtil f4 = PathUtil("A.b.c.d.e.f");
+    EXPECT_EQ(f4.firstExtension(), ".b");
+    EXPECT_EQ(f4.lastExtension(), ".f");
+    EXPECT_EQ(f4.fullExtension(), ".b.c.d.e.f");
+}
 
 using IntStack = Stack<int>;
 
@@ -101,76 +267,6 @@ GTEST_TEST(Utils, String_SplitCR)
     EXPECT_EQ("C", a3[2]);
 }
 
-GTEST_TEST(Utils, Path_LocaFile)
-{
-    const PathUtil f0 = PathUtil("Z:\\A\\AAA\\BBB\\CCC\\A.ext1.extLast");
-
-    EXPECT_EQ(f0.fullPath(), "Z:/A/AAA/BBB/CCC/A.ext1.extLast");
-    EXPECT_TRUE(f0.hasDirectory());
-    EXPECT_EQ(f0.fullExtension(), ".ext1.extLast");
-    EXPECT_EQ(f0.lastExtension(), ".extLast");
-    EXPECT_EQ(f0.firstExtension(), ".ext1");
-
-
-    StringDeque d0;
-    f0.directoryList(d0);
-
-    EXPECT_EQ(d0.at(0), "A");
-    EXPECT_EQ(d0.at(1), "AAA");
-    EXPECT_EQ(d0.at(2), "BBB");
-    EXPECT_EQ(d0.at(3), "CCC");
-
-    const PathUtil f1 = PathUtil("/A/AAA/BBB/CCC/A.ext1.extLast");
-
-    EXPECT_EQ(f1.fullPath(), "/A/AAA/BBB/CCC/A.ext1.extLast");
-    EXPECT_TRUE(f1.hasDirectory());
-
-    StringDeque d1;
-    f1.directoryList(d1);
-
-    EXPECT_EQ(d1.at(0), "A");
-    EXPECT_EQ(d1.at(1), "AAA");
-    EXPECT_EQ(d1.at(2), "BBB");
-    EXPECT_EQ(d1.at(3), "CCC");
-
-    const PathUtil f2 = PathUtil("Z:\\A\\AAA\\BBB\\CCC\\A.ext1.extLast");
-
-    EXPECT_EQ(f2.parentDir(0), "Z:/A/AAA/BBB/CCC/");
-    EXPECT_EQ(f2.parentDir(1), "Z:/A/AAA/BBB/");
-    EXPECT_EQ(f2.parentDir(2), "Z:/A/AAA/");
-    EXPECT_EQ(f2.parentDir(3), "Z:/A/");
-    EXPECT_EQ(f2.parentDir(4), "Z:/");
-    EXPECT_EQ(f2.parentDir(5), "Z:/");
-    EXPECT_EQ(f2.parentDir(6), "Z:/");
-
-    PathUtil newPath = f2.parentPath(2);
-    newPath.appendDirectory(PathUtil("/DDD/EEE/"));
-    newPath.fileName(f2.fileName());
-
-    EXPECT_EQ(newPath.fullPath(), "Z:/A/AAA/DDD/EEE/A.ext1.extLast");
-
-    const PathUtil f3 = PathUtil("A/AAA/BBB/CCC/A.ext1.extLast");
-
-    EXPECT_EQ(f3.parentDir(0), "/A/AAA/BBB/CCC/");
-    EXPECT_EQ(f3.parentDir(1), "/A/AAA/BBB/");
-    EXPECT_EQ(f3.parentDir(2), "/A/AAA/");
-    EXPECT_EQ(f3.parentDir(3), "/A/");
-    EXPECT_EQ(f3.parentDir(4), "/");
-    EXPECT_EQ(f3.parentDir(5), "/");
-    EXPECT_EQ(f3.parentDir(6), "/");
-
-    PathUtil newPath1 = f3.parentPath(2);
-    newPath1.appendDirectory(PathUtil("DDD/EEE/"));
-    newPath1.fileName(f3.fileName());
-
-    EXPECT_EQ(newPath1.fullPath(), "/A/AAA/DDD/EEE/A.ext1.extLast");
-
-    const PathUtil f4 = PathUtil("A.b.c.d.e.f");
-    EXPECT_EQ(f4.firstExtension(), ".b");
-    EXPECT_EQ(f4.lastExtension(), ".f");
-    EXPECT_EQ(f4.fullExtension(), ".b.c.d.e.f");
-}
-
 GTEST_TEST(Utils, String_Trim)
 {
     String inp = "     A B C       ";
@@ -186,7 +282,6 @@ GTEST_TEST(Utils, String_Trim)
     StringUtils::trimWs(inp, inp);
     EXPECT_EQ("A\tB C", inp);
 }
-
 
 GTEST_TEST(Utils, Stack_001)
 {
@@ -207,7 +302,6 @@ GTEST_TEST(Utils, Stack_002)
     EXPECT_EQ(17, a.capacity());
     EXPECT_NE(nullptr, a.data());
 }
-
 
 GTEST_TEST(Utils, Stack_003)
 {
@@ -231,7 +325,6 @@ GTEST_TEST(Utils, Stack_003)
     EXPECT_EQ(0, a.size());
 }
 
-
 GTEST_TEST(Utils, Stack_004)
 {
     IntStack a;
@@ -243,7 +336,6 @@ GTEST_TEST(Utils, Stack_004)
     Stack b(a);
 
     EXPECT_EQ(a.size(), b.size());
-
 
     const IntStack::PointerType na = a.data();
     const IntStack::PointerType nb = b.data();
@@ -266,12 +358,9 @@ GTEST_TEST(Utils, Stack_005)
     b = a;
     EXPECT_EQ(a.size(), b.size());
 
-
     for (i = 0; i < 16; ++i)
         EXPECT_EQ(a[i], b[i]);
 }
-
-
 
 GTEST_TEST(Utils, Char_bool)
 {
@@ -408,7 +497,6 @@ GTEST_TEST(Utils, Char_U64)
     EXPECT_EQ(0xFFFFFFFFFFFFFFFF, test);
 }
 
-
 GTEST_TEST(Utils, Char_stringI16)
 {
     {
@@ -527,7 +615,6 @@ GTEST_TEST(Utils, Char_stringI64)
     }
 }
 
-
 GTEST_TEST(Utils, FixedArray_001)
 {
     FixedArray<int, 10> a = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -576,7 +663,6 @@ GTEST_TEST(Utils, FixedArray_002)
     }
 }
 
-
 GTEST_TEST(Utils, FixedArray_003)
 {
     FixedArray<int, 10> a;
@@ -602,7 +688,6 @@ GTEST_TEST(Utils, FixedArray_003)
     {
     }
 }
-
 
 GTEST_TEST(Utils, FixedArray_004)
 {
@@ -671,7 +756,6 @@ GTEST_TEST(Utils, FixedArray_006)
         a.remove(a.size() - 1);
     }
 }
-
 
 struct Complex
 {
@@ -862,7 +946,6 @@ GTEST_TEST(Utils, HashTable_001)
 
     EXPECT_EQ(it.capacity(), 0x20000);
 }
-
 
 GTEST_TEST(Utils, HashTable_002)
 {

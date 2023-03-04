@@ -36,10 +36,13 @@ namespace Rt2
         void construct(const String& str);
 
     public:
+        [[deprecated]]
         PathUtil() = default;
 
+        [[deprecated]]
         PathUtil(const PathUtil& oth);
 
+        [[deprecated]]
         explicit PathUtil(const String& fileName);
 
         const String& stem() const;

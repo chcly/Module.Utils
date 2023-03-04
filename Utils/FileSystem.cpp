@@ -34,10 +34,10 @@ namespace Rt2
         const String swp = "\\";
 #endif
         String cp1;
-        StringUtils::trimWs(cp1, path);
+        Su::trimWs(cp1, path);
 
         String cp2;
-        StringUtils::replaceAll(cp2, cp1, swp, sep);
+        Su::replaceAll(cp2, cp1, swp, sep);
         return cp2;
     }
 
@@ -66,7 +66,25 @@ namespace Rt2
         return StdFileSystem::current_path().string();
     }
 
-    void FileSystem::list(const String& path, DirectoryEntryArray& dest)
+    String FileSystem::unixPath(const String& path)
+    {
+        String cp1;
+        Su::trimWs(cp1, path);
+
+        String cp2;
+        Su::replaceAll(cp2, cp1, "\\\\", "\\");
+        Su::replaceAll(cp2, cp1, "\\", "/");
+        return cp2;
+    }
+
+    FilePath FileSystem::unixPath(const FilePath& path)
+    {
+        return FilePath{unixPath(path.string())};
+    }
+
+    void FileSystem::list(
+        const String&        path,
+        DirectoryEntryArray& dest)
     {
         if (const FilePath fp = {path};
             is_directory(fp))

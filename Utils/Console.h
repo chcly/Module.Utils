@@ -68,6 +68,7 @@ namespace Rt2
 
         static void resetColor();
 
+        static void write(IStream& stream);
         static void write(const String& str);
         static void writeLine(const String& str);
         static void writeLine(const int64_t& i);
@@ -151,6 +152,5 @@ namespace Rt2
         using Out = Console;
         using Con = Console;
         using Dbg = Console;
-
     };
 }  // namespace Rt2

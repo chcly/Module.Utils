@@ -36,6 +36,7 @@ namespace Rt2
     using FilePath          = StdFileSystem::path;
     using DirectoryEntry    = StdFileSystem::directory_entry;
     using DirectoryIterator = StdFileSystem::directory_iterator;
+    using Permissions       = StdFileSystem::perms;
 
     using PathArray           = std::deque<FilePath>;
     using DirectoryEntryArray = std::deque<DirectoryEntry>;
@@ -50,6 +51,10 @@ namespace Rt2
         static FilePath absolute(const String& input);
 
         static String currentPath();
+
+        static String unixPath(const String& path);
+
+        static FilePath unixPath(const FilePath& path);
 
         static void list(const String& path, DirectoryEntryArray& dest);
     };
