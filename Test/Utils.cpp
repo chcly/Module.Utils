@@ -151,9 +151,8 @@ GTEST_TEST(Utils, DirPath_004)
 
     EXPECT_TRUE(f2.canRead());
     EXPECT_TRUE(f2.canWrite());
-    //EXPECT_FALSE(f2.canExecute()); // true on windows...
+    // EXPECT_FALSE(f2.canExecute()); // true on windows...
 }
-
 
 GTEST_TEST(Utils, DirPath_005)
 {
@@ -162,6 +161,21 @@ GTEST_TEST(Utils, DirPath_005)
 
     EXPECT_EQ(f0.full(), "Z:/A/A.A.A/B.B.B/C.C.C/A.ext1.extLast");
     EXPECT_EQ(f0.directory(), "A/A.A.A/B.B.B/C.C.C/");
+}
+
+GTEST_TEST(Utils, DirPath_006)
+{
+    using Path = Directory::Path;
+
+    const Path a = Path("Z:/foo/bar/file.x.yz");
+    const Path b = Path("Z:/foo/bar/");
+
+    const Path c = a.relativeTo(b);
+    EXPECT_EQ(c.full(), "file.x.yz");
+    EXPECT_EQ(c.stem(), "file");
+    EXPECT_EQ(c.extension(), ".x.yz");
+
+    // Still has kinks...
 }
 
 GTEST_TEST(Utils, Path_LocaFile)

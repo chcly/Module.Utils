@@ -43,7 +43,7 @@ namespace Rt2
     using OutputStringStream = std::ostringstream;
     using InputFileStream    = std::ifstream;
     using OutputFileStream   = std::ofstream;
-    
+
     class StringUtils
     {
     public:
@@ -81,6 +81,14 @@ namespace Rt2
         static void trimWs(
             String&       di,
             const String& in);
+
+        static bool startsWith(
+            const String& test,
+            const char&   chk);
+
+        static bool endsWith(
+            const String& test,
+            const char&   chk);
 
         static void trimL(
             String&       destination,

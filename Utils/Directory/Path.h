@@ -50,9 +50,13 @@ namespace Rt2::Directory
 
         Path& operator=(const String& oth);
 
+        bool empty() const;
+
         const String& root() const;
 
         const String& directory() const;
+
+        String lastDirectory() const;
 
         const String& stem() const;
 
@@ -78,13 +82,7 @@ namespace Rt2::Directory
 
         bool isSymLink() const;
 
-        void list(PathArray& dest) const;
-
-        Permissions permissions() const;
-
-        DirectoryEntry entry() const;
-
-        bool open(InputFileStream& fs, bool binary = false) const;
+        bool isDotDirectory() const;
 
         bool canRead() const;
 
@@ -92,10 +90,32 @@ namespace Rt2::Directory
 
         bool canExecute() const;
 
+        void list(PathArray& dest, bool sortByDirectory = false) const;
+
+        Permissions permissions() const;
+
+        DirectoryEntry entry() const;
+
+        bool open(InputFileStream& fs, bool binary = false) const;
+
+        Path append(const String& path) const;
+
+        Path append(const Path& path) const;
+
+        Path relativeTo(const String& to) const;
+
+        Path relativeTo(const Path& to) const;
+
+        const StringDeque& directories() const;
+
     private:
         static int scan(IStream& input, String& out, int& state);
 
+        void constructImpl(const String& str) const;
+
         void construct(const String& str) const;
+
+        static void pushFlipped(StringDeque& dest, const String& str);
     };
 
 }  // namespace Rt2::Directory

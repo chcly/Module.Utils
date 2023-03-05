@@ -68,4 +68,9 @@ namespace Rt2
             return _string.c_str();
         }
     };
-}  // namespace Jam
+#ifdef _DEBUG
+    #define DebugLog(x) Console::writeError((x).what())
+#else
+    #define DebugLog(x) 
+#endif
+}  // namespace Rt2

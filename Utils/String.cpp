@@ -71,13 +71,18 @@ namespace Rt2
 
     void StringUtils::reverse(String& dest, const String& input)
     {
-        dest.clear();
-        String::const_reverse_iterator it = input.rbegin();
-        while (it != input.rend())
+        if (input.size() > 1)
         {
-            dest.push_back(*it);
-            ++it;
+            dest.clear();
+            String::const_reverse_iterator it = input.rbegin();
+            while (it != input.rend())
+            {
+                dest.push_back(*it);
+                ++it;
+            }
         }
+        else
+            dest = input;
     }
 
     void StringUtils::toLower(String& dest, const String& in)
@@ -457,6 +462,16 @@ namespace Rt2
         if (y == Npos)
             y = n2 > 1 ? n2 - 1 : 0;
         di = in.substr(x, y - x);
+    }
+
+    bool StringUtils::startsWith(const String& test, const char& chk)
+    {
+        return !test.empty() && test.front() == chk;
+    }
+
+    bool StringUtils::endsWith(const String& test, const char& chk)
+    {
+        return !test.empty() && test.back() == chk;
     }
 
     void StringUtils::trimL(String& destination, const String& input, const char character)

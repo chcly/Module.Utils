@@ -19,6 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 -------------------------------------------------------------------------------
 */
+// TODO:  All this should be extracted into a header only sub-directory
 #pragma once
 #include <bitset>
 #include <cstdint>
@@ -178,21 +179,40 @@ namespace Rt2
     };
 
     template <typename T>
+    bool isEmpty(const T& v)
+    {
+        return v.empty();
+    }
+
+    template <typename T>
     class Attribute : CallableStream<Attribute<T>>
     {
     private:
-        String _key;
-        T      _val;
+        using CheckFn = std::function<bool(const T&)>;
+
+        String        _key;
+        T             _val;
+        const CheckFn _fn;
+
+        bool empty() const
+        {
+            // conditionally write to
+            // the stream if it's not empty
+            return _fn ? _fn(_val) : true;
+        }
 
     public:
-        explicit Attribute(String key, T val) :
+        explicit Attribute(String key, T val, CheckFn cb = isEmpty<T>) :
             _key(std::move(key)),
-            _val(std::move(val))
+            _val(std::move(val)),
+            _fn(cb)
         {
         }
 
         OStream& operator()(OStream& out) const
         {
+            if (empty())
+                return out;
             return out << ' ' << _key << '=' << '"' << _val << '"';
         }
     };
