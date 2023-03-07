@@ -72,6 +72,8 @@ namespace Rt2::Directory
 
         const String& fullDirectory() const;
 
+        Path directoryAsPath() const;
+
         bool hasDirectory() const;
 
         bool exists() const;

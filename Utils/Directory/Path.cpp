@@ -309,6 +309,11 @@ namespace Rt2::Directory
         return _private->cache.fullDirectory;
     }
 
+    Path Path::directoryAsPath() const
+    {
+        return Path{fullDirectory()};
+    }
+
     bool Path::exists() const
     {
         try
@@ -363,8 +368,7 @@ namespace Rt2::Directory
 
     bool Path::isDotDirectory() const
     {
-        const String str = directory();
-        return !str.empty() && str[0] == '.' && str[str.size() - 1] == '/';
+        return Su::startsWith(lastDirectory(), '.');
     }
 
     bool Path::canRead() const
@@ -389,9 +393,11 @@ namespace Rt2::Directory
 
         try
         {
-            if (const DirectoryEntry fp = entry(); is_directory(fp))
+            if (const DirectoryEntry fp = entry(); 
+                is_directory(fp))
             {
                 const DirectoryIterator dit = DirectoryIterator(fp.path());
+
                 for (const auto& ent : dit)
                     dest.push_back(Path(ent.path().generic_string()));
 
@@ -441,7 +447,10 @@ namespace Rt2::Directory
     Path Path::append(const String& path) const
     {
         if (isDirectory())
-            return Path(Su::join(full(), path));
+        {
+            return Path(Su::join(fullDirectory(), path));
+            
+        }
         return {};
     }
 

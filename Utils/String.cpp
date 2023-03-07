@@ -257,9 +257,7 @@ namespace Rt2
         {
             if (in != 0)
                 dest.push_back(in);
-
             dest.append(el);
-
             if (out != 0)
                 dest.push_back(out);
         }
@@ -284,6 +282,7 @@ namespace Rt2
         while (pos != String::npos)
         {
             String t1 = t0.substr(0, pos);
+
             trimWs(t1, t1);
             if (!t1.empty())
                 destination.push_back(t1);

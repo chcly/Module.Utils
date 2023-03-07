@@ -213,7 +213,31 @@ namespace Rt2
         {
             if (empty())
                 return out;
-            return out << ' ' << _key << '=' << '"' << _val << '"';
+            return out << _key << '=' << '"' << _val << '"';
+        }
+    };
+
+    class AttributeMap : CallableStream<AttributeMap>
+    {
+    private:
+        StringMap _values;
+
+    public:
+        explicit AttributeMap(StringMap& values) :
+            _values(std::move(values))
+        {
+        }
+
+        OStream& operator()(OStream& out) const
+        {
+            if (!_values.empty())
+            {
+                out << "style=" << '"';
+                for (const auto& [k, v] : _values)
+                    out <<  k << ':' << v << ';';
+                out << '"';
+            }
+            return out;
         }
     };
 
