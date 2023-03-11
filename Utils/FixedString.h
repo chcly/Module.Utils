@@ -238,7 +238,7 @@ namespace Rt2
             if (_size == 0 || !_buffer)
                 return -1;
 
-            _hash = skHash(_buffer);
+            _hash = Hash(_buffer);
             return _hash;
         }
 
