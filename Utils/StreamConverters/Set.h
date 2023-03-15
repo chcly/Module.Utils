@@ -1,5 +1,6 @@
 #pragma once
 #include <iomanip>
+#include <cfloat>
 #include "Utils/Array.h"
 #include "Utils/StreamConverters/Callable.h"
 
