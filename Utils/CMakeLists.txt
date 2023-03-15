@@ -6,6 +6,7 @@ set_group(Utils_HDR
     Header/CommandLine:CommandLine/*.h
     Header/Directory:Directory/*.h
     Header/LeakCheck:Win32/*.h
+    Header/StreamConverters:StreamConverters/*.h
     )
 set_group(Utils_SRC
     Source:*.hint
