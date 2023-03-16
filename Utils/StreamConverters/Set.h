@@ -1,61 +1,67 @@
 #pragma once
-#include <iomanip>
 #include <cfloat>
+#include <iomanip>
 #include "Utils/Array.h"
-#include "Utils/StreamConverters/Callable.h"
+#include "Utils/StreamConverters/OutOperator.h"
 
 namespace Rt2
 {
 
-    template <typename T,
-              uint8_t O,
-              uint8_t S,
-              uint8_t C,
-              uint8_t W,
-              uint8_t P,
-              uint8_t F = 0>
-    class TPrintSet : CallableStream<TPrintSet<T, O, S, C, W, P, F>>
+    template <typename T,    // type
+              uint8_t O,     // open symbol
+              uint8_t S,     // separator symbol
+              uint8_t C,     // close symbol
+              uint8_t W,     // width
+              uint8_t P,     // precision
+              uint8_t F = 0  // fixed
+              >
+    class TPrintSet : OutOperator<TPrintSet<T, O, S, C, W, P, F>>
     {
     public:
         using Set = Array<T>;
 
     private:
-        Set     _data;
+        Set     _v;
         uint8_t _w;
         uint8_t _p;
-        bool    _fix{false};
+        bool    _f{false};
 
     public:
-        explicit TPrintSet(const Set&    data,
+        explicit TPrintSet(const Set&    d,
                            const uint8_t w   = W,
                            const uint8_t p   = P,
-                           const bool    fix = F != 0) :
-            _data(data), _w(w), _p(p), _fix(fix)
+                           const bool    f = F != 0) :
+            _v(d),
+            _w(std::max<uint8_t>(w, 1) - 1),
+            _p(p),
+            _f(f)
         {
         }
 
         OStream& operator()(OStream& out) const
         {
-            if (O != '\0')
-                out << (int8_t)O;
+            if (O != '\0') out << (int8_t)O;
 
             out << std::setfill(' ');
+
             bool f = true;
-            for (const auto& data : _data)
+            for (const auto& data : _v)
             {
                 if (!f) out << (int8_t)S << ' ';
 
                 out << std::setw(_w);
                 out << std::setprecision(_p);
-                if (_fix)
+
+                if (_f)
                     out << std::fixed;
                 else
                     out << std::defaultfloat;
+
                 out << data;
                 f = false;
             }
-            if (C != '\0')
-                out << (int8_t)C;
+
+            if (C != '\0') out << (int8_t)C;
             return out;
         }
     };

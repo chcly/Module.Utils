@@ -1,12 +1,12 @@
 #pragma once
 #include <iomanip>
-#include "Utils/StreamConverters/Callable.h"
+#include "Utils/StreamConverters/OutOperator.h"
 
 namespace Rt2
 {
     template <uint8_t PadIn  = 1,
               uint8_t PadOut = 1>
-    class Equ : CallableStream<Equ<PadIn, PadOut>>
+    class Equ : OutOperator<Equ<PadIn, PadOut>>
     {
     private:
         uint8_t _pi;
@@ -15,8 +15,8 @@ namespace Rt2
     public:
         explicit Equ(const uint8_t pi = PadIn,
                      const uint8_t po = PadOut) :
-            _pi(pi),
-            _po(po)
+            _pi(std::max<uint8_t>(pi, 1) - 1),
+            _po(std::max<uint8_t>(po, 1) - 1)
         {
         }
 

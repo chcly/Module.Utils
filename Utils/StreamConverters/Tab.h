@@ -1,24 +1,21 @@
 #pragma once
 #include <iomanip>
-#include "Utils/StreamConverters/Callable.h"
+#include "Utils/StreamConverters/OutOperator.h"
 
 namespace Rt2
 {
-    struct Tab : CallableStream<Tab>
+    struct Tab : OutOperator<Tab>
     {
-        mutable uint8_t w{4};
-
-        Tab() = default;
+        uint8_t w{4};
 
         explicit Tab(const uint8_t nw) :
-            w(nw) {}
+            w(std::max<uint8_t>(nw, 1) - 1) {}
 
         OStream& operator()(OStream& out) const
         {
-            w = std::max<uint8_t>(w, 1);
             return out
                    << std::setfill(' ')
-                   << std::setw(std::streamsize(w) - 1)
+                   << std::setw(std::streamsize(w))
                    << ' ';
         }
     };

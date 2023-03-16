@@ -1,7 +1,7 @@
 #pragma once
 #include <functional>
 #include "Utils/Definitions.h"
-#include "Utils/StreamConverters/Callable.h"
+#include "Utils/StreamConverters/OutOperator.h"
 
 namespace Rt2
 {
@@ -13,27 +13,27 @@ namespace Rt2
     }
 
     template <typename T>
-    class Attribute : CallableStream<Attribute<T>>
+    class Attribute : OutOperator<Attribute<T>>
     {
     private:
         using CheckFn = std::function<bool(const T&)>;
 
-        String        _key;
-        T             _val;
-        const CheckFn _fn;
+        String        _k;
+        T             _v;
+        const CheckFn _f;
 
         bool empty() const
         {
             // conditionally write to
             // the stream if it's not empty
-            return _fn ? _fn(_val) : true;
+            return _f ? _f(_v) : true;
         }
 
     public:
         explicit Attribute(String key, T val, CheckFn cb = isEmpty<T>) :
-            _key(std::move(key)),
-            _val(std::move(val)),
-            _fn(cb)
+            _k(std::move(key)),
+            _v(std::move(val)),
+            _f(cb)
         {
         }
 
@@ -41,11 +41,11 @@ namespace Rt2
         {
             if (empty())
                 return out;
-            return out << _key << '=' << '"' << _val << '"';
+            return out << _k << '=' << '"' << _v << '"';
         }
     };
 
-    class AttributeMap : CallableStream<AttributeMap>
+    class AttributeMap : OutOperator<AttributeMap>
     {
     private:
         StringMap _values;
@@ -60,7 +60,7 @@ namespace Rt2
         {
             if (!_values.empty())
             {
-                out << "style=" << '"';
+                out << "style=" << '"';  // This shouldn't be hard coded.
                 for (const auto& [k, v] : _values)
                     out << k << ':' << v << ';';
                 out << '"';
