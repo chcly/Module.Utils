@@ -1,11 +1,11 @@
 #pragma once
 #include <bitset>
-#include "Utils/StreamConverters/Callable.h"
+#include "Utils/StreamConverters/OutOperator.h"
 
 namespace Rt2
 {
-    template <typename T, uint8_t Len>
-    class Bin : CallableStream<Bin<T, Len>>
+    template <typename T, uint8_t Len, bool Pad = true>
+    class Bin : OutOperator<Bin<T, Len, Pad>>
     {
     private:
         std::bitset<Len> _value;
@@ -21,8 +21,11 @@ namespace Rt2
             while (i < str.size())
             {
                 out << str[i];
-                if (i + 1 < str.size() && i % 4 == 3)
-                    out << "`";
+                if (Pad)
+                {
+                    if (i + 1 < str.size() && i % 4 == 3)
+                        out << "`";
+                }
                 ++i;
             }
             return out;

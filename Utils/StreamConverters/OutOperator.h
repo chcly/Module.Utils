@@ -4,7 +4,7 @@
 namespace Rt2
 {
     template <typename T>
-    struct CallableStream
+    struct OutOperator
     {
         friend OStream& operator<<(
             OStream& out,

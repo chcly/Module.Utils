@@ -1,9 +1,9 @@
 #pragma once
-#include "Utils/StreamConverters/Callable.h"
+#include "Utils/StreamConverters/OutOperator.h"
 
 namespace Rt2
 {
-    struct Nl : CallableStream<Nl>
+    struct Nl : OutOperator<Nl>
     {
         OStream& operator()(OStream& out) const
         {
@@ -11,7 +11,7 @@ namespace Rt2
         }
     };
 
-    class NlTab : CallableStream<NlTab>
+    class NlTab : OutOperator<NlTab>
     {
     public:
         OStream& operator()(OStream& out) const

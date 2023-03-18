@@ -1,7 +1,7 @@
 #pragma once
 #include <functional>
 #include "Utils/Definitions.h"
-#include "Utils/StreamConverters/Callable.h"
+#include "Utils/StreamConverters/OutOperator.h"
 
 namespace Rt2
 {
@@ -13,7 +13,7 @@ namespace Rt2
     }
 
     template <typename T>
-    class Attribute : CallableStream<Attribute<T>>
+    class Attribute : OutOperator<Attribute<T>>
     {
     private:
         using CheckFn = std::function<bool(const T&)>;
@@ -45,7 +45,7 @@ namespace Rt2
         }
     };
 
-    class AttributeMap : CallableStream<AttributeMap>
+    class AttributeMap : OutOperator<AttributeMap>
     {
     private:
         String    _attr;

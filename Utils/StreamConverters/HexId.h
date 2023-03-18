@@ -1,10 +1,10 @@
 #pragma once
 #include <iomanip>
-#include "Utils/StreamConverters/Callable.h"
+#include "Utils/StreamConverters/OutOperator.h"
 
 namespace Rt2
 {
-    class HexId : CallableStream<HexId>
+    class HexId : OutOperator<HexId>
     {
     public:
         OStream& operator()(OStream& out) const
