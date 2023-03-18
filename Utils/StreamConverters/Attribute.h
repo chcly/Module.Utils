@@ -48,10 +48,12 @@ namespace Rt2
     class AttributeMap : CallableStream<AttributeMap>
     {
     private:
+        String    _attr;
         StringMap _values;
 
     public:
-        explicit AttributeMap(StringMap& values) :
+        explicit AttributeMap(String attr, StringMap values) :
+            _attr(std::move(attr)),
             _values(std::move(values))
         {
         }
@@ -60,7 +62,7 @@ namespace Rt2
         {
             if (!_values.empty())
             {
-                out << "style=" << '"';
+                out << _attr << '=' << '"';
                 for (const auto& [k, v] : _values)
                     out << k << ':' << v << ';';
                 out << '"';
