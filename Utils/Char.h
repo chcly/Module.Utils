@@ -193,17 +193,33 @@ namespace Rt2
 
     inline bool isLower(const int ch)
     {
-        return (ch >= 'a' && ch <= 'z');
+        return ch >= 'a' && ch <= 'z';
     }
 
     inline bool isUpper(const int ch)
     {
-        return (ch >= 'A' && ch <= 'Z');
+        return ch >= 'A' && ch <= 'Z';
     }
 
     inline bool isLetter(const int ch)
     {
         return isLower(ch) || isUpper(ch);
+    }
+
+    inline bool isInteger(const int ch)
+    {
+        return isDecimal(ch) || ch == '-';
+    }
+
+    inline bool isReal(const int ch)
+    {
+        return isDecimal(ch) || ch == '-' ||
+               ch == '+' ||
+               ch == 'E' ||
+               ch == 'e' ||
+               ch == 'F' ||
+               ch == 'f' ||
+               ch == '.';
     }
 
     inline bool isPrintable(const int constant)
@@ -216,6 +232,11 @@ namespace Rt2
         return isPrintable(constant) ||
                isWhiteSpace(constant) ||
                isNewLine(constant);
+    }
+
+    inline bool isAlphaNumeric(const int ch)
+    {
+        return isLower(ch) || isUpper(ch) || isDecimal(ch);
     }
 
     using Ch = Char;

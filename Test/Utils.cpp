@@ -307,6 +307,50 @@ GTEST_TEST(Utils, String_Trim)
     EXPECT_EQ("A\tB C", inp);
 }
 
+GTEST_TEST(Utils, Filter_alpha)
+{
+    const String exp = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    String       cmp;
+    String       inp;
+    for (int i=32; i<128; ++i )
+        inp.push_back((char)i);
+    Su::filterAZaz(cmp, inp, 96);
+    EXPECT_EQ(cmp, exp);
+}
+
+GTEST_TEST(Utils, Filter_alpha_digit)
+{
+    const String exp = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    String       cmp;
+    String       inp;
+    for (int i=32; i<128; ++i )
+        inp.push_back((char)i);
+    Su::filterAZaz09(cmp, inp, 96);
+    EXPECT_EQ(cmp, exp);
+}
+
+GTEST_TEST(Utils, Filter_digit)
+{
+    const String exp = "-0123456789";
+    String       cmp;
+    String       inp;
+    for (int i=32; i<128; ++i )
+        inp.push_back((char)i);
+    Su::filterInt(cmp, inp, 96);
+    EXPECT_EQ(cmp, exp);
+}
+
+GTEST_TEST(Utils, Filter_real)
+{
+    const String exp = "+-.0123456789EFef";
+    String       cmp;
+    String       inp;
+    for (int i=32; i<128; ++i )
+        inp.push_back((char)i);
+    Su::filterReal(cmp, inp, 96);
+    EXPECT_EQ(cmp, exp);
+}
+
 GTEST_TEST(Utils, Stack_001)
 {
     IntStack a;

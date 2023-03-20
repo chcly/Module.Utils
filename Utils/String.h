@@ -23,6 +23,7 @@
 
 #include <deque>
 #include <fstream>
+#include <functional>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -43,6 +44,7 @@ namespace Rt2
     using OutputStringStream = std::ostringstream;
     using InputFileStream    = std::ifstream;
     using OutputFileStream   = std::ofstream;
+    using FilterFunction     = std::function<bool(const char& ch)>;
 
     class StringUtils
     {
@@ -109,32 +111,46 @@ namespace Rt2
             const String& input,
             char          character);
 
+        /// Filters characters out of the input string into the destination string.
+        /// Filtering occurs when the pass function returns a true value.
+        /// Returns true if the string was modified.
+        static bool filter(
+            String&               destination,
+            const String&         input,
+            const FilterFunction& pass,
+            size_t                max = 0x100);
+
         static bool filterRange(
             String&       destination,
             const String& input,
             int8_t        start,
             int8_t        end,
-            size_t        max = 256);
+            size_t        max = 0x100);
 
         static bool filterAZaz(
             String&       destination,
             const String& input,
-            size_t        max = 256);
+            size_t        max = 0x100);
+
+        static bool filterAZaz09(
+            String&       destination,
+            const String& input,
+            size_t        max = 0x100);
 
         static bool filterAscii(
             String&       destination,
             const String& input,
-            size_t        max = 256);
+            size_t        max = 0x100);
 
         static bool filterInt(
             String&       destination,
             const String& input,
-            size_t        max = 256);
+            size_t        max = 0x100);
 
         static bool filterReal(
             String&       destination,
             const String& input,
-            size_t        max = 256);
+            size_t        max = 0x100);
 
         static void replaceAll(
             String&       dest,

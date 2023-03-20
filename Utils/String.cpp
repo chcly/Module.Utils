@@ -341,6 +341,26 @@ namespace Rt2
         trimR(destination, destination, character);
     }
 
+    bool StringUtils::filter(String&               destination,
+                             const String&         input,
+                             const FilterFunction& pass,
+                             const size_t          max)
+    {
+        if (!pass) return false;
+        if (input.empty()) return false;
+
+        if (!destination.empty())
+            destination.clear();
+        destination.reserve(input.size());
+
+        for (const char ch : input)
+        {
+            if (destination.size() >= max) break;
+            if (pass(ch)) destination.push_back(ch);
+        }
+        return destination.size() != input.size();
+    }
+
     bool StringUtils::filterRange(
         String&       destination,
         const String& input,
@@ -348,30 +368,26 @@ namespace Rt2
         const int8_t  end,
         const size_t  max)
     {
-        destination.clear();
-        for (const char ch : input)
-        {
-            if (destination.size() >= max)
-                break;
-
-            if (ch >= start && ch <= end)
-                destination.push_back(ch);
-        }
-        return destination.size() != input.size();
+        return filter(
+            destination, input, [start, end](const char ch)
+            { return ch >= start && ch <= end; },
+            max);
     }
 
-    bool StringUtils::filterAZaz(String& destination, const String& input, const size_t max)
+    bool StringUtils::filterAZaz(
+        String&       destination,
+        const String& input,
+        const size_t  max)
     {
-        destination.clear();
-        for (const char ch : input)
-        {
-            if (destination.size() >= max)
-                break;
+        return filter(destination, input, isLetter, max);
+    }
 
-            if (isLetter(ch))
-                destination.push_back(ch);
-        }
-        return destination.size() != input.size();
+    bool StringUtils::filterAZaz09(
+        String&       destination,
+        const String& input,
+        const size_t  max)
+    {
+        return filter(destination, input, isAlphaNumeric, max);
     }
 
     bool StringUtils::filterAscii(
@@ -379,16 +395,7 @@ namespace Rt2
         const String& input,
         const size_t  max)
     {
-        destination.clear();
-        for (const char ch : input)
-        {
-            if (destination.size() >= max)
-                break;
-
-            if (ch >= 0x20 && ch < 0x7F)
-                destination.push_back(ch);
-        }
-        return destination.size() != input.size();
+        return filter(destination, input, isPrintableAscii, max);
     }
 
     bool StringUtils::filterInt(
@@ -396,16 +403,7 @@ namespace Rt2
         const String& input,
         const size_t  max)
     {
-        destination.clear();
-        for (const char ch : input)
-        {
-            if (destination.size() >= max)
-                break;
-
-            if (ch >= '0' && ch < '9' || ch == '-')
-                destination.push_back(ch);
-        }
-        return destination.size() != input.size();
+        return filter(destination, input, isInteger, max);
     }
 
     bool StringUtils::filterReal(
@@ -413,23 +411,7 @@ namespace Rt2
         const String& input,
         const size_t  max)
     {
-        destination.clear();
-        for (const char ch : input)
-        {
-            if (destination.size() >= max)
-                break;
-
-            if (ch >= '0' && ch < '9' ||
-                ch == '-' ||
-                ch == '+' ||
-                ch == 'E' ||
-                ch == 'e' ||
-                ch == 'F' ||
-                ch == 'f' ||
-                ch == '.')
-                destination.push_back(ch);
-        }
-        return destination.size() != input.size();
+        return filter(destination, input, isReal, max);
     }
 
     void StringUtils::trimWs(String& di, const String& in)

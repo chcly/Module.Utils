@@ -20,7 +20,7 @@
 -------------------------------------------------------------------------------
 */
 #pragma once
-#include <stdio.h>
+#include <cstdio>
 #include "Utils/Allocator.h"
 #include "Utils/Definitions.h"
 #include "Utils/Hash.h"
