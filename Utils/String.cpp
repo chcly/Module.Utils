@@ -152,6 +152,13 @@ namespace Rt2
         }
     }
 
+    void StringUtils::copy(String& out, IStream& in, const bool newLine)
+    {
+        OutputStringStream oss;
+        copy(oss, in, false, newLine);
+        out.assign(oss.str());
+    }
+
     // clang-format off
     constexpr char BaseChars[] = {
         'D', 'c', 'U', 'y', '3', 'b', 'C', 'g',
