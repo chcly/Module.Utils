@@ -20,7 +20,7 @@ list(APPEND CMAKE_MODULE_PATH
   ${Utils_SOURCE_DIR}/CMake/Modules
 )
 
-include(${Utils_SOURCE_DIR}/CMake/Configure.cmake)
+include(Configure)
 if (NOT Configure_SUCCEEDED)
    return()
 endif()
