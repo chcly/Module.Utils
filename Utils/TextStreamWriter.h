@@ -70,6 +70,13 @@ namespace Rt2
         {
             ((out << std::forward<Args>(args)), ...);
         }
+
+        template <typename... Args>
+        static void println(OStream& out, Args&&... args)
+        {
+            ((out << std::forward<Args>(args)), ...);
+            out << std::endl;
+        }
     };
 
     using Ts = WriteUtils;

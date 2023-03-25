@@ -100,6 +100,8 @@ namespace Rt2::Directory
 
         bool open(InputFileStream& fs, bool binary = false) const;
 
+        bool open(OutputFileStream& fs, bool binary = false) const;
+
         Path append(const String& path) const;
 
         Path append(const Path& path) const;

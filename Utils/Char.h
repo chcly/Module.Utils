@@ -169,6 +169,9 @@ namespace Rt2
         static String toBinaryString(uint64_t v);
 
         static int hexToDec(char v);
+
+        static int invertId(int ch);
+
     };
 
     inline bool isNewLine(const int constant)

@@ -393,7 +393,7 @@ namespace Rt2::Directory
 
         try
         {
-            if (const DirectoryEntry fp = entry(); 
+            if (const DirectoryEntry fp = entry();
                 is_directory(fp))
             {
                 const DirectoryIterator dit = DirectoryIterator(fp.path());
@@ -444,12 +444,20 @@ namespace Rt2::Directory
         return fs.is_open();
     }
 
+    bool Path::open(OutputFileStream& fs, bool binary) const
+    {
+        if (binary)
+            fs.open(full(), std::ios_base::binary);
+        else
+            fs.open(full());
+        return fs.is_open();
+    }
+
     Path Path::append(const String& path) const
     {
         if (isDirectory())
         {
             return Path(Su::join(fullDirectory(), path));
-            
         }
         return {};
     }

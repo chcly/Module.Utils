@@ -78,17 +78,14 @@ namespace Rt2
                 flag &= ~_CRTDBG_CHECK_CRT_DF;
 
                 _CrtSetDbgFlag(flag);
-                _CrtSetReportHook(nullptr);
             }
 
             __startState = {};
         }
-        else
+
+        if (_CrtDumpMemoryLeaks() == 0)
         {
-            if (_CrtDumpMemoryLeaks() == 0)
-            {
-                // Console::writeLine("No memory leaks were found");
-            }
+            // Console::writeLine("No memory leaks were found");
         }
 
         _CrtSetReportHook(nullptr);

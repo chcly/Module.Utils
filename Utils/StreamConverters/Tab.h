@@ -13,6 +13,8 @@ namespace Rt2
 
         OStream& operator()(OStream& out) const
         {
+            if (w == 0)
+                return out;
             return out
                    << std::setfill(' ')
                    << std::setw(std::streamsize(w))

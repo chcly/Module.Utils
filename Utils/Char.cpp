@@ -500,4 +500,16 @@ namespace Rt2
             return 0;
         }
     }
+
+    int Char::invertId(const int ch)
+    {
+        #define fs(s, e, c) ((e) - (c) + (s) - (s))
+        if (isUpper(ch))
+            return 'a' + fs('A', 'Z', ch);
+        if (isLower(ch))
+            return 'A' + fs('a', 'z', ch);
+        if (isDecimal(ch))
+            return '9' - (ch - '0');
+        return ch;
+    }
 }  // namespace Rt2
