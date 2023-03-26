@@ -206,7 +206,6 @@ namespace Rt2::CommandLine
         Console::write(oss.str());
     }
 
-
     String Parser::programName() const
     {
         return _programName.fileName();
@@ -227,6 +226,17 @@ namespace Rt2::CommandLine
         if (enumId < _options.size())
             return _options[enumId]->isPresent();
         return false;
+    }
+
+    int Parser::flag(const uint32_t& enumId, int present, int notPresent) const
+    {
+        return isPresent(enumId) ? present : notPresent;
+    }
+
+    void Parser::setIfPresent(int& dest, const uint32_t& enumId, int present) const
+    {
+        if (isPresent(enumId))
+            dest |= present;
     }
 
     ParseOption* Parser::option(const uint32_t& enumId) const
@@ -425,4 +435,4 @@ namespace Rt2::CommandLine
         return -1;
     }
 
-}  // namespace Jam::CommandLine
+}  // namespace Rt2::CommandLine

@@ -84,6 +84,10 @@ namespace Rt2::CommandLine
 
         bool isPresent(const uint32_t& enumId) const;
 
+        int flag(const uint32_t& enumId, int present, int notPresent) const;
+
+        void setIfPresent(int& dest, const uint32_t& enumId, int present) const;
+
         ParseOption* option(const uint32_t& enumId) const;
 
         int32_t int32(const uint32_t& enumId,
@@ -109,4 +113,4 @@ namespace Rt2::CommandLine
     {
         return _argumentList;
     }
-}  // namespace Jam::CommandLine
+}  // namespace Rt2::CommandLine
