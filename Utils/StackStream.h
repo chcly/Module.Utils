@@ -54,24 +54,24 @@ namespace Rt2
         }
 
     public:
-        class Flush
+        class ScopeLock
         {
         private:
             TStreamStack* _parent{nullptr};
 
-            Flush() = default;
+            ScopeLock() = default;
 
-            Flush& operator=(const Flush& rhs) = default;
+            ScopeLock& operator=(const ScopeLock& rhs) = default;
 
         public:
-            Flush(const Flush& rhs) = default;
+            ScopeLock(const ScopeLock& rhs) = default;
 
-            explicit Flush(TStreamStack* base)
+            explicit ScopeLock(TStreamStack* base)
             {
                 _parent = base;
             }
 
-            ~Flush()
+            ~ScopeLock()
             {
                 if (_parent)
                     _parent->flush();
@@ -116,14 +116,14 @@ namespace Rt2
                 _depth += Clamp(n, -LevelMax, LevelMax);
         }
 
-        [[nodiscard]] Flush push(OStream* stream)
+        [[nodiscard]] ScopeLock push(OStream* stream)
         {
             if (stream)
             {
                 _stack.push({stream, new OutputStringStream(), _depth});
-                return Flush{this};
+                return ScopeLock{this};
             }
-            return Flush{nullptr};
+            return ScopeLock{nullptr};
         }
 
         void _push(OStream* stream)
@@ -207,6 +207,6 @@ namespace Rt2
     };
 
     using OutputStreamStack = TStreamStack<4>;
-    using StackFlush        = OutputStreamStack::Flush;
+    using StackStreamLock   = OutputStreamStack::ScopeLock;
 
 }  // namespace Rt2
