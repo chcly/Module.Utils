@@ -32,14 +32,14 @@ namespace Rt2
         static void indent(OStream& out, int n)
         {
             n = (int)std::min<size_t>(std::max<size_t>(n, 0), 80);
-            if (n > 0)
-                out << std::setw((std::streamsize)(n - 1)) << ' ';
+            while (--n >= 0)
+                out.put(' ');
         }
 
         static void newLine(OStream& out, int n)
         {
             n = std::min(std::max(n, 0), 20);
-            while (n-- > 0)
+            while (--n >= 0)
                 out << std::endl;
         }
 

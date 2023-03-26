@@ -110,10 +110,27 @@ namespace Rt2
             _root = base;
         }
 
-        void inc(const int n)
+        void inc(const int n = 1)
         {
             if (n != 0)
                 _depth += Clamp(n, -LevelMax, LevelMax);
+        }
+
+        void dec(const int n = 1)
+        {
+            inc(-Abs(n));
+        }
+
+        TStreamStack& operator++()
+        {
+            inc();
+            return *this;
+        }
+
+        TStreamStack& operator--()
+        {
+            dec();
+            return *this;
         }
 
         [[nodiscard]] ScopeLock push(OStream* stream)
@@ -160,7 +177,7 @@ namespace Rt2
             }
         }
 
-        void endl(int n=1)
+        void endl(int n = 1)
         {
             if (auto [client, stream, indent] = top();
                 stream != nullptr)
