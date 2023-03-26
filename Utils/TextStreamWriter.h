@@ -33,7 +33,7 @@ namespace Rt2
         {
             n = (int)std::min<size_t>(std::max<size_t>(n, 0), 80);
             if (n > 0)
-                out << std::setw((size_t)(n - 1)) << ' ';
+                out << std::setw((std::streamsize)(n - 1)) << ' ';
         }
 
         static void newLine(OStream& out, int n)

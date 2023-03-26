@@ -8,11 +8,13 @@ namespace Rt2
     class FillT : OutOperator<FillT<W, C, R>>
     {
     private:
-        uint8_t _w;
+        std::streamsize _w;
 
     public:
-        explicit FillT(const uint8_t w = W) :
-            _w(std::max((int)w, 1) - 1) {}
+        explicit FillT(const uint8_t w = W)
+        {
+            _w = std::max<std::streamsize>((std::streamsize)w, 1) - 1;
+        }
 
         OStream& operator()(OStream& out) const
         {
@@ -22,6 +24,7 @@ namespace Rt2
             return out;
         }
     };
+
     using Line = FillT<32, '-', ' '>;
 
 }  // namespace Rt2
