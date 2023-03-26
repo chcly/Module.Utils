@@ -160,12 +160,13 @@ namespace Rt2
             }
         }
 
-        void endl()
+        void endl(int n=1)
         {
             if (auto [client, stream, indent] = top();
                 stream != nullptr)
             {
-                *stream << std::endl;
+                while (--n >= 0)
+                    *stream << std::endl;
                 _stickyLine = false;
             }
         }
