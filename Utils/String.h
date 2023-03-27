@@ -74,6 +74,10 @@ namespace Rt2
             const String& input,
             char          swap = '$');
 
+        static void scanSplitLine(
+            StringArray&  dest,
+            const String& input);
+
         static void combine(
             String&            dest,
             const StringDeque& input,

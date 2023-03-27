@@ -494,6 +494,19 @@ namespace Rt2::Directory
         return _private->directories;
     }
 
+    Path Path::absolute() const
+    {
+        if (_private->drive.empty())
+        {
+            String curDir = FileSystem::currentPath();
+            if (!Su::endsWith(curDir, '/'))
+                curDir.push_back('/');
+
+            return Path(Su::join(curDir, directory(), stem(), extension()));
+        }
+        return Path(full());
+    }
+
     const String& Path::stem() const
     {
         return _private->stem;

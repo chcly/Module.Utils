@@ -112,6 +112,8 @@ namespace Rt2::Directory
 
         const StringDeque& directories() const;
 
+        Path absolute() const;
+
     private:
         static int scan(IStream& input, String& out, int& state);
 

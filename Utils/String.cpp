@@ -20,6 +20,7 @@
 -------------------------------------------------------------------------------
 */
 #include "Utils/String.h"
+#include "Utils/Array.h"
 #include "Utils/Char.h"
 #include "Utils/Definitions.h"
 #include "Utils/Time.h"
@@ -253,6 +254,47 @@ namespace Rt2
         replaceAll(temp, temp, swap2, "\r\n");
         replaceAll(temp, temp, swap1, "\r\n");
         split(dest, temp, "\r\n");
+    }
+
+    void StringUtils::scanSplitLine(StringArray& dest, const String& input)
+    {
+        InputStringStream stream(input);
+        SimpleArray<char> buf;
+        buf.reserve(0x200);
+
+        if (const size_t est = Clamp<size_t>(input.size()  / 0x10, 0x00, 0x200); 
+            est > 0)
+            dest.reserve(est);
+
+        while (!stream.eof())
+        {
+            if (const int c0 = stream.get(); isNewLine(c0))
+            {
+                if (const int c1 = stream.peek(); c0 == '\r' && c1 == '\n')
+                    stream.seekg(1, std::ios::cur);  // counts as 1
+
+                if (buf.empty())
+                    dest.push_back("");
+                else
+                {
+                    dest.push_back("");
+                    dest.back().assign(buf.data(), buf.size());
+                    buf.resizeFast(0);
+                }
+            }
+            else
+            {
+                if (isPrintableAscii(c0))
+                    buf.push_back((char)c0);
+                // else - filter it out..
+            }
+        }
+
+        if (!buf.empty())
+        {
+            dest.push_back("");
+            dest.back().assign(buf.data(), buf.size());
+        }
     }
 
     void StringUtils::combine(String&            dest,
