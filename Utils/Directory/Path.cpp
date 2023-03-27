@@ -49,79 +49,59 @@ namespace Rt2::Directory
         }
     };
 
+    enum Flags
+    {
+        PathNoFlag       = 0x00,
+        PathHasRoot      = 0x01,
+        PathHasExtension = 0x02,
+        PathIsOnlyDir    = 0x03,
+    };
+
+    enum State
+    {
+        SearchPeriod,  // Search until the EOS or the first '/' character
+        SearchSep,     // Search until the EOS or the first ':' character
+        SearchDrive,   // Search until the EOS
+    };
+
     struct PathPrivate
     {
-        String      drive;
+        String      root;
         StringDeque directories;
         String      stem;
         StringDeque extensions;
         PathCache   cache;
+        uint32_t    flags{PathNoFlag};
 
         void clear()
         {
-            drive.clear();
+            root.clear();
             directories.clear();
             stem.clear();
             extensions.clear();
             cache.clear();
+            flags = PathNoFlag;
         }
 
         bool empty() const
         {
-            return drive.empty() &&
+            return root.empty() &&
                    directories.empty() &&
                    stem.empty() &&
                    extensions.empty();
         }
+
+        static void scan(IStream& input, String& out, int& state);
+
+        void constructImpl(const String& str);
+
+        void construct(const String& str);
+
+        static void pushFlipped(StringDeque& dest, const String& str);
     };
 
-    Path::Path() :
-        _private(new PathPrivate())
+    void PathPrivate::scan(IStream& input, String& out, int& state)
     {
-    }
-
-    Path::Path(const Path& oth) :
-        _private(new PathPrivate())
-    {
-        construct(oth.full());
-    }
-
-    Path::Path(const String& fileName) :
-        _private(new PathPrivate())
-
-    {
-        construct(fileName);
-    }
-
-    Path::~Path()
-    {
-        delete _private;
-        _private = nullptr;
-    }
-
-    Path& Path::operator=(const Path& oth)
-    {
-        if (this != &oth)
-            construct(oth.full());
-        return *this;
-    }
-
-    Path& Path::operator=(const String& oth)
-    {
-        construct(oth);
-        return *this;
-    }
-
-    bool Path::empty() const
-    {
-        return _private->empty();
-    }
-
-    int Path::scan(IStream& input, String& out, int& state)
-    {
-        // state: 0 - file
-        // state: 1 - dir
-
         out.clear();
         while (!input.eof())
         {
@@ -132,13 +112,13 @@ namespace Rt2::Directory
             switch (ch)
             {
             case '/':
-                state = 1;
+                state = SearchSep;
                 if (input.peek() == '/')
                     (void)input.get();
-                return 1;
+                return;
             case '.':
-                if (state == 0)
-                    return 1;
+                if (state == SearchPeriod)
+                    return;
                 [[fallthrough]];
             case PathSpecialChars:
             case UpperCaseAz:
@@ -147,61 +127,72 @@ namespace Rt2::Directory
                 out.push_back((char)ch);
                 break;
             case ':':
-                state = 2;
+                state = SearchDrive;
                 break;
             default:
                 throw Exception("Invalid character in path sequence :", Hex(ch));
             }
         }
-        return -1;
     }
 
-    void Path::constructImpl(const String& str) const
+    void PathPrivate::constructImpl(const String& str)
     {
-        RT_ASSERT(_private)
-        _private->clear();
+        clear();
 
-        // only dealing with Unix path separators.
-        String norm;
-        Su::replaceAll(norm, str, "\\", "/");
+        String n2 = FileSystem::sanitize(str);
+        if (Su::startsWith(n2, "./"))
+            n2 = Su::join(FileSystem::current(), n2.substr(2, n2.size()));
 
-        String rn;
-        Su::reverse(rn, norm);  // read it backwards
+        if (Su::startsWith(n2, '/') || FileSystem::isRooted(n2))
+            flags |= PathHasRoot;
 
-        int state = 0;
-        int prev  = Su::startsWith(rn, '/') ? 1 : 0;
+        String n3;
+        Su::reverse(n3, n2);  // read it backwards
 
-        String flip;
-        String buf;
+        int state = SearchPeriod;
+        int prev  = Su::startsWith(n3, '/') ? SearchSep : SearchPeriod;
+        if (prev)
+            flags |= PathIsOnlyDir;
 
-        InputStringStream stream(rn);
+        String t0;
+
+        InputStringStream stream(n3);
         while (!stream.eof())
         {
-            scan(stream, buf, state);
-            if (prev == state)
+            scan(stream, t0, state);
+            if (prev == state)  // no transition
             {
-                if (state == 0)
+                if (state == SearchPeriod)
                 {
                     if (stream.eof())
-                        Su::reverse(_private->stem, buf);
+                        Su::reverse(stem, t0);
                     else
-                        pushFlipped(_private->extensions, buf);
+                        pushFlipped(extensions, t0);
                 }
-                else if (state == 1)
-                    pushFlipped(_private->directories, buf);
+                else if (state == SearchSep)
+                    pushFlipped(directories, t0);
+                else
+                    Console::writeError("unhandled exit: ", state);
             }
-            else
+            else  // transition state
             {
-                if (prev == 0)
-                    Su::reverse(_private->stem, buf);
-                if (prev == 1 && state == 2)
-                    Su::reverse(_private->drive, buf);
+                if (prev == SearchPeriod)
+                    Su::reverse(stem, t0);
+                else if (prev == SearchSep && state == SearchDrive)
+                    Su::reverse(root, t0);
+                else
+                    Console::writeError("unhandled transition: ", prev, "->", state);
             }
             prev = state;
         }
+
+        if (!root.empty())
+            flags |= PathHasRoot;
+        if (!extensions.empty())
+            flags |= PathHasExtension;
     }
 
-    void Path::construct(const String& str) const
+    void PathPrivate::construct(const String& str)
     {
         try
         {
@@ -210,12 +201,12 @@ namespace Rt2::Directory
         }
         catch (Exception& ex)
         {
-            DebugLog(ex);
-            _private->clear();
+            Console::writeError(ex.what());
+            clear();
         }
     }
 
-    void Path::pushFlipped(StringDeque& dest, const String& str)
+    void PathPrivate::pushFlipped(StringDeque& dest, const String& str)
     {
         if (str.empty())
             return;
@@ -230,16 +221,58 @@ namespace Rt2::Directory
             dest.push_front(str);
     }
 
+    Path::Path() :
+        _private(new PathPrivate())
+    {
+    }
+
+    Path::Path(const Path& oth) :
+        _private(new PathPrivate())
+    {
+        _private->construct(oth.full());
+    }
+
+    Path::Path(const String& fileName) :
+        _private(new PathPrivate())
+
+    {
+        _private->construct(fileName);
+    }
+
+    Path::~Path()
+    {
+        delete _private;
+        _private = nullptr;
+    }
+
+    Path& Path::operator=(const Path& oth)
+    {
+        if (this != &oth)
+            _private->construct(oth.full());
+        return *this;
+    }
+
+    Path& Path::operator=(const String& oth)
+    {
+        _private->construct(oth);
+        return *this;
+    }
+
+    bool Path::empty() const
+    {
+        return _private->empty();
+    }
+
     const String& Path::root() const
     {
         if (!empty() && _private->cache.drive.empty())
         {
-            if (hasDirectory())
+            if (hasDirectory() && isRooted())
             {
-                if (_private->drive.empty())
+                if (_private->root.empty())
                     _private->cache.drive = "/";
                 else
-                    _private->cache.drive = _private->drive + ":/";
+                    _private->cache.drive = _private->root + ":/";
             }
         }
         return _private->cache.drive;
@@ -496,15 +529,21 @@ namespace Rt2::Directory
 
     Path Path::absolute() const
     {
-        if (_private->drive.empty())
+        if (_private->root.empty())
         {
-            String curDir = FileSystem::currentPath();
-            if (!Su::endsWith(curDir, '/'))
-                curDir.push_back('/');
-
-            return Path(Su::join(curDir, directory(), stem(), extension()));
+            return Path(
+                Su::join(
+                    FileSystem::current(),
+                    directory(),
+                    stem(),
+                    extension()));
         }
         return Path(full());
+    }
+
+    Path Path::current()
+    {
+        return Path(FileSystem::current());
     }
 
     const String& Path::stem() const
@@ -515,6 +554,11 @@ namespace Rt2::Directory
     bool Path::hasDirectory() const
     {
         return !_private->directories.empty();
+    }
+
+    bool Path::isRooted() const
+    {
+        return (_private->flags & PathHasRoot) != 0;
     }
 
     const String& Path::base() const

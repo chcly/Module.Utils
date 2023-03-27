@@ -92,9 +92,17 @@ namespace Rt2
             const String& test,
             const char&   chk);
 
+        static bool startsWith(
+            const String& test,
+            const String& chk);
+
         static bool endsWith(
             const String& test,
             const char&   chk);
+
+        static bool endsWith(
+            const String& test,
+            const String& chk);
 
         static void trimL(
             String&       destination,
@@ -187,7 +195,7 @@ namespace Rt2
             bool     newLine = true);
 
         static void copy(
-            String& out,
+            String&  out,
             IStream& in,
             bool     newLine = true);
 

@@ -66,6 +66,31 @@ namespace Rt2
         return StdFileSystem::current_path().string();
     }
 
+    String FileSystem::current()
+    {
+        String path = sanitize(StdFileSystem::current_path().string());
+        if (!Su::endsWith(path, '/'))
+            path.push_back('/');
+        return path;
+    }
+
+    bool FileSystem::isRooted(const String& test)
+    {
+        return FilePath(test).has_root_directory();
+    }
+
+    String FileSystem::sanitize(const String& path)
+    {
+        // only dealing with Unix path separators.
+        String n1;
+        Su::replaceAll(n1, path, "\\", "/");
+
+        // Take double slashes out of the equation
+        String n2;
+        Su::replaceAll(n2, n1, "//", "/");
+        return n2;
+    }
+
     String FileSystem::unixPath(const String& path)
     {
         String cp1;

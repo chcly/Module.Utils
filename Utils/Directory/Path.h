@@ -76,6 +76,8 @@ namespace Rt2::Directory
 
         bool hasDirectory() const;
 
+        bool isRooted() const;
+
         bool exists() const;
 
         bool isDirectory() const;
@@ -114,14 +116,8 @@ namespace Rt2::Directory
 
         Path absolute() const;
 
-    private:
-        static int scan(IStream& input, String& out, int& state);
 
-        void constructImpl(const String& str) const;
-
-        void construct(const String& str) const;
-
-        static void pushFlipped(StringDeque& dest, const String& str);
+        static Path current();
     };
 
 }  // namespace Rt2::Directory

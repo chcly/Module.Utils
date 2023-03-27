@@ -44,13 +44,26 @@ namespace Rt2
     class FileSystem
     {
     public:
+        //[[deprecated]]
         static String normalize(const String& path);
 
+        //[[deprecated]]
         static FilePath normalize(const FilePath& path);
 
+        //[[deprecated]]
         static FilePath absolute(const String& input);
 
+        //[[deprecated]]
         static String currentPath();
+
+        static String current();
+
+
+        static bool isRooted(const String & test);
+
+
+        static String sanitize(const String& path);
+
 
         static String unixPath(const String& path);
 

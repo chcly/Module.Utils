@@ -66,6 +66,7 @@ GTEST_TEST(Utils, DirPath_001)
 
     EXPECT_EQ(f0.full(), "Z:/A/AAA/BBB/CCC/A.ext1.extLast");
     EXPECT_TRUE(f0.hasDirectory());
+    EXPECT_TRUE(f0.isRooted());
 
     EXPECT_EQ(f0.fullDirectory(), "Z:/A/AAA/BBB/CCC/");
     EXPECT_EQ(f0.extension(), ".ext1.extLast");
@@ -176,6 +177,58 @@ GTEST_TEST(Utils, DirPath_006)
     EXPECT_EQ(c.extension(), ".x.yz");
 
     // Still has kinks...
+}
+
+GTEST_TEST(Utils, DirPath_007)
+{
+    using Path = Directory::Path;
+
+    // should be read as cwd/file
+    const Path a = Path("./xyz.pdq");
+
+    EXPECT_EQ(a.fullDirectory(), FileSystem::current());
+    EXPECT_EQ(a.base(), "xyz.pdq");
+}
+
+void CheckDirState(
+    const Directory::Path& b,
+    bool                   hasDir,
+    bool                   isRoot,
+    const String&          expRoot,
+    const String&          expDirState,
+    const String&          expFileName)
+{
+    EXPECT_EQ(b.hasDirectory(), hasDir);
+    EXPECT_EQ(b.isRooted(), isRoot);
+    EXPECT_EQ(b.root(), expRoot);
+    EXPECT_EQ(b.directory(), expDirState);
+    EXPECT_EQ(b.base(), expFileName);
+}
+
+GTEST_TEST(Utils, DirPath_008)
+{
+    using Path = Directory::Path;
+    CheckDirState(
+        Path("Rel1/xyz.pdq"),
+        true,
+        false,
+        "",
+        "Rel1/",
+        "xyz.pdq");
+    CheckDirState(
+        Path("/Rel1/xyz.pdq"),
+        true,
+        true,
+        "/",
+        "Rel1/",
+        "xyz.pdq");
+    CheckDirState(
+        Path("label:/Rel1/xyz.pdq"),
+        true,
+        true,
+        "label:/",
+        "Rel1/",
+        "xyz.pdq");
 }
 
 GTEST_TEST(Utils, Path_LocaFile)
@@ -307,12 +360,23 @@ GTEST_TEST(Utils, String_Trim)
     EXPECT_EQ("A\tB C", inp);
 }
 
+
+GTEST_TEST(Utils, String_CheckBegEnd)
+{
+    EXPECT_EQ(Su::startsWith("#A", ""), false);
+    EXPECT_EQ(Su::endsWith("#A", ""), false);
+    EXPECT_EQ(Su::startsWith("#A", "#"), true);
+    EXPECT_EQ(Su::endsWith("#A", "A"), true);
+}
+
+
+
 GTEST_TEST(Utils, Filter_alpha)
 {
     const String exp = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     String       cmp;
     String       inp;
-    for (int i=32; i<128; ++i )
+    for (int i = 32; i < 128; ++i)
         inp.push_back((char)i);
     Su::filterAZaz(cmp, inp, 96);
     EXPECT_EQ(cmp, exp);
@@ -323,7 +387,7 @@ GTEST_TEST(Utils, Filter_alpha_digit)
     const String exp = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     String       cmp;
     String       inp;
-    for (int i=32; i<128; ++i )
+    for (int i = 32; i < 128; ++i)
         inp.push_back((char)i);
     Su::filterAZaz09(cmp, inp, 96);
     EXPECT_EQ(cmp, exp);
@@ -334,7 +398,7 @@ GTEST_TEST(Utils, Filter_digit)
     const String exp = "-0123456789";
     String       cmp;
     String       inp;
-    for (int i=32; i<128; ++i )
+    for (int i = 32; i < 128; ++i)
         inp.push_back((char)i);
     Su::filterInt(cmp, inp, 96);
     EXPECT_EQ(cmp, exp);
@@ -345,7 +409,7 @@ GTEST_TEST(Utils, Filter_real)
     const String exp = "+-.0123456789EFef";
     String       cmp;
     String       inp;
-    for (int i=32; i<128; ++i )
+    for (int i = 32; i < 128; ++i)
         inp.push_back((char)i);
     Su::filterReal(cmp, inp, 96);
     EXPECT_EQ(cmp, exp);

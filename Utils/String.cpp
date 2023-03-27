@@ -211,10 +211,11 @@ namespace Rt2
         }
     };
 
-    String StringUtils::scramble(const String& value, bool randomize)
+    String StringUtils::scramble(const String& value, const bool randomize)
     {
         OutputStringStream oss;
-        Merge              m;
+
+        Merge m{};
         for (size_t i = 0; i < value.size(); ++i)
         {
             m.b[i % 8] = (uint8_t)value[i];
@@ -262,7 +263,7 @@ namespace Rt2
         SimpleArray<char> buf;
         buf.reserve(0x200);
 
-        if (const size_t est = Clamp<size_t>(input.size()  / 0x10, 0x00, 0x200); 
+        if (const size_t est = Clamp<size_t>(input.size() / 0x10, 0x00, 0x200);
             est > 0)
             dest.reserve(est);
 
@@ -499,9 +500,31 @@ namespace Rt2
         return !test.empty() && test.front() == chk;
     }
 
+    bool StringUtils::startsWith(const String& test, const String& chk)
+    {
+        if (chk.empty())
+            return test.empty();
+        if (test.size() > chk.size())
+            return test.substr(0, chk.size()) == chk;
+        if (test.size() == chk.size())
+            return test == chk;
+        return false;
+    }
+
     bool StringUtils::endsWith(const String& test, const char& chk)
     {
         return !test.empty() && test.back() == chk;
+    }
+
+    bool StringUtils::endsWith(const String& test, const String& chk)
+    {
+        if (chk.empty())
+            return test.empty();
+        if (test.size() > chk.size())
+            return test.substr(test.size() - chk.size(), chk.size()) == chk;
+        if (test.size() == chk.size())
+            return test == chk;
+        return false;
     }
 
     void StringUtils::trimL(String& destination, const String& input, const char character)
