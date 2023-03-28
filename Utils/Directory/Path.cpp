@@ -541,6 +541,17 @@ namespace Rt2::Directory
         return Path(full());
     }
 
+    String Path::fullPlatform() const
+    {
+#ifdef WIN32
+        String fix;
+        Su::replaceAll(fix, full(), "/", "\\");
+        return fix;
+#else
+        return full();
+#endif
+    }
+
     Path Path::current()
     {
         return Path(FileSystem::current());

@@ -27,27 +27,18 @@ namespace Rt2::CommandLine
     class Scanner
     {
     private:
-        size_t _position{0};
-        String _buffer;
+        InputStringStream _stream;
 
-        void scanString(char ch, Token& tok);
+        void scanString(Token& tok);
 
-        void scanIdentifier(char ch, Token& tok);
+        void scanOption(Token& tok);
 
     public:
         Scanner() = default;
 
-        void clear();
+        void scan(Token& tok);
 
-        void lex(Token& tok);
-
-        void append(const char* arg);
-
-        const String& getValue() const;
+        void load(char** argv, int argc);
     };
 
-    inline const String& Scanner::getValue() const
-    {
-        return _buffer;
-    }
 }  // namespace Jam::CommandLine

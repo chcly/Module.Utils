@@ -20,120 +20,106 @@
 -------------------------------------------------------------------------------
 */
 #include "Utils/CommandLine/Scanner.h"
+#include "Utils/Char.h"
+#include "Utils/Exception.h"
+#include "Utils/StreamConverters/Hex.h"
 
 namespace Rt2::CommandLine
 {
 
-    void Scanner::clear()
+    void Scanner::load(char** argv, const int argc)
     {
-        _buffer.resize(0);
+        String buf;
+        Su::cmd(buf, argv, argc);
+        _stream = InputStringStream(buf);
     }
 
-    void Scanner::append(const char* arg)
+    void Scanner::scanString(Token& tok)
     {
-        _buffer.append(arg);
-        _buffer.push_back(' ');
-    }
+        int ch = _stream.get();
+        if (!isQuote(ch))
+            throw Exception("expected the quote character '\"'");
 
-    void Scanner::scanString(char ch, Token& tok)
-    {
-        // parse a standard string
-        if (_position + 1 < _buffer.size())
+        ch = _stream.get();
+        while (!isQuote(ch))
         {
-            ch = _buffer.at(_position++);
-            while (ch != 0 && ch != '\'' && ch != '\"')
+            tok.append((char)ch);
+            ch = _stream.get();
+            if (ch <= 0)
             {
-                tok.append(ch);
-                ch = _buffer.at(_position++);
-            }
-            if (ch == '\'' || ch == '"')
-            {
-                if (!tok.getValue().empty())
-                    tok.setType(TOK_IDENTIFIER);
+                throw Exception(
+                    "unexpected end of file "
+                    "while searching for a closing (",
+                    '"',
+                    ") character");
             }
         }
-        else
-            tok.setType(TOK_ERROR);
+        tok.setType(TOK_VALUE);
     }
 
-    void Scanner::scanIdentifier(char ch, Token& tok)
+    inline bool isValid(const int ch)
     {
-        while (ch != 0 && ch != ' ')
-        {
-            tok.append(ch);
-            ch = _buffer.at(_position++);
-        }
-        if (ch == ' ')
-            --_position;
-        tok.setType(TOK_IDENTIFIER);
+        return !isWhiteSpace(ch) && ch > 0;
     }
-    
-    // clang-format off
-#define LowerCaseAz                                                   \
-    'a' : case 'b' : case 'c' : case 'd' : case 'e' : case 'f' : case 'g' \
-        : case 'h' : case 'i' : case 'j' : case 'k' : case 'l' : case 'm' \
-        : case 'n' : case 'o' : case 'p' : case 'q' : case 'r' : case 's' \
-        : case 't' : case 'u' : case 'v' : case 'w' : case 'x' : case 'y' \
-        : case 'z'
 
-#define UpperCaseAz                                                   \
-    'A' : case 'B' : case 'C' : case 'D' : case 'E' : case 'F' : case 'G' \
-        : case 'H' : case 'I' : case 'J' : case 'K' : case 'L' : case 'M' \
-        : case 'N' : case 'O' : case 'P' : case 'Q' : case 'R' : case 'S' \
-        : case 'T' : case 'U' : case 'V' : case 'W' : case 'X' : case 'Y' \
-        : case 'Z'
+    void Scanner::scanOption(Token& tok)
+    {
+        int ch = _stream.get();
+        while (isValid(ch))
+        {
+            tok.append((char)ch);
+            ch = _stream.get();
+        }
 
-#define Digits09                                                      \
-    '0' : case '1' : case '2' : case '3' : case '4' : case '5' : case '6' \
-        : case '7' : case '8' : case '9'
 
-    // clang-format on
-    void Scanner::lex(Token& tok)
+        tok.setType(TOK_VALUE);
+    }
+
+    void Scanner::scan(Token& tok)
     {
         tok.clear();
-
-        while (_position < _buffer.size())
+        while (!_stream.eof())
         {
-            char ch = _buffer.at(_position++);
-            if (ch == '-')
-            {
-                const char nx = _buffer.at(_position);
-                if (nx >= '0' && nx <= '9')
-                {
-                    tok.append(ch);
-                    continue;
-                }
-            }
-
-            switch (ch)
+            switch (const int ch = _stream.get())
             {
             case '-':
             {
-                const char nx = _buffer.at(_position);
-                if (nx == '-')
-                    ++_position;
-                tok.setType(nx == '-' ? (int)TOK_SWITCH_LONG : (int)TOK_SWITCH_SHORT);
+                if (_stream.peek() == '-')
+                {
+                    _stream.seekg(1, std::ios_base::cur);
+                    tok.setType(TOK_LONG);
+                }
+                else
+                    tok.setType(TOK_SHORT);
                 return;
             }
             case '"':
             case '\'':
-                scanString(ch, tok);
+                // read any '[.]*' or "[.]*"
+                _stream.putback((char)ch);
+                scanString(tok);
                 return;
             case '.':
             case '/':
             case Digits09:
             case UpperCaseAz:
             case LowerCaseAz:
-                scanIdentifier(ch, tok);
+                // read any till the eof or first ' '
+                _stream.putback((char)ch);
+                scanOption(tok);
                 return;
             case ' ':
             case '\t':
                 break;
+            case 0:
+            case -1:
+                tok.setType(TOK_EOS);
+                return;
             default:
                 tok.setType(TOK_ERROR);
-                tok.append(_buffer.substr(_position - 1, _buffer.size()));
+                tok.append(Su::join("unknown token, ", Hex(ch)));
                 return;
             }
         }
     }
-}  // namespace Jam::CommandLine
+}  // namespace Rt2::CommandLine

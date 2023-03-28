@@ -23,6 +23,7 @@
 #include <unordered_map>
 #include "Utils/CommandLine/Option.h"
 #include "Utils/CommandLine/Scanner.h"
+#include "Utils/Directory/Path.h"
 #include "Utils/FileSystem.h"
 #include "Utils/Path.h"
 
@@ -36,14 +37,14 @@ namespace Rt2::CommandLine
         typedef std::vector<String>                      StringArray;
 
     private:
-        int         _maxLongSwitch{4};
-        int         _requiredOptions{0};
-        int         _usedOptions{0};
-        Scanner     _scanner;
-        Switches    _switches;
-        StringArray _argumentList;
-        Options     _options;
-        PathUtil    _programName;
+        int             _maxLen{4};
+        int             _requiredOptions{0};
+        int             _usedOptions{0};
+        Scanner         _scanner;
+        Switches        _switches;
+        StringArray     _argumentList;
+        Options         _options;
+        Directory::Path _program;
 
         bool hasSwitch(const String& sw) const;
 
@@ -55,9 +56,18 @@ namespace Rt2::CommandLine
 
         int parseOptions(Token& token, String& tmpBuffer);
 
-        bool setupParse(int argc, char** argv);
+        bool setup(int argc, char** argv);
 
         int parseImpl();
+
+        template <typename... Args>
+        int error(Args&&... args)
+        {
+            OutputStringStream out;
+            ((out << std::forward<Args>(args)), ...);
+            out << std::endl;
+            return writeError(out);
+        }
 
     public:
         Parser() = default;
@@ -65,16 +75,11 @@ namespace Rt2::CommandLine
 
         int parse(int argc, char** argv, const Switch* switches, uint32_t count);
 
-        int parseNoSwitch(int argc, char** argv);
-
-        void logInput() const;
+        int parse(int argc, char** argv);
 
         StringArray& arguments();
 
-        String programPath() const
-        {
-            return _programName.fullPath();
-        }
+        String programPath() const;
 
         String programName() const;
 

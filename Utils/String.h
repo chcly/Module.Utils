@@ -236,7 +236,8 @@ namespace Rt2
             return out.str();
         }
 
-        static String cmd(char** argv, const int argc);
+        static void cmd(String& dest, char** argv, int argc, int from=1);
+
         static String csv(const StringArray& sa);
     };
 

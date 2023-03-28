@@ -240,16 +240,15 @@ namespace Rt2
         join(destination, "L", sa, sb, sc, sd);
     }
 
-    String StringUtils::cmd(char** argv, const int argc)
+    void StringUtils::cmd(String& dest, char** argv, const int argc, int from)
     {
-        OutputStringStream oss;
-        for (int i = 0; i < argc; ++i)
+        from = std::min<int>(from, argc);
+        for (int i = from; i < argc; ++i)
         {
-            if (i > 0)
-                oss.put(' ');
-            oss << String(argv[i]);
+            if (i > from)
+                dest.push_back(' ');
+            dest.append(String(argv[i], Char::length(argv[i])));
         }
-        return oss.str();
     }
 
     String StringUtils::csv(const StringArray& sa)

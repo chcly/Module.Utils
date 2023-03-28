@@ -20,13 +20,12 @@
 -------------------------------------------------------------------------------
 */
 #include "Utils/CommandLine/Parser.h"
-#include <iomanip>
 #include <iostream>
 #include "Utils/Console.h"
 #include "Utils/Definitions.h"
 #include "Utils/FileSystem.h"
-#include "Utils/Path.h"
-#include "Utils/TextStreamWriter.h"
+#include "Utils/StackStream.h"
+#include "Utils/StreamConverters/Tab.h"
 
 namespace Rt2::CommandLine
 {
@@ -43,20 +42,19 @@ namespace Rt2::CommandLine
         return _switches.find(sw) != _switches.end();
     }
 
-    bool Parser::setupParse(int argc, char** argv)
+    bool Parser::setup(const int argc, char** argv)
     {
         RT_ASSERT(argv)
         RT_ASSERT(argc >= 1)
 
-        if (!_programName.empty())  // using as a check for multiple calls
+        if (!_program.empty())  // using as a check for multiple calls
             return false;
 
-        _programName = PathUtil(argv[0]);
+        _program = Directory::Path(argv[0]);
+
         _usedOptions = 0;
 
-        _scanner.clear();
-        for (int i = 1; i < argc; ++i)
-            _scanner.append(argv[i]);
+        _scanner.load(argv, argc);
         return true;
     }
 
@@ -67,12 +65,12 @@ namespace Rt2::CommandLine
 
         tmpBuffer.reserve(16);
         const int rc = parseOptions(token, tmpBuffer);
-
+        if (rc < 0)
+            usage();
         if (_usedOptions != _requiredOptions)
         {
-            OutputStringStream os;
-            os << "missing required options" << endl;
-            return writeError(os);
+            usage();
+            return error("missing required options");
         }
         return rc;
     }
@@ -82,7 +80,7 @@ namespace Rt2::CommandLine
                       const Switch*  switches,
                       const uint32_t count)
     {
-        if (!setupParse(argc, argv))
+        if (!setup(argc, argv))
             return -1;
 
         if (!initializeSwitches(switches, count))
@@ -91,9 +89,9 @@ namespace Rt2::CommandLine
         return parseImpl();
     }
 
-    int Parser::parseNoSwitch(int argc, char** argv)
+    int Parser::parse(const int argc, char** argv)
     {
-        if (!setupParse(argc, argv))
+        if (!setup(argc, argv))
             return -1;
         return parseImpl();
     }
@@ -102,72 +100,57 @@ namespace Rt2::CommandLine
     {
         while (token.getType() != TOK_EOS)
         {
-            _scanner.lex(token);
+            _scanner.scan(token);
             const int type = token.getType();
-
             if (token.getType() == TOK_ERROR)
-            {
-                cerr << token.getValue() << endl;
-                usage();
-                return -1;
-            }
+                return error("error token, ", token.getValue());
 
-            if (type == TOK_SWITCH_SHORT || type == TOK_SWITCH_LONG)
+            if (type == TOK_SHORT || type == TOK_LONG)
             {
                 // grab the next token
-                _scanner.lex(token);
-
-                if (token.getType() == TOK_NEXT || token.getType() == TOK_EOS)
+                _scanner.scan(token);
+                if (token.getType() != TOK_VALUE)
                 {
-                    OutputStringStream os;
-                    os << "expected a switch value to follow '-'" << endl;
-                    return writeError(os);
+                    return error(
+                        "expected a switch value "
+                        "to follow the '-' character");
                 }
 
                 if (token.getValue() == "help" || token.getValue() == "h")
                 {
+                    _usedOptions = _requiredOptions;
                     usage();
                     return -1;
                 }
 
                 auto it = _switches.find(token.getValue());
                 if (it == _switches.end())
-                {
-                    OutputStringStream os;
-                    os << "unknown option " << token.getValue() << endl;
-                    return writeError(os);
-                }
+                    return error("unknown option ", token.getValue());
 
                 tmpBuffer.assign(token.getValue());
 
                 ParseOption* opt = it->second;
                 opt->makePresent();
-
                 if (!opt->isOptional())
                     _usedOptions++;
 
-                const size_t nArgs = opt->getArgCount();
-                if (nArgs > 0)
+                if (const size_t nArgs = opt->getArgCount();
+                    nArgs > 0)
                 {
                     size_t i;
                     for (i = 0; i < nArgs; ++i)
                     {
-                        _scanner.lex(token);
-
-                        if (token.getType() != TOK_IDENTIFIER)
+                        _scanner.scan(token);
+                        if (token.getType() != TOK_VALUE)
                         {
-                            OutputStringStream os;
-                            os << "invalid argument for option " << tmpBuffer
-                               << endl;
-                            return writeError(os);
+                            return error("invalid argument for option: ",
+                                         tmpBuffer);
                         }
 
                         if (token.getValue().empty())
                         {
-                            OutputStringStream os;
-                            os << "missing argument for option " << tmpBuffer
-                               << endl;
-                            return writeError(os);
+                            return error("missing argument for option: ",
+                                         tmpBuffer);
                         }
 
                         opt->setValue(i, token.getValue());
@@ -175,50 +158,43 @@ namespace Rt2::CommandLine
 
                     if (i != nArgs)
                     {
-                        OutputStringStream os;
-                        os << "not all arguments converted when parsing switch "
-                           << tmpBuffer << endl;
-                        return writeError(os);
+                        return error(
+                            "not all arguments converted "
+                            "when parsing switch: ",
+                            tmpBuffer);
                     }
                 }
             }
-            else if (type >= TOK_OPTION && type < TOK_EOS)
+            else if (type == TOK_VALUE)
                 _argumentList.push_back(token.getValue());
             else
             {
                 if (type != TOK_EOS)
-                {
-                    OutputStringStream os;
-                    os << "unknown option " << token.getValue().c_str() << endl;
-                    return writeError(os);
-                }
+                    return error("unknown option: ",
+                                 token.getValue());
             }
         }
         return 0;
     }
 
-    void Parser::logInput() const
+    String Parser::programPath() const
     {
-        OutputStringStream oss;
-        WriteUtils::writeLine(oss, 0, 1, "Launching: ", programPath());
-        WriteUtils::writeLine(oss, 0, 1, "Working Directory: ", currentDirectory());
-        WriteUtils::writeLine(oss, 0, 1, "Command line: [", _scanner.getValue(), "]");
-        Console::write(oss.str());
+        return _program.fullPlatform();
     }
 
     String Parser::programName() const
     {
-        return _programName.fileName();
+        return _program.base();
     }
 
     String Parser::programDirectory() const
     {
-        return _programName.fullPath();
+        return _program.fullDirectory();
     }
 
     String Parser::currentDirectory()
     {
-        return PathUtil(FileSystem::currentPath()).fullPath();
+        return Directory::Path::current().full();
     }
 
     bool Parser::isPresent(const uint32_t& enumId) const
@@ -228,12 +204,14 @@ namespace Rt2::CommandLine
         return false;
     }
 
-    int Parser::flag(const uint32_t& enumId, int present, int notPresent) const
+    int Parser::flag(const uint32_t& enumId,
+                     const int       present,
+                     const int       notPresent) const
     {
         return isPresent(enumId) ? present : notPresent;
     }
 
-    void Parser::setIfPresent(int& dest, const uint32_t& enumId, int present) const
+    void Parser::setIfPresent(int& dest, const uint32_t& enumId, const int present) const
     {
         if (isPresent(enumId))
             dest |= present;
@@ -298,59 +276,80 @@ namespace Rt2::CommandLine
 
     void Parser::usage(String& dest) const
     {
-        const streamsize w = max(_maxLongSwitch + 2, 4);
+        const int mw = max<int>(_maxLen, 6);
 
         OutputStringStream stream;
+        TStreamStack<2>    out;
 
-        stream << "Usage: " << programName() << " <options> <arg[0] .. arg[n]>" << endl
-               << endl;
-        stream << setw(4) << "-h, --help" << setw(w - 4) << ' '
-               << "Display this help message" << endl;
+        auto lock = out.push(&stream);
 
-        for (const ParseOption* opt : _options)
+        out.endl(1);
+        out.println("Usage: ", programName(), " [<options> <arg[0] .. arg[n]>]");
+        out.endl();
+        out.inc();
+        out.println("Where <arg[0] .. arg[n]> is a white space separated list");
+        out.println(" of input arguments, and one or more of the following:");
+        out.endl();
+        out.println("<options>");
+        out.endl();
+        out.inc();
+
+        out.println("-h, --help", Tab(mw - 4), " - Display this message.");
+
+        for (const auto opt : _options)
         {
-            const Switch& switchVal = opt->getSwitch();
-            stream << std::setw(4) << ' ';
+            const auto& [id,
+                         shortSwitch,
+                         longSwitch,
+                         description,
+                         optional,
+                         argCount] = opt->getSwitch();
 
-            if (switchVal.shortSwitch != 0)
+            if (shortSwitch != 0)
             {
-                stream << '-' << switchVal.shortSwitch;
-                if (switchVal.longSwitch != nullptr)
-                    stream << ", ";
+                out.print('-', (char)shortSwitch);
+                if (longSwitch != nullptr)
+                    out.print(',', ' ');
                 else
-                    stream << setw(4) << ' ';
+                    out.print(Tab(2));
             }
             else
-                stream << setw(4) << ' ';
+                out.print(Tab(4));
 
-            streamsize space = _maxLongSwitch;
-            if (switchVal.longSwitch != nullptr)
+            if (longSwitch != nullptr)
             {
-                space -= (int)Char::length(switchVal.longSwitch);
-                stream << "--" << switchVal.longSwitch;
+                out.print('-', '-', longSwitch);
+                out.print(Tab(mw - (int)Char::length(longSwitch)));
             }
+            else
+                out.print(Tab(mw + 2));
 
-            stream << setw(space + 2) << ' ';
+            out.print(' ', (optional ? '-' : '+'), ' ');
 
-            if (switchVal.description != nullptr)
+            if (description != nullptr)
             {
-                StringArray arr;
-                StringUtils::split(arr, switchVal.description, '\n');
+                String desc = description;
+                if (!Su::endsWith(desc, '.'))
+                    desc.push_back('.');
 
+                StringArray arr;
+                StringUtils::splitRejectEmpty(arr, desc, '\n');
                 for (size_t i = 0; i < arr.size(); ++i)
                 {
-                    const String& str = arr[i];
-                    stream << str;
-                    if (i + 1 < arr.size())
-                    {
-                        stream << endl
-                               << setw(w + 10) << ' ';
-                    }
+                    if (i == 0)
+                        out.println(Su::toUpperFirst(arr[i]));
+                    else
+                        out.println(Tab(4 + mw + 2 + 4), arr[i]);
                 }
+                if (arr.size() > 1)  // break the line to improve readability
+                    out.endl();
             }
-            stream << endl;
+            else
+                out.endl();
         }
-        stream << endl;
+        out.endl();
+        out.println("'+' Is a required parameter.");
+        out.flush();
         dest = stream.str();
     }
 
@@ -367,9 +366,7 @@ namespace Rt2::CommandLine
         {
             if (hasSwitch(String(sw.shortSwitch, 1)))
             {
-                OutputStringStream stream;
-                stream << "Duplicate switch " << sw.shortSwitch;
-                Console::writeError(stream);
+                Console::writeError("Duplicate switch: ", (char)sw.shortSwitch);
                 return false;
             }
         }
@@ -378,13 +375,11 @@ namespace Rt2::CommandLine
         {
             const String lsw = String(sw.longSwitch);
 
-            _maxLongSwitch = max(_maxLongSwitch, (int)lsw.size());
+            _maxLen = max<int>(_maxLen, (int)lsw.size());
 
             if (hasSwitch(lsw))
             {
-                OutputStringStream stream;
-                stream << "Duplicate switch " << sw.longSwitch;
-                Console::writeError(stream);
+                Console::writeError("Duplicate switch: ", (char)sw.shortSwitch);
                 return false;
             }
         }
@@ -412,7 +407,7 @@ namespace Rt2::CommandLine
         {
             if (switches[i].id != i)
             {
-                Console::writeError("Misaligned switch id");
+                Console::writeError("misaligned switch id");
                 result = false;
             }
             else
@@ -430,8 +425,10 @@ namespace Rt2::CommandLine
 
     int Parser::writeError(const OutputStringStream& stream) const
     {
-        Console::writeError(stream);
-        usage();
+        Console::println(programPath());
+        Console::nl();
+        Console::setForeground(CS_RED);
+        Console::println(Tab(4), stream.str());
         return -1;
     }
 

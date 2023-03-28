@@ -241,6 +241,11 @@ namespace Rt2
     {
         return isLower(ch) || isUpper(ch) || isDecimal(ch);
     }
+    
+    inline bool isQuote(const int ch)
+    {
+        return ch == '"' || ch == '\'';
+    }
 
     using Ch = Char;
 

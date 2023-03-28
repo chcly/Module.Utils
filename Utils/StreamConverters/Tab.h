@@ -6,19 +6,17 @@ namespace Rt2
 {
     struct Tab : OutOperator<Tab>
     {
-        uint8_t w{4};
+        int w{4};
 
-        explicit Tab(const uint8_t nw) :
-            w(std::max<uint8_t>(nw, 1) - 1) {}
+        explicit Tab(const int nw) :
+            w(Clamp<int>(nw, 0, 80)) {}
 
         OStream& operator()(OStream& out) const
         {
-            if (w == 0)
-                return out;
-            return out
-                   << std::setfill(' ')
-                   << std::setw(std::streamsize(w))
-                   << ' ';
+            int n = w;
+            while (--n >= 0)
+                out.put(' ');
+            return out;
         }
     };
 }  // namespace Rt2

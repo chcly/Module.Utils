@@ -22,24 +22,16 @@
 #pragma once
 
 #include "Utils/String.h"
+#include "Utils/Char.h"
 
 namespace Rt2::CommandLine
 {
     enum TokenType
     {
         TOK_NONE,
-        TOK_SWITCH_SHORT,
-        TOK_SWITCH_LONG,
-        TOK_NEXT,
-        TOK_OPTION,
-        // delete
-        TOK_INTEGER,
-        // delete
-        TOK_REAL,
-        // delete
-        TOK_IDENTIFIER,
-        // rename to value
-        TOK_FILEPATH,
+        TOK_SHORT,
+        TOK_LONG,
+        TOK_VALUE,
         TOK_EOS,
         TOK_ERROR
     };
@@ -74,7 +66,8 @@ namespace Rt2::CommandLine
 
         void append(const char& ch)
         {
-            _value.push_back(ch);
+            if (isPrintableAscii(ch))
+                _value.push_back(ch);
         }
 
         void append(const String& str)

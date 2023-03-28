@@ -116,6 +116,8 @@ namespace Rt2::Directory
 
         Path absolute() const;
 
+        String fullPlatform() const;
+
 
         static Path current();
     };
