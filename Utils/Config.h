@@ -63,11 +63,13 @@ namespace Rt2
 
         bool contains(const String& key);
 
-        const String& getValue(const String& key, const String& def = "");
+        const String& string(const String& key, const String& def = "");
 
-        bool getBool(const String& key, bool def = false);
+        bool boolean(const String& key, bool def = false);
 
-        int getInt(const String& key, int def = 0);
+        int integer(const String& key, int def = 0);
+
+        void csv(const String& key, StringArray &values);
 
         const StringMap& attributes() const;
     };

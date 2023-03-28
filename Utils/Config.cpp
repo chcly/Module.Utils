@@ -221,25 +221,30 @@ namespace Rt2
         return ch;
     }
 
-    const String& Config::getValue(const String& key, const String& def)
+    const String& Config::string(const String& key, const String& def)
     {
-        const StringMap::const_iterator it = _attributes.find(key);
-        if (it != _attributes.end())
+        if (const StringMap::const_iterator it = _attributes.find(key); 
+            it != _attributes.end())
             return it->second;
         return def;
     }
 
-    bool Config::getBool(const String& key, const bool def)
+    bool Config::boolean(const String& key, const bool def)
     {
-        const String& v = getValue(key);
+        const String& v = string(key);
         if (v != "true")
             return def;
         return true;
     }
 
-    int Config::getInt(const String& key, const int def)
+    int Config::integer(const String& key, const int def)
     {
-        return Char::toInt32(getValue(key), def);
+        return Char::toInt32(string(key), def);
+    }
+
+    void Config::csv(const String& key, StringArray& values)
+    {
+        Su::splitRejectEmpty(values, string(key), ',');
     }
 
     const StringMap& Config::attributes() const

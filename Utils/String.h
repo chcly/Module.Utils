@@ -235,6 +235,9 @@ namespace Rt2
             ((out << c << std::forward<Args>(args)), ...);
             return out.str();
         }
+
+        static String cmd(char** argv, const int argc);
+        static String csv(const StringArray& sa);
     };
 
     using Su = StringUtils;

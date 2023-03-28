@@ -143,6 +143,13 @@ namespace Rt2
             return ScopeLock{nullptr};
         }
 
+        [[nodiscard]] ScopeLock push()
+        {
+            _stack.push({&std::cout, new OutputStringStream(), _depth});
+            return ScopeLock{this};
+        }
+
+
         void _push(OStream* stream)
         {
             // Note: If you do something like
@@ -172,7 +179,6 @@ namespace Rt2
                 flush(buf, client);
                 if (_root != client)
                     flush(buf, _root);
-
                 _stack.pop();
             }
         }

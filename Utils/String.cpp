@@ -240,6 +240,30 @@ namespace Rt2
         join(destination, "L", sa, sb, sc, sd);
     }
 
+    String StringUtils::cmd(char** argv, const int argc)
+    {
+        OutputStringStream oss;
+        for (int i = 0; i < argc; ++i)
+        {
+            if (i > 0)
+                oss.put(' ');
+            oss << String(argv[i]);
+        }
+        return oss.str();
+    }
+
+    String StringUtils::csv(const StringArray& sa)
+    {
+        OutputStringStream oss;
+        for (size_t i = 0; i < sa.size(); ++i)
+        {
+            oss << sa[i];
+            if (i + 1 < sa.size())
+                oss << ',';
+        }
+        return oss.str();
+    }
+
     void StringUtils::splitLine(StringArray&  dest,
                                 const String& input,
                                 const char    swap)
