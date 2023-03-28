@@ -67,7 +67,7 @@ namespace Rt2::CommandLine
         const int rc = parseOptions(token, tmpBuffer);
         if (rc < 0)
             usage();
-        if (_usedOptions != _requiredOptions)
+        else if (_usedOptions != _requiredOptions)
         {
             usage();
             return error("missing required options");
@@ -117,11 +117,7 @@ namespace Rt2::CommandLine
                 }
 
                 if (token.getValue() == "help" || token.getValue() == "h")
-                {
-                    _usedOptions = _requiredOptions;
-                    usage();
                     return -1;
-                }
 
                 auto it = _switches.find(token.getValue());
                 if (it == _switches.end())
