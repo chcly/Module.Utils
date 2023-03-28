@@ -20,7 +20,7 @@
 -------------------------------------------------------------------------------
 */
 #pragma once
-#include <iomanip>
+#include <iostream>
 #include "Utils/Stack.h"
 #include "Utils/String.h"
 #include "Utils/TextStreamWriter.h"
@@ -121,18 +121,6 @@ namespace Rt2
             inc(-Abs(n));
         }
 
-        TStreamStack& operator++()
-        {
-            inc();
-            return *this;
-        }
-
-        TStreamStack& operator--()
-        {
-            dec();
-            return *this;
-        }
-
         [[nodiscard]] ScopeLock push(OStream* stream)
         {
             if (stream)
@@ -148,7 +136,6 @@ namespace Rt2
             _stack.push({&std::cout, new OutputStringStream(), _depth});
             return ScopeLock{this};
         }
-
 
         void _push(OStream* stream)
         {
