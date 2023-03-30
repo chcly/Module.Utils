@@ -123,6 +123,8 @@ namespace Rt2
             const String& input,
             char          character);
 
+        static String stripEol(const String& input, char replacement=0);
+
         /// Filters characters out of the input string into the destination string.
         /// Filtering occurs when the pass function returns a true value.
         /// Returns true if the string was modified.
@@ -236,7 +238,7 @@ namespace Rt2
             return out.str();
         }
 
-        static void cmd(String& dest, char** argv, int argc, int from=1);
+        static void cmd(String& dest, char** argv, int argc, int from = 1);
 
         static String csv(const StringArray& sa);
     };

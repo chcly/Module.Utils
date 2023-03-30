@@ -414,6 +414,26 @@ namespace Rt2
         trimR(destination, destination, character);
     }
 
+    String StringUtils::stripEol(const String& input, const char replacement)
+    {
+        OutputStringStream dest;
+        StringArray        src;
+        scanSplitLine(src, input);
+
+        for (const auto& line : src)
+        {
+            String d1, d2;
+            trim(d1, line, '\n');
+            trim(d2, d1, '\r');
+            trim(d2, d2, ' ');
+
+            if (replacement != 0)
+                d2.push_back(replacement);
+            dest << d2;
+        }
+        return dest.str();
+    }
+
     bool StringUtils::filter(String&               destination,
                              const String&         input,
                              const FilterFunction& pass,
