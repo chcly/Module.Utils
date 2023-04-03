@@ -25,7 +25,7 @@
 */
 #pragma once
 
-#include "Utils/Definitions.h"
+#include "Utils/Exception.h"
 
 namespace Rt2
 {
@@ -33,37 +33,33 @@ namespace Rt2
     class Singleton
     {
     protected:
-        static Singleton* _singleton;
+        using SelfType = T;
+        static SelfType* instance;
 
     public:
         Singleton()
         {
-            RT_ASSERT(!_singleton);
-            _singleton = this;
+            instance = static_cast<SelfType*>(this);
         }
 
         virtual ~Singleton()
         {
-            RT_ASSERT(_singleton);
-            _singleton = nullptr;
+            instance = nullptr;
+        }
+
+        static T& reference()
+        {
+            if (!instance)
+                throw Exception("invalid singleton");
+            return *instance;
+        }
+
+        static T* pointer()
+        {
+            if (!instance)
+                throw Exception("invalid singleton");
+            return instance;
         }
     };
-
-#define RT_DECLARE_SINGLETON(cls) \
-    static cls& getSingleton();   \
-    static cls* getSingletonPtr();
-
-#define RT_IMPLEMENT_SINGLETON(cls)                           \
-    template <>                                               \
-    Rt2::Singleton<cls>* Rt2::Singleton<cls>::_singleton = 0; \
-    cls&                 cls::getSingleton()                  \
-    {                                                         \
-        RT_ASSERT(_singleton);                               \
-        return *static_cast<cls*>(_singleton);                \
-    }                                                         \
-    cls* cls::getSingletonPtr()                               \
-    {                                                         \
-        return static_cast<cls*>(_singleton);                 \
-    }
 
 }  // namespace Rt2
