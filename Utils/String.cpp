@@ -237,7 +237,7 @@ namespace Rt2
         scramble(sb, Time::now32());
         scramble(sc, (size_t)seed);
         scramble(sd, size_t(41) * ++counter);
-        join(destination, "L", sa, sb, sc, sd);
+        destination = join("L", sa, sb, sc, sd);
     }
 
     void StringUtils::cmd(String& dest, char** argv, const int argc, int from)

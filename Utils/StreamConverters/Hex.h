@@ -1,6 +1,5 @@
 #pragma once
 #include <iomanip>
-
 #include "Utils/StreamConverters/OutOperator.h"
 
 namespace Rt2
@@ -27,4 +26,29 @@ namespace Rt2
                    << _v;
         }
     };
+
+
+    template <typename T>
+    class HexConstant : OutOperator<HexConstant<T>>
+    {
+    private:
+        size_t _v;
+
+    public:
+        explicit HexConstant(T v) :
+            _v{(size_t)v} {}
+        explicit HexConstant(T* v) :
+            _v{(size_t)v} {}
+
+        OStream& operator()(OStream& out) const
+        {
+            return out << '0' << 'x'
+                   << std::setfill('0')
+                   << std::setw(sizeof(T) << 1)
+                   << std::uppercase
+                   << std::hex
+                   << _v;
+        }
+    };
+
 }  // namespace Rt2
