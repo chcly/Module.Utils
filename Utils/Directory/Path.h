@@ -82,6 +82,8 @@ namespace Rt2::Directory
 
         bool isDirectory() const;
 
+        bool isHidden() const;
+
         bool isFile() const;
 
         bool isSymLink() const;
@@ -95,6 +97,8 @@ namespace Rt2::Directory
         bool canExecute() const;
 
         void list(PathArray& dest, bool sortByDirectory = false) const;
+
+        void list(StringArray& dest, bool sortByDirectory = false) const;
 
         Permissions permissions() const;
 
@@ -117,7 +121,6 @@ namespace Rt2::Directory
         Path absolute() const;
 
         String fullPlatform() const;
-
 
         static Path current();
     };

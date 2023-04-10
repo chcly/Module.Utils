@@ -179,7 +179,11 @@ namespace Rt2::Directory
                 if (prev == SearchPeriod)
                     Su::reverse(stem, t0);
                 else if (prev == SearchSep && state == SearchDrive)
+                {
+                    if (directories.empty())
+                        directories.push_back("/");
                     Su::reverse(root, t0);
+                }
                 else
                     Console::writeError("unhandled transition: ", prev, "->", state);
             }
@@ -353,9 +357,8 @@ namespace Rt2::Directory
         {
             return StdFileSystem::exists(FilePath(full()));
         }
-        catch (Exception& ex)
+        catch (...)
         {
-            DebugLog(ex);
             return false;
         }
     }
@@ -366,10 +369,21 @@ namespace Rt2::Directory
         {
             return StdFileSystem::is_directory(FilePath(full()));
         }
-        catch (Exception& ex)
+        catch (...)
         {
-            DebugLog(ex);
             return false;
+        }
+    }
+
+    bool Path::isHidden() const
+    {
+        try
+        {
+            return isDotDirectory();
+        }
+        catch (...)
+        {
+            return true;
         }
     }
 
@@ -379,9 +393,8 @@ namespace Rt2::Directory
         {
             return StdFileSystem::is_regular_file(FilePath(full()));
         }
-        catch (Exception& ex)
+        catch (...)
         {
-            DebugLog(ex);
             return false;
         }
     }
@@ -392,16 +405,15 @@ namespace Rt2::Directory
         {
             return StdFileSystem::is_symlink(FilePath(full()));
         }
-        catch (Exception& ex)
+        catch (...)
         {
-            DebugLog(ex);
-            return false;
+            return true;
         }
     }
 
     bool Path::isDotDirectory() const
     {
-        return Su::startsWith(lastDirectory(), '.');
+        return Su::startsWith(lastDirectory(), '.') || Su::startsWith(base(), '.');
     }
 
     bool Path::canRead() const
@@ -433,7 +445,6 @@ namespace Rt2::Directory
 
                 for (const auto& ent : dit)
                     dest.push_back(Path(ent.path().generic_string()));
-
                 if (sortByDirectory)
                 {
                     std::sort(
@@ -453,6 +464,15 @@ namespace Rt2::Directory
             // empty
             dest.clear();
         }
+    }
+
+    void Path::list(StringArray& dest, const bool sortByDirectory) const
+    {
+        PathArray pa;
+        list(pa, sortByDirectory);
+
+        for (const auto& path : pa)
+            dest.push_back(path.full());
     }
 
     Permissions Path::permissions() const
@@ -477,7 +497,7 @@ namespace Rt2::Directory
         return fs.is_open();
     }
 
-    bool Path::open(OutputFileStream& fs, bool binary) const
+    bool Path::open(OutputFileStream& fs, const bool binary) const
     {
         if (binary)
             fs.open(full(), std::ios_base::binary);
