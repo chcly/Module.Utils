@@ -123,6 +123,11 @@ namespace Rt2::Directory
         String fullPlatform() const;
 
         static Path current();
+
+        static Path combine(const String &a, const String& b);
+
+        Path parentDir() const;
+
     };
 
 }  // namespace Rt2::Directory

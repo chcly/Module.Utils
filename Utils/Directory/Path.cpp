@@ -97,7 +97,7 @@ namespace Rt2::Directory
 
         void construct(const String& str);
 
-        static void pushFlipped(StringDeque& dest, const String& str);
+        static void pushFlipped(StringDeque& dest, const String& str, char ex = 0);
     };
 
     void PathPrivate::scan(IStream& input, String& out, int& state)
@@ -170,7 +170,7 @@ namespace Rt2::Directory
                         pushFlipped(extensions, t0);
                 }
                 else if (state == SearchSep)
-                    pushFlipped(directories, t0);
+                    pushFlipped(directories, t0, '/');
                 else
                     Console::writeError("unhandled exit: ", state);
             }
@@ -179,11 +179,7 @@ namespace Rt2::Directory
                 if (prev == SearchPeriod)
                     Su::reverse(stem, t0);
                 else if (prev == SearchSep && state == SearchDrive)
-                {
-                    if (directories.empty())
-                        directories.push_back("/");
                     Su::reverse(root, t0);
-                }
                 else
                     Console::writeError("unhandled transition: ", prev, "->", state);
             }
@@ -210,7 +206,7 @@ namespace Rt2::Directory
         }
     }
 
-    void PathPrivate::pushFlipped(StringDeque& dest, const String& str)
+    void PathPrivate::pushFlipped(StringDeque& dest, const String& str, char ex)
     {
         if (str.empty())
             return;
@@ -223,6 +219,9 @@ namespace Rt2::Directory
         }
         else
             dest.push_front(str);
+
+        if (ex != 0)
+            dest.front().push_back(ex);
     }
 
     Path::Path() :
@@ -271,7 +270,7 @@ namespace Rt2::Directory
     {
         if (!empty() && _private->cache.drive.empty())
         {
-            if (hasDirectory() && isRooted())
+            if (isRooted())
             {
                 if (_private->root.empty())
                     _private->cache.drive = "/";
@@ -287,7 +286,7 @@ namespace Rt2::Directory
         if (!empty() && _private->cache.directory.empty())
         {
             if (!_private->directories.empty())
-                Su::combine(_private->cache.directory, _private->directories, 0, '/');
+                Su::combine(_private->cache.directory, _private->directories, 0, 0);
         }
         return _private->cache.directory;
     }
@@ -575,6 +574,32 @@ namespace Rt2::Directory
     Path Path::current()
     {
         return Path(FileSystem::current());
+    }
+
+    Path Path::combine(const String& a, const String& b)
+    {
+        String val = a;
+        if (!Su::endsWith(val, '/'))
+            val.push_back('/');
+        return Path(Su::join(val, b));
+    }
+
+    Path Path::parentDir() const
+    {
+        if (!stem().empty())
+            return Path(fullDirectory());
+
+        StringDeque dirs = directories();
+        if (!dirs.empty())
+            dirs.pop_back();
+
+        if (!dirs.empty())
+        {
+            String np;
+            Su::combine(np, dirs, 0, '/');
+            return Path(Su::join(root(), np));
+        }
+        return Path(Su::join(root(), '/'));
     }
 
     const String& Path::stem() const
