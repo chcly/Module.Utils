@@ -115,7 +115,7 @@ namespace Rt2
                     files->push_front(ent);
 
                 if (totalFileSize)
-                    (*totalFileSize) += ent.file_size();
+                    (*totalFileSize) += file_size(ent);
             }
         }
     }
