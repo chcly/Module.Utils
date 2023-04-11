@@ -96,9 +96,15 @@ namespace Rt2::Directory
 
         bool canExecute() const;
 
-        void list(PathArray& dest, bool sortByDirectory = false) const;
+        [[deprecated]] void list(PathArray& dest, bool sortByDirectory = false) const;
 
-        void list(StringArray& dest, bool sortByDirectory = false) const;
+        [[deprecated]] void list(StringArray& dest, bool sortByDirectory = false) const;
+
+        void list(DirectoryEntryArray* directories   = nullptr,
+                  DirectoryEntryArray* files         = nullptr,
+                  size_t*              totalFileSize = nullptr) const;
+
+        DirectoryIterator iterator() const;
 
         Permissions permissions() const;
 
@@ -124,10 +130,9 @@ namespace Rt2::Directory
 
         static Path current();
 
-        static Path combine(const String &a, const String& b);
+        static Path combine(const String& a, const String& b);
 
         Path parentDir() const;
-
     };
 
 }  // namespace Rt2::Directory

@@ -79,6 +79,47 @@ namespace Rt2
         return FilePath(test).has_root_directory();
     }
 
+    DirectoryIterator FileSystem::tryGet(const DirectoryEntry& ent)
+    {
+        try
+        {
+            return DirectoryIterator(ent);
+        }
+        catch (...)
+        {
+            // treat it like it does not exist.
+            return {};
+        }
+    }
+
+    void FileSystem::list(const DirectoryEntry& root,
+                          DirectoryEntryArray*  directories,
+                          DirectoryEntryArray*  files,
+                          size_t*               totalFileSize)
+    {
+        if (!directories && !files && !totalFileSize)
+            return;
+
+        const auto it = tryGet(root);
+
+        for (const auto& ent : it)
+        {
+            if (is_directory(ent))
+            {
+                if (directories)
+                    directories->push_front(ent);
+            }
+            else
+            {
+                if (files)
+                    files->push_front(ent);
+
+                if (totalFileSize)
+                    (*totalFileSize) += ent.file_size();
+            }
+        }
+    }
+
     String FileSystem::sanitize(const String& path)
     {
         // only dealing with Unix path separators.

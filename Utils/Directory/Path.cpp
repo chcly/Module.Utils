@@ -437,25 +437,21 @@ namespace Rt2::Directory
 
         try
         {
-            if (const DirectoryEntry fp = entry();
-                is_directory(fp))
-            {
-                const DirectoryIterator dit = DirectoryIterator(fp.path());
+            const DirectoryIterator dit = iterator();
+            for (const auto& ent : dit)
+                dest.push_back(Path(ent.path().generic_string()));
 
-                for (const auto& ent : dit)
-                    dest.push_back(Path(ent.path().generic_string()));
-                if (sortByDirectory)
-                {
-                    std::sort(
-                        dest.begin(),
-                        dest.end(),
-                        [](const Path& a, const Path& b)
-                        {
-                            const int av = a.isDirectory() ? 0 : 1;
-                            const int bv = b.isDirectory() ? 0 : 1;
-                            return av < bv;
-                        });
-                }
+            if (sortByDirectory)
+            {
+                std::sort(
+                    dest.begin(),
+                    dest.end(),
+                    [](const Path& a, const Path& b)
+                    {
+                        const int av = a.isDirectory() ? 0 : 1;
+                        const int bv = b.isDirectory() ? 0 : 1;
+                        return av < bv;
+                    });
             }
         }
         catch (...)
@@ -474,6 +470,26 @@ namespace Rt2::Directory
             dest.push_back(path.full());
     }
 
+    void Path::list(DirectoryEntryArray* directories,
+                    DirectoryEntryArray* files,
+                    size_t*              totalFileSize) const
+    {
+        if (!directories && !files && !totalFileSize)
+            return;
+
+        FileSystem::list(
+            entry(),
+            directories,
+            files,
+            totalFileSize);
+    }
+
+    DirectoryIterator Path::iterator() const
+    {
+        if (isDirectory())
+            return FileSystem::tryGet(entry());
+        return {};
+    }
     Permissions Path::permissions() const
     {
         return entry().status().permissions();

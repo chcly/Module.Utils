@@ -58,12 +58,16 @@ namespace Rt2
 
         static String current();
 
+        static bool isRooted(const String& test);
 
-        static bool isRooted(const String & test);
+        static DirectoryIterator tryGet(const DirectoryEntry& ent);
 
+        static void list(const DirectoryEntry& root,
+                         DirectoryEntryArray*  directories   = nullptr,
+                         DirectoryEntryArray*  files         = nullptr,
+                         size_t*               totalFileSize = nullptr);
 
         static String sanitize(const String& path);
-
 
         static String unixPath(const String& path);
 
