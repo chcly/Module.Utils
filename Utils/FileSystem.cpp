@@ -93,7 +93,7 @@ namespace Rt2
         {
             return {ent, DirOptions::skip_permission_denied};
         }
-        catch (std::filesystem::filesystem_error& ex)
+        catch (StdFileSystem::filesystem_error& ex)
         {
             Console::println(ex.what());
             return {};
