@@ -37,9 +37,17 @@ namespace Rt2
     using DirectoryEntry    = StdFileSystem::directory_entry;
     using DirectoryIterator = StdFileSystem::directory_iterator;
     using Permissions       = StdFileSystem::perms;
-
     using PathArray           = std::deque<FilePath>;
     using DirectoryEntryArray = std::deque<DirectoryEntry>;
+
+    enum ExtraPerm
+    {
+        EP_NONE   = 0x00,
+        EP_HIDDEN = 0x01,
+        EP_SYSTEM = 0x02,
+        EP_DOT    = 0x03,
+    };
+
 
     class FileSystem
     {
@@ -62,6 +70,14 @@ namespace Rt2
 
         static DirectoryIterator tryGet(const DirectoryEntry& ent);
 
+        static ExtraPerm access(const DirectoryEntry& ent);
+
+        static bool isFile(const DirectoryEntry& ent);
+
+        static bool isDirectory(const DirectoryEntry& ent);
+
+        static size_t fileSize(const DirectoryEntry& ent);
+
         static void list(const DirectoryEntry& root,
                          DirectoryEntryArray*  directories   = nullptr,
                          DirectoryEntryArray*  files         = nullptr,
@@ -69,10 +85,15 @@ namespace Rt2
 
         static String sanitize(const String& path);
 
+        static String sanitizePlatform(const String& path);
+
         static String unixPath(const String& path);
 
         static FilePath unixPath(const FilePath& path);
 
         static void list(const String& path, DirectoryEntryArray& dest);
     };
+
+    using Fs = FileSystem;
+
 }  // namespace Rt2

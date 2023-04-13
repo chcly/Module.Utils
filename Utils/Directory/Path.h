@@ -86,6 +86,8 @@ namespace Rt2::Directory
 
         bool isFile() const;
 
+        bool isSystemFile() const;
+
         bool isSymLink() const;
 
         bool isDotDirectory() const;
@@ -96,9 +98,9 @@ namespace Rt2::Directory
 
         bool canExecute() const;
 
-        [[deprecated]] void list(PathArray& dest, bool sortByDirectory = false) const;
+        void list(PathArray& dest) const;
 
-        [[deprecated]] void list(StringArray& dest, bool sortByDirectory = false) const;
+        void list(StringArray& dest) const;
 
         void list(DirectoryEntryArray* directories   = nullptr,
                   DirectoryEntryArray* files         = nullptr,

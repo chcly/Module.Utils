@@ -20,10 +20,18 @@
 -------------------------------------------------------------------------------
 */
 #include "Utils/FileSystem.h"
-#include "Utils/Char.h"
+#include "Console.h"
+#ifdef _WIN32
+    #include <corecrt_io.h>
+#endif
 
 namespace Rt2
 {
+
+    using FileType   = StdFileSystem::file_type;
+    using ErrorCode  = std::error_code;
+    using DirOptions = StdFileSystem::directory_options;
+
     String FileSystem::normalize(const String& path)
     {
 #ifdef _WIN32
@@ -68,7 +76,7 @@ namespace Rt2
 
     String FileSystem::current()
     {
-        String path = sanitize(StdFileSystem::current_path().string());
+        String path = sanitize(currentPath());
         if (!Su::endsWith(path, '/'))
             path.push_back('/');
         return path;
@@ -83,13 +91,71 @@ namespace Rt2
     {
         try
         {
-            return DirectoryIterator(ent);
+            return {ent, DirOptions::skip_permission_denied};
+        }
+        catch (std::filesystem::filesystem_error& ex)
+        {
+            Console::println(ex.what());
+            return {};
         }
         catch (...)
         {
-            // treat it like it does not exist.
             return {};
         }
+    }
+
+    void portableHack(const FilePath& filePath, int& p)
+    {
+#ifdef _WIN32
+        // opinion: permissions for system files should
+        // be abstracted to 0000, or 0700
+        p = EP_NONE;
+        if (Su::startsWith(filePath.stem().generic_string(), '.'))
+        {
+            p |= EP_DOT | EP_HIDDEN;
+        }
+
+        _finddata_t find = {};
+        if (const intptr_t fp = _findfirst(filePath.generic_string().c_str(), &find);
+            fp != -1)
+        {
+            if (find.attrib & _A_SYSTEM)
+                p |= EP_SYSTEM;
+            if (find.attrib & _A_HIDDEN)
+                p |= EP_HIDDEN;
+            _findclose(fp);
+        }
+#else
+
+        p = EP_NONE;
+
+        if (Su::startsWith(filePath.stem().generic_string(), '.'))
+        {
+            p |= EP_DOT | EP_HIDDEN;
+        }
+#endif
+    }
+
+    ExtraPerm FileSystem::access(const DirectoryEntry& ent)
+    {
+        int ph;
+        portableHack(ent.path(), ph);
+        return (ExtraPerm)ph;
+    }
+
+    bool FileSystem::isFile(const DirectoryEntry& ent)
+    {
+        return ent.status().type() == FileType::regular;
+    }
+
+    bool FileSystem::isDirectory(const DirectoryEntry& ent)
+    {
+        return ent.status().type() == FileType::directory;
+    }
+
+    size_t FileSystem::fileSize(const DirectoryEntry& ent)
+    {
+        return StdFileSystem::file_size(ent);
     }
 
     void FileSystem::list(const DirectoryEntry& root,
@@ -104,7 +170,10 @@ namespace Rt2
 
         for (const auto& ent : it)
         {
-            if (is_directory(ent))
+            if (access(ent) != EP_NONE)
+                continue;
+
+            if (isDirectory(ent))
             {
                 if (directories)
                     directories->push_front(ent);
@@ -115,7 +184,7 @@ namespace Rt2
                     files->push_front(ent);
 
                 if (totalFileSize)
-                    (*totalFileSize) += file_size(ent);
+                    (*totalFileSize) += fileSize(ent);
             }
         }
     }
@@ -130,6 +199,17 @@ namespace Rt2
         String n2;
         Su::replaceAll(n2, n1, "//", "/");
         return n2;
+    }
+
+    String FileSystem::sanitizePlatform(const String& path)
+    {
+#ifdef _WIN32
+        String win;
+        Su::replaceAll(win, sanitize(path), "/", "\\");
+        return win;
+#else
+        return sanitize(path);
+#endif
     }
 
     String FileSystem::unixPath(const String& path)
@@ -152,13 +232,13 @@ namespace Rt2
         const String&        path,
         DirectoryEntryArray& dest)
     {
-        if (const FilePath fp = {path};
-            is_directory(fp))
+        if (const DirectoryEntry fp{FilePath(path)};
+            isDirectory(fp))
         {
-            const DirectoryIterator it{fp};
+            const DirectoryIterator it = tryGet(fp);
             for (const auto& val : it)
             {
-                if (is_directory(val))
+                if (isDirectory(val))
                     dest.push_front(val);
                 else
                     dest.push_back(val);

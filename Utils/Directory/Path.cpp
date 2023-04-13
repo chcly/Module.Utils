@@ -72,6 +72,7 @@ namespace Rt2::Directory
         StringDeque extensions;
         PathCache   cache;
         uint32_t    flags{PathNoFlag};
+        uint32_t    permissions{Npos32};
 
         void clear()
         {
@@ -80,7 +81,8 @@ namespace Rt2::Directory
             stem.clear();
             extensions.clear();
             cache.clear();
-            flags = PathNoFlag;
+            flags       = PathNoFlag;
+            permissions = Npos32;
         }
 
         bool empty() const
@@ -96,6 +98,8 @@ namespace Rt2::Directory
         void constructImpl(const String& str);
 
         void construct(const String& str);
+
+        uint32_t checkAccess(const String& str);
 
         static void pushFlipped(StringDeque& dest, const String& str, char ex = 0);
     };
@@ -204,6 +208,13 @@ namespace Rt2::Directory
             Console::writeError(ex.what());
             clear();
         }
+    }
+
+    uint32_t PathPrivate::checkAccess(const String& str)
+    {
+        if (permissions == Npos32)
+            permissions = FileSystem::access(DirectoryEntry(str));
+        return permissions;
     }
 
     void PathPrivate::pushFlipped(StringDeque& dest, const String& str, char ex)
@@ -378,6 +389,8 @@ namespace Rt2::Directory
     {
         try
         {
+            if ((_private->checkAccess(full()) & EP_HIDDEN) != 0)
+                return true;
             return isDotDirectory();
         }
         catch (...)
@@ -396,6 +409,11 @@ namespace Rt2::Directory
         {
             return false;
         }
+    }
+
+    bool Path::isSystemFile() const
+    {
+        return (_private->checkAccess(full()) & EP_SYSTEM) != 0;
     }
 
     bool Path::isSymLink() const
@@ -430,44 +448,50 @@ namespace Rt2::Directory
         return (permissions() & Permissions::owner_exec) != Permissions::none;
     }
 
-    void Path::list(PathArray& dest, const bool sortByDirectory) const
+    void Path::list(PathArray& dest) const
     {
         if (isSymLink() || !canRead())
             return;
 
-        try
-        {
-            const DirectoryIterator dit = iterator();
-            for (const auto& ent : dit)
-                dest.push_back(Path(ent.path().generic_string()));
+        DirectoryEntryArray dirs;
+        DirectoryEntryArray files;
 
-            if (sortByDirectory)
-            {
-                std::sort(
-                    dest.begin(),
-                    dest.end(),
-                    [](const Path& a, const Path& b)
-                    {
-                        const int av = a.isDirectory() ? 0 : 1;
-                        const int bv = b.isDirectory() ? 0 : 1;
-                        return av < bv;
-                    });
-            }
-        }
-        catch (...)
+        list(&dirs, &files, nullptr);
+
+        while (!dirs.empty())
         {
-            // empty
-            dest.clear();
+            dest.push_back(Path(dirs.back().path().generic_string()));
+            dirs.pop_back();
+        }
+
+        while (!files.empty())
+        {
+            dest.push_back(Path(files.back().path().generic_string()));
+            files.pop_back();
         }
     }
 
-    void Path::list(StringArray& dest, const bool sortByDirectory) const
+    void Path::list(StringArray& dest) const
     {
-        PathArray pa;
-        list(pa, sortByDirectory);
+        if (isSymLink() || !canRead())
+            return;
 
-        for (const auto& path : pa)
-            dest.push_back(path.full());
+        DirectoryEntryArray dirs;
+        DirectoryEntryArray files;
+
+        list(&dirs, &files, nullptr);
+
+        while (!dirs.empty())
+        {
+            dest.push_back(dirs.back().path().generic_string());
+            dirs.pop_back();
+        }
+
+        while (!files.empty())
+        {
+            dest.push_back(files.back().path().generic_string());
+            files.pop_back();
+        }
     }
 
     void Path::list(DirectoryEntryArray* directories,

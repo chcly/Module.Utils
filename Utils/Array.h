@@ -240,6 +240,25 @@ namespace Rt2
             this->replicate(rhs);
             return *this;
         }
+
+        void merge(const Array& rhs)
+        {
+            if (rhs._size > 0)
+            {
+                SizeType newSize = this->_size + rhs._size;
+
+                this->reserve(newSize);
+
+                if (newSize >= this->_capacity)
+                    throw Exception("no room to merge");
+
+                Fill(this->_data + this->_size,
+                    rhs._data,
+                    rhs._size);
+
+                this->_size += rhs._size;
+            }
+        }
     };
 
     template <typename T, typename Allocator = Allocator<T, uint32_t>>
@@ -255,4 +274,4 @@ namespace Rt2
         }
     };
 
-}  // namespace Jam
+}  // namespace Rt2
