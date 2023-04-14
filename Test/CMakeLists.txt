@@ -20,11 +20,13 @@
 # ------------------------------------------------------------------------------
 set(TestTargetName ${TargetName}Test)
 
+include(GroupSet)
 include(TestDirectory)
 gen_path_to_here()
 
-set(TestTarget_SOURCE
-    Utils.cpp
+set_group(
+   TestTarget_SOURCE
+   Source:*cpp
 )
 
 include_directories(

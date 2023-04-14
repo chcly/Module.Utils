@@ -27,35 +27,68 @@
 
 namespace Rt2
 {
-    template <typename T, U16 StackSize = 0x40>
-    class ListBinaryTree
+    template <typename Key,
+              typename Value,
+              U16 StackSize    = 0x40,
+              int ArrayOptions = AOP_SIMPLE_TYPE>
+    class PairedBinaryTree
     {
     public:
-        RT_DECLARE_TYPE(T)
+        struct Pair
+        {
+            Key   key;
+            Value value;
+
+            bool operator<(const Pair& rhs) const
+            {
+                return key < rhs.key;
+            }
+
+            bool operator>(const Pair& rhs) const
+            {
+                return key > rhs.key;
+            }
+
+            bool operator==(const Pair& rhs) const
+            {
+                return key == rhs.key;
+            }
+        };
+        using Guard = FixedStackGuard<StackSize>;
 
     public:
         class Node
         {
         private:
-            friend class ListBinaryTree;
+            friend class PairedBinaryTree;
 
-            Node*     _left{nullptr};
-            Node*     _right{nullptr};
-            ValueType _data{};
+            Node* _left{nullptr};
+            Node* _right{nullptr};
 
-        public:
-            Node() = default;
-
-            explicit Node(ConstValueType v) :
-                _data(v)
-            {
-            }
+            Pair _data{};
 
             ~Node()
             {
                 destruct();
             }
 
+            Node() = default;
+
+            explicit Node(const Pair& v) :
+                _data(v)
+            {
+            }
+
+            void destruct()
+            {
+                delete _left;
+                _left = nullptr;
+
+                delete _right;
+                _right = nullptr;
+            }
+
+        public:
             Node* left()
             {
                 return _left;
@@ -66,39 +99,39 @@ namespace Rt2
                 return _right;
             }
 
-            ReferenceType data()
+            Pair& pair()
             {
                 return _data;
             }
 
-        private:
-            void destruct()
+            Value& value()
             {
-                delete _left;
-                _left = nullptr;
+                return _data.value;
+            }
 
-                delete _right;
-                _right = nullptr;
+            Key& key()
+            {
+                return _data.key;
             }
         };
 
-        RT_DECLARE_NAMED_TYPE(Node)
+        using Keys   = Array<Key, ArrayOptions>;
+        using Values = Array<Value, ArrayOptions>;
 
-        using Iterator         = SimpleArray<T>;
-        using ArrayPointerType = typename Iterator::PointerType;
+        using ValuePointerType = typename Values::PointerType;
+        using KeyPointerType   = typename Keys::PointerType;
 
     private:
-        NodePointerType            _root{nullptr};
-        size_t                     _size{0};
-        Iterator                   _array;
-        FixedStackGuard<StackSize> _guard;
-
-        ListBinaryTree(const ListBinaryTree& rhs) = default;
+        Node*  _root{nullptr};
+        size_t _size{0};
+        Values _array;
+        Guard  _guard;
 
     public:
-        ListBinaryTree() = default;
+        PairedBinaryTree()                            = default;
+        PairedBinaryTree(const PairedBinaryTree& rhs) = delete;
 
-        ~ListBinaryTree()
+        ~PairedBinaryTree()
         {
             clear();
         }
@@ -110,81 +143,76 @@ namespace Rt2
             _array.clear();
         }
 
-        void insert(ConstReferenceType val)
+        void insert(const Key& key, const Value& val)
         {
             if (_root == nullptr)
             {
-                _root = new Node(val);
+                _root = new Node({key, val});
                 _size++;
             }
             else
             {
                 _guard.reset();
-                insertRecursive(_root, val);
+                insertRecursive(_root, Pair{key, val});
                 if (_guard.isValid())
                     _size++;
             }
         }
 
-        bool find(ConstReferenceType val) const
+        bool contains(const Key& key) const
         {
             if (_root == nullptr)
                 return false;
-            return findNonRecursive(val);
+            return findNode(key) != nullptr;
         }
 
-        bool findNonRecursive(ConstReferenceType val) const
+        const Value& get(const Key& key, const Value& error = {}) const
+        {
+            Node* node = findNode(key);
+            return node == nullptr ? error : node->value();
+        }
+
+        Node* findNode(const Key& key) const
         {
             if (_root == nullptr)
-                return false;
+                return nullptr;
 
-            NodePointerType node = _root;
+            Node* node = _root;
             while (node != nullptr)
             {
-                if (node->_data == val)
-                    return true;
-                if (node->_data < val)
+                if (node->_data.key == key)
+                    return node;
+                if (node->_data.key < key)
                     node = node->_right;
                 else
                     node = node->_left;
             }
-            return false;
+            return nullptr;
         }
 
-        bool findNonRecursive(ReferenceType out, ConstReferenceType val) const
-        {
-            if (_root == nullptr)
-                return false;
-
-            NodePointerType node = _root;
-            while (node != nullptr)
-            {
-                if (node->_data == val)
-                {
-                    out = node->_data;
-                    return true;
-                }
-                if (node->_data < val)
-                    node = node->_right;
-                else
-                    node = node->_left;
-            }
-            return false;
-        }
-
-        void erase(ConstReferenceType val)
+        void erase(const Key& key)
         {
             if (_root == nullptr)
                 return;
 
             _guard.reset();
-            _root = eraseRecursive(_root, val);
+            _root = eraseRecursive(_root, key);
         }
 
-        ArrayPointerType begin()
+        void keys(Keys& dest, const bool descending = false)
+        {
+            decompose<Key>(dest, &Node::key, descending);
+        }
+
+        void values(Values& dest, const bool descending = false)
+        {
+            decompose<Value>(dest, &Node::value, descending);
+        }
+
+        ValuePointerType begin()
         {
             if (_array.size() != _size)
-                makeArray(false);
+                decompose<Value>(_array, &Node::value);
 
             if (!_array.empty())
                 return _array.begin();
@@ -192,46 +220,39 @@ namespace Rt2
             return nullptr;
         }
 
-        ArrayPointerType end()
+        ValuePointerType end()
         {
             if (_array.size() != _size)
-                makeArray(false);
+                decompose<Value>(_array, &Node::value);
 
             if (!_array.empty())
                 return _array.end();
             return nullptr;
         }
 
-        void makeArray(const bool descending = false)
-        {
-            _guard.reset();
-            _array.resizeFast(0);
-            populate(_root, descending);
-        }
-
-        NodePointerType minimum(NodePointerType node = nullptr)
+        Node* minimum(Node* node = nullptr)
         {
             _guard.reset();
             return minRecursive(node ? node : _root);
         }
 
-        NodePointerType maximum(NodePointerType node = nullptr)
+        Node* maximum(Node* node = nullptr)
         {
             _guard.reset();
             return maxRecursive(node ? node : _root);
         }
 
-        NodePointerType root()
+        Node* root()
         {
             return _root;
         }
 
-        NodePointerType left()
+        Node* left()
         {
             return _root ? _root->_left : nullptr;
         }
 
-        NodePointerType right()
+        Node* right()
         {
             return _root ? _root->_right : nullptr;
         }
@@ -241,8 +262,35 @@ namespace Rt2
             return _size;
         }
 
+        bool empty() const
+        {
+            return _size < 1;
+        }
+
     private:
-        NodePointerType minRecursive(NodePointerType node)
+        template <typename U>
+        void decompose(
+            Array<U, ArrayOptions>& dest,
+            U& (Node::*accessor)(),
+            const bool descending = false)
+        {
+            _guard.reset();
+            dest.resizeFast(0);
+            populate<U>(dest, _root, descending, accessor);
+        }
+
+        template <typename U>
+        void populate(Array<U, ArrayOptions>& dest, Node* node, bool descending, U& (Node::*accessor)())
+        {
+            if (!node)
+                return;
+
+            populate<U>(dest, descending ? node->_right : node->_left, descending, accessor);
+            dest.push_back((node->*accessor)());
+            populate<U>(dest, descending ? node->_left : node->_right, descending, accessor);
+        }
+
+        Node* minRecursive(Node* node)
         {
             if (_guard.test())
                 return node;
@@ -251,7 +299,7 @@ namespace Rt2
             return node;
         }
 
-        NodePointerType maxRecursive(NodePointerType node)
+        Node* maxRecursive(Node* node)
         {
             if (_guard.test())
                 return node;
@@ -261,7 +309,7 @@ namespace Rt2
             return node;
         }
 
-        bool insertRecursive(NodePointerType node, ConstReferenceType val)
+        bool insertRecursive(Node* node, const Pair& val)
         {
             if (_guard.test())
                 return false;
@@ -282,7 +330,7 @@ namespace Rt2
             return true;
         }
 
-        NodePointerType findRecursive(NodePointerType node, ConstReferenceType val) const
+        Node* findRecursive(Node* node, const Pair& val) const
         {
             if (!node || _guard.test())
                 return nullptr;
@@ -296,21 +344,21 @@ namespace Rt2
             return findRecursive(node->_right, val);
         }
 
-        NodePointerType eraseRecursive(NodePointerType node, ConstReferenceType val)
+        Node* eraseRecursive(Node* node, const Key& val)
         {
             if (!node || _guard.test())
                 return nullptr;
 
-            if (node->_data > val)
+            if (node->_data.key > val)
                 node->_left = eraseRecursive(node->_left, val);
-            else if (node->_data < val)
+            else if (node->_data.key < val)
                 node->_right = eraseRecursive(node->_right, val);
             else
                 return detach(node);
             return node;
         }
 
-        NodePointerType detach(NodePointerType node)
+        Node* detach(Node* node)
         {
             RT_ASSERT(node)
 
@@ -322,7 +370,7 @@ namespace Rt2
             }
             else if (node->_left == nullptr || node->_right == nullptr)
             {
-                NodePointerType local = node->_left == nullptr ? node->_right : node->_left;
+                Node* local = node->_left == nullptr ? node->_right : node->_left;
                 node->_left = node->_right = nullptr;
 
                 --_size;
@@ -332,23 +380,13 @@ namespace Rt2
             else
             {
                 _guard.reset();
-                NodePointerType cur = minRecursive(node->_right);
+                Node* cur = minRecursive(node->_right);
 
                 _guard.reset();
                 node->_data  = cur->_data;
-                node->_right = eraseRecursive(node->_right, cur->_data);
+                node->_right = eraseRecursive(node->_right, cur->_data.key);
             }
             return node;
-        }
-
-        void populate(NodePointerType node, bool descending)
-        {
-            if (!node)
-                return;
-
-            populate(descending ? node->_right : node->_left, descending);
-            _array.push_back(node->_data);
-            populate(descending ? node->_left : node->_right, descending);
         }
     };
 

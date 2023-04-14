@@ -27,9 +27,7 @@
 
 namespace Rt2
 {
-
     using FileType   = StdFileSystem::file_type;
-    using ErrorCode  = std::error_code;
     using DirOptions = StdFileSystem::directory_options;
 
     String FileSystem::normalize(const String& path)

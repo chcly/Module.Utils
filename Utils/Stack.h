@@ -105,7 +105,14 @@ namespace Rt2
             }
         }
 
-        ConstReferenceType top()
+        ConstReferenceType top() const
+        {
+            if (this->_size < 1)
+                throw Exception("empty stack");
+            return this->_data[this->_size - 1];
+        }
+
+        ReferenceType top()
         {
             if (this->_size < 1)
                 throw Exception("empty stack");
