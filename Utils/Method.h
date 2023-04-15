@@ -62,7 +62,14 @@ namespace Rt2
         Instance* _self{nullptr};
 
     public:
-        Method() = default;
+        Method()                  = default;
+        Method(const Method& oth) = delete;
+
+        Method(Instance* self, const Invoke& ot) :
+            _method(ot),
+            _self(self)
+        {
+        }
 
         void bind(Instance* self, Invoke ot)
         {

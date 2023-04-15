@@ -26,7 +26,7 @@ namespace Rt2
 {
 
     template <typename T,
-              uint8_t Options    = 0,
+              uint8_t Options    = AOP_SIMPLE_TYPE,
               typename Allocator = Allocator<T, uint32_t> >
     class Stack : public ArrayBase<T, Options, Allocator>
     {
@@ -126,7 +126,7 @@ namespace Rt2
             return (int)this->_size - 1;
         }
 
-        ConstReferenceType popTop()
+        ValueType popTop()
         {
             if (this->_size < 1)
                 throw Exception("empty stack");
@@ -144,7 +144,6 @@ namespace Rt2
             RT_ASSERT(idx < this->_capacity)
             return this->_data[idx];
         }
-
     };
 
 }  // namespace Rt2

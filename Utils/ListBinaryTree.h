@@ -115,11 +115,15 @@ namespace Rt2
             }
         };
 
-        using Keys   = Array<Key, ArrayOptions>;
-        using Values = Array<Value, ArrayOptions>;
+        using Keys    = Array<Key, ArrayOptions>;
+        using Values  = Array<Value, ArrayOptions>;
+        using KvPairs = Array<Pair, ArrayOptions>;
 
         using ValuePointerType = typename Values::PointerType;
         using KeyPointerType   = typename Keys::PointerType;
+        using KvpPointerType   = typename KvPairs::PointerType;
+
+        using InsertPoint = std::function<void(Node* parent, Node* node)>;
 
     private:
         Node*  _root{nullptr};
@@ -143,17 +147,19 @@ namespace Rt2
             _array.clear();
         }
 
-        void insert(const Key& key, const Value& val)
+        void insert(const Key& key, const Value& val, const InsertPoint& event = nullptr)
         {
             if (_root == nullptr)
             {
                 _root = new Node({key, val});
                 _size++;
+                if (event)
+                    event(_root, nullptr);
             }
             else
             {
                 _guard.reset();
-                insertRecursive(_root, Pair{key, val});
+                insertRecursive(_root, {key, val}, event);
                 if (_guard.isValid())
                     _size++;
             }
@@ -207,6 +213,11 @@ namespace Rt2
         void values(Values& dest, const bool descending = false)
         {
             decompose<Value>(dest, &Node::value, descending);
+        }
+
+        void keyValuePairs(KvPairs& dest, const bool descending = false)
+        {
+            decompose<Pair>(dest, &Node::pair, descending);
         }
 
         ValuePointerType begin()
@@ -275,7 +286,15 @@ namespace Rt2
             const bool descending = false)
         {
             _guard.reset();
-            dest.resizeFast(0);
+
+            if (ArrayOptions & AOP_SIMPLE_TYPE)
+                dest.resizeFast(0);
+            else
+                dest.clear();
+
+            if (!accessor)
+                return;
+
             populate<U>(dest, _root, descending, accessor);
         }
 
@@ -309,7 +328,7 @@ namespace Rt2
             return node;
         }
 
-        bool insertRecursive(Node* node, const Pair& val)
+        bool insertRecursive(Node* node, const Pair& val, const InsertPoint& event)
         {
             if (_guard.test())
                 return false;
@@ -317,16 +336,21 @@ namespace Rt2
             if (val < node->_data)
             {
                 if (node->_left)
-                    return insertRecursive(node->_left, val);
+                    return insertRecursive(node->_left, val, event);
 
                 node->_left = new Node(val);
+                if (event)
+                    event(node, node->_left);
                 return true;
             }
 
             if (node->_right)
-                return insertRecursive(node->_right, val);
+                return insertRecursive(node->_right, val, event);
 
             node->_right = new Node(val);
+
+            if (event)
+                event(node, node->_right);
             return true;
         }
 

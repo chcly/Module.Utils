@@ -60,14 +60,7 @@ namespace Rt2
         using ConstReferenceType = const T&;
         using CompareFunc        = std::function<bool(ConstReferenceType a, ConstReferenceType b)>;
 
-        /**
-         * \brief Defines shorthand access to the current template type.
-         */
         using SelfType = ArrayBase<T, Options, Allocator>;
-
-        /**
-         * \brief Defines shorthand access to the supplied size type.
-         */
         using SizeType = typename Allocator::SizeType;
 
     protected:
@@ -103,7 +96,7 @@ namespace Rt2
 
         // This assumes that the array was previously sorted by the 'Param' type.
         // Param should be some common member of the type T.
-        // Returns NPOS if not found or the index of the found array element.
+        // Returns NPOS if not found or the index of the found element.
         template <typename Param>
         SizeType findBinary(int (*cmpFunc)(ValueType a, Param b), Param param) const
         {
