@@ -114,7 +114,7 @@ namespace Rt2
 
         void resize(const uint16_t size)
         {
-            if (size < limit)
+            if (size <= limit)
             {
                 if (size < _size)  // test
                 {

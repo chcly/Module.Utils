@@ -40,9 +40,9 @@ void populate(SearchTree& tree, const int initial[], const size_t len)
     for (size_t i = 0; i < len; ++i)
         tree.insert(initial[i], initial[i]);
 
-    for (const auto it : tree)
-        Rt2::Console::print(it, ' ');
-    Console::nl();
+    // for (const auto it : tree)
+    //    Rt2::Console::print(it, ' ');
+    //Console::nl();
 }
 
 void remove(SearchTree& tree,
@@ -53,16 +53,15 @@ void remove(SearchTree& tree,
     {
         if (int v = removeList[i]; tree.contains(v))
         {
-            printf("Removing %i: = ", v);
-            Console::print("Removing ", v, ": = ", ' ');
+            // Console::print("Removing ", v, ": = ", ' ');
 
             tree.erase(v);
-            for (const auto it : tree)
-                Console::print(it, ' ');
-            Console::nl();
+            // for (const auto it : tree)
+            //    Console::print(it, ' ');
+            // Console::nl();
         }
     }
-    Console::nl();
+    // Console::nl();
 }
 
 GTEST_TEST(Utils, ListBinaryTree_001)
@@ -361,6 +360,6 @@ GTEST_TEST(Utils, ListBinaryTree_006)
     {
         EXPECT_TRUE(n < counts.sizeI());
         EXPECT_EQ(counts[n], i);
-        Console::println(counts[n]);
+        // Console::println(counts[n]);
     }
 }
