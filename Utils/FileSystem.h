@@ -78,6 +78,8 @@ namespace Rt2
 
         static size_t fileSize(const DirectoryEntry& ent);
 
+        static String extension(const DirectoryEntry& ent);
+
         static void list(const DirectoryEntry& root,
                          DirectoryEntryArray*  directories   = nullptr,
                          DirectoryEntryArray*  files         = nullptr,

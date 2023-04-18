@@ -39,20 +39,9 @@ namespace Rt2
             Key   key;
             Value value;
 
-            bool operator<(const Pair& rhs) const
-            {
-                return key < rhs.key;
-            }
-
-            bool operator>(const Pair& rhs) const
-            {
-                return key > rhs.key;
-            }
-
-            bool operator==(const Pair& rhs) const
-            {
-                return key == rhs.key;
-            }
+            bool operator<(const Pair& rhs) const { return key < rhs.key; }
+            bool operator>(const Pair& rhs) const { return key > rhs.key; }
+            bool operator==(const Pair& rhs) const { return key == rhs.key; }
         };
         using Guard = FixedStackGuard<StackSize>;
 
@@ -67,10 +56,7 @@ namespace Rt2
 
             Pair _data{};
 
-            ~Node()
-            {
-                destruct();
-            }
+            ~Node() { destruct(); }
 
             Node() = default;
 
@@ -89,30 +75,15 @@ namespace Rt2
             }
 
         public:
-            Node* left()
-            {
-                return _left;
-            }
+            Node* left() { return _left; }
 
-            Node* right()
-            {
-                return _right;
-            }
+            Node* right() { return _right; }
 
-            Pair& pair()
-            {
-                return _data;
-            }
+            Pair& pair() { return _data; }
 
-            Value& value()
-            {
-                return _data.value;
-            }
+            Value& value() { return _data.value; }
 
-            Key& key()
-            {
-                return _data.key;
-            }
+            Key& key() { return _data.key; }
         };
 
         using Keys    = Array<Key, ArrayOptions>;
@@ -123,7 +94,8 @@ namespace Rt2
         using KeyPointerType   = typename Keys::PointerType;
         using KvpPointerType   = typename KvPairs::PointerType;
 
-        using InsertPoint = std::function<void(Node* parent, Node* node)>;
+        using InsertionPoint = std::function<void(Node* parent, Node* node)>;
+        using ValueCallback  = std::function<int(const Value&)>;
 
     private:
         Node*  _root{nullptr};
@@ -144,17 +116,18 @@ namespace Rt2
         {
             delete _root;
             _root = nullptr;
-            _array.clear();
+            if (ArrayOptions & AOP_SIMPLE_TYPE)
+                _array.resizeFast(0);
+            else
+                _array.clear();
         }
 
-        void insert(const Key& key, const Value& val, const InsertPoint& event = nullptr)
+        void insert(const Key& key, const Value& val, const InsertionPoint& event = nullptr)
         {
             if (_root == nullptr)
             {
                 _root = new Node({key, val});
                 _size++;
-                if (event)
-                    event(_root, nullptr);
             }
             else
             {
@@ -167,8 +140,7 @@ namespace Rt2
 
         bool contains(const Key& key) const
         {
-            if (_root == nullptr)
-                return false;
+            if (_root == nullptr) return false;
             return findNode(key) != nullptr;
         }
 
@@ -180,14 +152,12 @@ namespace Rt2
 
         Node* findNode(const Key& key) const
         {
-            if (_root == nullptr)
-                return nullptr;
-
+            if (_root == nullptr) return nullptr;
             Node* node = _root;
             while (node != nullptr)
             {
-                if (node->_data.key == key)
-                    return node;
+                if (node->_data.key == key) return node;
+
                 if (node->_data.key < key)
                     node = node->_right;
                 else
@@ -198,9 +168,7 @@ namespace Rt2
 
         void erase(const Key& key)
         {
-            if (_root == nullptr)
-                return;
-
+            if (_root == nullptr) return;
             _guard.reset();
             _root = eraseRecursive(_root, key);
         }
@@ -215,6 +183,11 @@ namespace Rt2
             decompose<Value>(dest, &Node::value, descending);
         }
 
+        void values(const ValueCallback& dest, const bool descending = false)
+        {
+            decompose<Value>(dest, &Node::value, descending);
+        }
+
         void keyValuePairs(KvPairs& dest, const bool descending = false)
         {
             decompose<Pair>(dest, &Node::pair, descending);
@@ -224,10 +197,7 @@ namespace Rt2
         {
             if (_array.size() != _size)
                 decompose<Value>(_array, &Node::value);
-
-            if (!_array.empty())
-                return _array.begin();
-
+            if (!_array.empty()) return _array.begin();
             return nullptr;
         }
 
@@ -235,9 +205,7 @@ namespace Rt2
         {
             if (_array.size() != _size)
                 decompose<Value>(_array, &Node::value);
-
-            if (!_array.empty())
-                return _array.end();
+            if (!_array.empty()) return _array.end();
             return nullptr;
         }
 
@@ -253,30 +221,15 @@ namespace Rt2
             return maxRecursive(node ? node : _root);
         }
 
-        Node* root()
-        {
-            return _root;
-        }
+        Node* root() { return _root; }
 
-        Node* left()
-        {
-            return _root ? _root->_left : nullptr;
-        }
+        Node* left() { return _root ? _root->_left : nullptr; }
 
-        Node* right()
-        {
-            return _root ? _root->_right : nullptr;
-        }
+        Node* right() { return _root ? _root->_right : nullptr; }
 
-        size_t size() const
-        {
-            return _size;
-        }
+        size_t size() const { return _size; }
 
-        bool empty() const
-        {
-            return _size < 1;
-        }
+        bool empty() const { return _size < 1; }
 
     private:
         template <typename U>
@@ -286,27 +239,40 @@ namespace Rt2
             const bool descending = false)
         {
             _guard.reset();
-
             if (ArrayOptions & AOP_SIMPLE_TYPE)
                 dest.resizeFast(0);
             else
                 dest.clear();
-
-            if (!accessor)
-                return;
-
+            if (!accessor) return;
             populate<U>(dest, _root, descending, accessor);
         }
 
         template <typename U>
         void populate(Array<U, ArrayOptions>& dest, Node* node, bool descending, U& (Node::*accessor)())
         {
-            if (!node)
-                return;
-
+            if (!node) return;
             populate<U>(dest, descending ? node->_right : node->_left, descending, accessor);
             dest.push_back((node->*accessor)());
             populate<U>(dest, descending ? node->_left : node->_right, descending, accessor);
+        }
+
+        template <typename U>
+        void decompose(
+            const std::function<int(const U&)>& callback, U& (Node::*accessor)(), const bool descending = false)
+        {
+            _guard.reset();
+            if (!accessor) return;
+            populate<U>(callback, _root, descending, accessor);
+        }
+
+        template <typename U>
+        void populate(const std::function<int(const U&)>& callback, Node* node, bool descending, U& (Node::*accessor)())
+        {
+            if (!node) return;
+            populate<U>(callback, descending ? node->_right : node->_left, descending, accessor);
+            if (callback((node->*accessor)()))
+                return;
+            populate<U>(callback, descending ? node->_left : node->_right, descending, accessor);
         }
 
         Node* minRecursive(Node* node)
@@ -328,7 +294,7 @@ namespace Rt2
             return node;
         }
 
-        bool insertRecursive(Node* node, const Pair& val, const InsertPoint& event)
+        bool insertRecursive(Node* node, const Pair& val, const InsertionPoint& event)
         {
             if (_guard.test())
                 return false;

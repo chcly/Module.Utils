@@ -31,14 +31,14 @@ namespace Rt2
     public:
         static void indent(OStream& out, int n)
         {
-            n = (int)std::min<size_t>(std::max<size_t>(n, 0), 80);
+            n = (int)Min<size_t>(Max<size_t>(n, 0), 80);
             while (--n >= 0)
                 out.put(' ');
         }
 
         static void newLine(OStream& out, int n)
         {
-            n = std::min(std::max(n, 0), 20);
+            n = Min(Max(n, 0), 20);
             while (--n >= 0)
                 out << std::endl;
         }

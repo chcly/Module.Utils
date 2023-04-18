@@ -156,6 +156,11 @@ namespace Rt2
         return StdFileSystem::file_size(ent);
     }
 
+    String FileSystem::extension(const DirectoryEntry& ent)
+    {
+        return ent.path().extension().generic_string();
+    }
+
     void FileSystem::list(const DirectoryEntry& root,
                           DirectoryEntryArray*  directories,
                           DirectoryEntryArray*  files,
