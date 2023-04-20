@@ -10,6 +10,7 @@
 #include "Utils/Path.h"
 #include "Utils/Stack.h"
 #include "gtest/gtest.h"
+#include "Utils/ObjectPool.h"
 using namespace Rt2;
 
 //                       50
@@ -362,4 +363,32 @@ GTEST_TEST(Utils, ListBinaryTree_006)
         EXPECT_EQ(counts[n], i);
         // Console::println(counts[n]);
     }
+}
+
+GTEST_TEST(Utils, ObjectPool_001)
+{
+    constexpr int m1 = 0x80;
+    constexpr int m2 = m1 * m1;
+
+    using RectPool = ObjectPool<int, m1>;
+
+    RectPool a, b;
+    for (int i = 0; i < m2; ++i)
+    {
+        int* r = a.allocate();
+
+        // tests the new placement call in free.
+        // Reset any previous state of it with
+        // the default constructor
+        *r = m2;
+        a.free(r);
+        r = a.allocate();
+        EXPECT_NE(*r, m2);
+
+        *r = m2;
+        b.free(r);
+    }
+
+    EXPECT_EQ(a.capacity(), m1);
+    EXPECT_EQ(b.capacity(), m2 + m1);
 }
