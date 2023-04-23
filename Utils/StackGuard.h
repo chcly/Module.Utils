@@ -45,10 +45,18 @@ namespace Rt2
         // should start exiting.
         bool test() const
         {
-            const bool result = _depth > Max;
+            const bool result = _depth >= Max;
             if (!result)
                 ++_depth;
             return result;
+        }
+
+        void release() const
+        {
+            if ((int)_depth <= 0)
+                _depth = 0;
+            else
+                --_depth;
         }
 
         void reset() 
@@ -65,7 +73,7 @@ namespace Rt2
         bool isValid() const
         {
             // has at least one more.
-            return _depth + 1 < Max;
+            return _depth + 1 <= Max;
         }
     };
 

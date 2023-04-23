@@ -7,29 +7,12 @@
 #include "Utils/FixedArray.h"
 #include "Utils/HashMap.h"
 #include "Utils/ListBinaryTree.h"
+#include "Utils/ObjectPool.h"
 #include "Utils/Path.h"
 #include "Utils/Stack.h"
 #include "gtest/gtest.h"
-#include "Utils/ObjectPool.h"
 using namespace Rt2;
 
-//                       50
-//                     /     \
-//                    /       \
-//                   /         \
-//                  30          70
-//                 /  \      /     \
-//                20  40     60     80
-//                    /       \     /  \
-//                   32        65  75  85
-//                     \
-//                      34
-//                        \
-//                         36
-//
-//   Case 1: Leaf nodes      {36, 20, 65, 75, 85}
-//   Case 2: One Branch(L|R) {32, 60, 40}
-//   Case 3: Two Branches    {30,70,50}
 constexpr int List[] = {50, 30, 70, 20, 40, 60, 80, 32, 34, 36, 65, 75, 85};
 constexpr int C1[]   = {36, 20, 65, 75, 85};
 constexpr int C2[]   = {32, 60, 40};
@@ -43,7 +26,7 @@ void populate(SearchTree& tree, const int initial[], const size_t len)
 
     // for (const auto it : tree)
     //    Rt2::Console::print(it, ' ');
-    //Console::nl();
+    // Console::nl();
 }
 
 void remove(SearchTree& tree,
@@ -200,23 +183,6 @@ GTEST_TEST(Utils, ListBinaryTree_003)
 
 GTEST_TEST(Utils, ListBinaryTree_004)
 {
-    /*
-    -----------------------
-           50
-         /   \
-        /     \
-       /       \
-      30        70
-     /  \     /    \
-    20  40   60     80
-        /     \     /  \
-       32      65  75  85
-         \
-          34
-            \
-             36
-    -----------------------
-    */
     SearchTree tree;
 
     int len = sizeof(List) / sizeof(int);
@@ -356,8 +322,8 @@ GTEST_TEST(Utils, ListBinaryTree_006)
     }
     std::sort(counts.begin(), counts.end());
 
-    int n =0;
-    for (int i = 1; i < 100; i+=2, ++n)
+    int n = 0;
+    for (int i = 1; i < 100; i += 2, ++n)
     {
         EXPECT_TRUE(n < counts.sizeI());
         EXPECT_EQ(counts[n], i);

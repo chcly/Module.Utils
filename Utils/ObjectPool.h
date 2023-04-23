@@ -95,5 +95,17 @@ namespace Rt2
                 _pool.push_back(new (ptr) T());
             }
         }
+
+        void freeFast(PointerType ptr)
+        {
+            // Use when object reinitialization is unimportant / undesired
+            // because of caching. (see Array::resizeFast)
+            if (ptr)
+            {
+                if (_pool.size() + 1 > _pool.capacity() - 1)
+                    _pool.reserve(_pool.size() + Expansion);
+                _pool.push_back(ptr);
+            }
+        }
     };
 }  // namespace Rt2
