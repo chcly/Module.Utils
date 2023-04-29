@@ -33,10 +33,10 @@
 
 namespace Rt2
 {
-    using FilePath          = StdFileSystem::path;
-    using DirectoryEntry    = StdFileSystem::directory_entry;
-    using DirectoryIterator = StdFileSystem::directory_iterator;
-    using Permissions       = StdFileSystem::perms;
+    using FilePath            = StdFileSystem::path;
+    using DirectoryEntry      = StdFileSystem::directory_entry;
+    using DirectoryIterator   = StdFileSystem::directory_iterator;
+    using Permissions         = StdFileSystem::perms;
     using PathArray           = std::deque<FilePath>;
     using DirectoryEntryArray = std::deque<DirectoryEntry>;
 
@@ -47,7 +47,6 @@ namespace Rt2
         EP_SYSTEM = 0x02,
         EP_DOT    = 0x03,
     };
-
 
     class FileSystem
     {

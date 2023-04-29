@@ -27,7 +27,7 @@
 namespace Rt2
 {
     template <typename T,
-              int Options        = AOP_SIMPLE_TYPE,
+              int Options        = AOP_DEFAULT_TYPE,
               typename Allocator = Allocator<T, uint32_t>>
     class Array : public ArrayBase<T, Options, Allocator>
     {
