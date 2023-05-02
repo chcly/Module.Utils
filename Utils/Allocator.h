@@ -147,7 +147,7 @@ namespace Rt2
         using ConstReferenceType = const Type&;
         using SelfType           = NewAllocator<Type, Size, Limit>;
 
-        explicit NewAllocator() = default;
+        NewAllocator() = default;
 
         NewAllocator(const SelfType&) = default;
 
