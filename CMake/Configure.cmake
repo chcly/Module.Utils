@@ -43,6 +43,4 @@ configure_gtest(${Utils_SOURCE_DIR}/Test/googletest
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Utils_EXTRA_FLAGS}")
 
-message("CMAKE_CXX_FLAGS = ${CMAKE_CXX_FLAGS}")
-
 set(Configure_SUCCEEDED TRUE)
