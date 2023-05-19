@@ -1,6 +1,7 @@
 # Utils
 
-Is the base library used for most of my C++ projects.
+Is the base library used for most of the projects here.
+
 It provides data structures and declarations in a common namespace.
 
 ## Testing
