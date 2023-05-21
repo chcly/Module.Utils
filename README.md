@@ -10,8 +10,8 @@ The Test directory is setup to work with [googletest](https://github.com/google/
 
 ## Building
 
-![A1](https://github.com/chcly/Utils/actions/workflows/build-linux.yml/badge.svg)
-![A2](https://github.com/chcly/Utils/actions/workflows/build-windows.yml/badge.svg)
+![A1](https://github.com/chcly/Module.Utils/actions/workflows/build-linux.yml/badge.svg)
+![A2](https://github.com/chcly/Module.Utils/actions/workflows/build-windows.yml/badge.svg)
 
 ```sh
 mkdir build
