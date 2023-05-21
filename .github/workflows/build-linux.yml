@@ -1,15 +1,11 @@
-name: Build With CMake
+name: Linux
 on: [push]
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
      - uses: actions/checkout@v3
-
      - name: Configure
-       run: cmake -DUtils_BUILD_TEST=ON -DUtils_AUTO_RUN_TEST=ON .
-
+       run: cmake -S . -B Build -DTemplate_BUILD_TEST=ON -DTemplate_AUTO_RUN_TEST=ON
      - name: Build
-       run: make
+       run: cmake --build Build

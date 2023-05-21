@@ -1,0 +1,12 @@
+name: Windows
+on: [push]
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+     - uses: actions/checkout@v3
+     - name: Configure
+       run: cmake -S . -B Build -DTemplate_BUILD_TEST=ON -DTemplate_AUTO_RUN_TEST=ON
+     - name: Build
+       run: cmake --build Build
+       
