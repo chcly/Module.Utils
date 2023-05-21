@@ -11,7 +11,7 @@ set(GroupRoot ../)
 set_ro_group(TargetName_SRC
     :${GroupRoot}/CMakeLists.txt
     :${GroupRoot}/README.md
-    :${GroupRoot}/.github/workflows/autobuild.yml
+    :${GroupRoot}/.github/workflows/*.yml
     Config:${GroupRoot}/CMake/CMakeLists.txt
     Config:${GroupRoot}/CMake/*.cmake
     Config/Modules:${GroupRoot}/CMake/Modules/*.cmake
