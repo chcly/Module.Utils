@@ -27,44 +27,14 @@
 
 namespace Rt2::CommandLine
 {
-    /**
-     * \brief A structure that represents a command line switch.
-     */
     struct Switch
     {
-        /**
-         * \brief Defines the lookup id for this switch. 
-         */
-        uint32_t id;
-
-        /**
-         * \brief Assigns a single character value for this switch -[a-zA-Z].
-         * 
-         * A value of 0 means unused.
-         */
-        char shortSwitch;
-
-        /**
-         * \brief Assigns word or phrase value for this switch --[a-zA-Z]+
-         * 
-         * A value of null means unused.
-         */
+        uint32_t    id;
+        char        shortSwitch;
         const char* longSwitch;
-
-        /**
-         * \brief Provides A brief description for the -h, --help builtin option.
-         */
         const char* description;
-
-        /**
-         * \brief Defines this switch as optional.
-         */
-        bool optional;
-
-        /**
-         * \brief Defines the number of required arguments.
-         */
-        size_t argCount;
+        bool        optional;
+        size_t      argCount;
     };
 
     class ParseOption
@@ -105,12 +75,12 @@ namespace Rt2::CommandLine
         void setValue(const size_t& index, const String& str);
     };
 
-    inline  ParseOption::ParseOption() :
+    inline ParseOption::ParseOption() :
         _isPresent(false)
     {
     }
 
-    inline  ParseOption::ParseOption(const Switch& option) :
+    inline ParseOption::ParseOption(const Switch& option) :
         _switch(option),
         _isPresent(false)
     {
@@ -118,49 +88,49 @@ namespace Rt2::CommandLine
             _values.resize(option.argCount);
     }
 
-    inline  bool ParseOption::isOptional() const
+    inline bool ParseOption::isOptional() const
     {
         return _switch.optional;
     }
 
-    inline  bool ParseOption::isPresent() const
+    inline bool ParseOption::isPresent() const
     {
         return _isPresent;
     }
 
-    inline  size_t ParseOption::getArgCount() const
+    inline size_t ParseOption::getArgCount() const
     {
         return _values.size();
     }
 
-    inline  void ParseOption::makePresent()
+    inline void ParseOption::makePresent()
     {
         _isPresent = true;
     }
 
-    inline  const Switch& ParseOption::getSwitch() const
+    inline const Switch& ParseOption::getSwitch() const
     {
         return _switch;
     }
 
-    inline  const ParseOption::Arguments& ParseOption::getValues() const
+    inline const ParseOption::Arguments& ParseOption::getValues() const
     {
         return _values;
     }
 
-    inline  const String& ParseOption::getValue(const size_t& idx)
+    inline const String& ParseOption::getValue(const size_t& idx)
     {
         assert(idx < _values.size());
         return _values[idx];
     }
 
-    inline  void ParseOption::setValue(const String& str)
+    inline void ParseOption::setValue(const String& str)
     {
         if (!_values.empty())
             _values[0] = str;
     }
 
-    inline  int ParseOption::getInt(const size_t& idx,
+    inline int ParseOption::getInt(const size_t& idx,
                                    const int&    defaultValue,
                                    const int&    base)
     {
@@ -169,18 +139,18 @@ namespace Rt2::CommandLine
                              base);
     }
 
-    inline  int64_t ParseOption::getInt64(const size_t&  idx,
-                                          const int64_t& defaultValue,
-                                          const int&     base)
+    inline int64_t ParseOption::getInt64(const size_t&  idx,
+                                         const int64_t& defaultValue,
+                                         const int&     base)
     {
         return Char::toInt64(getValue(idx),
                              defaultValue,
                              base);
     }
 
-    inline  void ParseOption::setValue(const size_t& index, const String& str)
+    inline void ParseOption::setValue(const size_t& index, const String& str)
     {
         if (index < _values.size())
             _values[index] = str;
     }
-}  // namespace Jam::CommandLine
+}  // namespace Rt2::CommandLine
