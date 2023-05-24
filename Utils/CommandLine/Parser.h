@@ -25,7 +25,6 @@
 #include "Utils/CommandLine/Scanner.h"
 #include "Utils/Directory/Path.h"
 #include "Utils/FileSystem.h"
-#include "Utils/Path.h"
 
 namespace Rt2::CommandLine
 {
@@ -85,6 +84,8 @@ namespace Rt2::CommandLine
 
         String programDirectory() const;
 
+        bool hasArguments() const;
+
         static String currentDirectory();
 
         bool isPresent(const uint32_t& enumId) const;
@@ -118,4 +119,10 @@ namespace Rt2::CommandLine
     {
         return _argumentList;
     }
+
+    inline bool Parser::hasArguments() const
+    {
+        return !_argumentList.empty();
+    }
+
 }  // namespace Rt2::CommandLine
