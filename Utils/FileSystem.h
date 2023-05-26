@@ -93,6 +93,8 @@ namespace Rt2
         static FilePath unixPath(const FilePath& path);
 
         static void list(const String& path, DirectoryEntryArray& dest);
+
+        static void count(const String& path, size_t &dirs, size_t &files, size_t &size);
     };
 
     using Fs = FileSystem;

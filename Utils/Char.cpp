@@ -512,4 +512,38 @@ namespace Rt2
             return '9' - (ch - '0');
         return ch;
     }
+
+    void Char::commaInt(String& dest, const size_t& iv)
+    {
+        dest.clear();
+
+        const String tmp = toString(iv);
+
+        if (size_t s = tmp.size(); s > 3)
+        {
+            const size_t k = s % 3;
+            size_t       j = k == 0 ? 1 : 0;
+            for (size_t i = 0; i < s; ++i)
+            {
+                if (i + 1 >= k)
+                {
+                    dest.push_back(tmp[i]);
+                    if (j % 3 == 0 && (i + 1) < s)
+                        dest.push_back(',');
+                    j++;
+                }
+                else
+                    dest.push_back(tmp[i]);
+            }
+        }
+        else
+            dest = tmp;
+    }
+
+    String Char::commaInt(const size_t& iv)
+    {
+        String copyOnReturn;
+        commaInt(copyOnReturn, iv);
+        return copyOnReturn;
+    }
 }  // namespace Rt2

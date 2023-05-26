@@ -248,4 +248,23 @@ namespace Rt2
             }
         }
     }
+
+    void FileSystem::count(const String& path, size_t& dirs, size_t& files, size_t& size)
+    {
+        const auto it = tryGet(DirectoryEntry(path));
+
+        for (const auto& ent : it)
+        {
+            if (access(ent) != EP_NONE)
+                continue;
+
+            if (isDirectory(ent))
+                ++dirs;
+            else
+            {
+                ++files;
+                size += fileSize(ent);
+            }
+        }
+    }
 }  // namespace Rt2

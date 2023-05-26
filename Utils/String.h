@@ -200,7 +200,7 @@ namespace Rt2
             String&  out,
             IStream& in,
             bool     newLine = true);
-
+        
         static void scramble(
             String& destination,
             size_t  value,
