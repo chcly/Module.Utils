@@ -114,6 +114,14 @@ namespace Rt2
             const String& input,
             char          character);
 
+        static String trimL(
+            const String& input,
+            char          character);
+
+        static String trimR(
+            const String& input,
+            char          character);
+
         static void trimRelPath(
             String&       destination,
             const String& input);
@@ -123,7 +131,7 @@ namespace Rt2
             const String& input,
             char          character);
 
-        static String stripEol(const String& input, char replacement=0);
+        static String stripEol(const String& input, char replacement = 0);
 
         /// Filters characters out of the input string into the destination string.
         /// Filtering occurs when the pass function returns a true value.
@@ -200,7 +208,7 @@ namespace Rt2
             String&  out,
             IStream& in,
             bool     newLine = true);
-        
+
         static void scramble(
             String& destination,
             size_t  value,

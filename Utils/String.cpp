@@ -603,6 +603,20 @@ namespace Rt2
             destination.clear();
     }
 
+    String StringUtils::trimL(const String& input, char character)
+    {
+        String copy;
+        trimL(copy, input, character);
+        return copy;
+    }
+
+    String StringUtils::trimR(const String& input, char character)
+    {
+        String copy;
+        trimR(copy, input, character);
+        return copy;
+    }
+
     void StringUtils::trimRelPath(String& destination, const String& input)
     {
         destination.clear();
