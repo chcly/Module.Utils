@@ -175,12 +175,7 @@ namespace Rt2
             return _buffer;
         }
 
-        char* ptr()
-        {
-            return _buffer;
-        }
-
-        const char* ptr()const
+        char* data()
         {
             return _buffer;
         }

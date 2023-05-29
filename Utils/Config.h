@@ -50,14 +50,19 @@ namespace Rt2
         static void scanToQuote(IStream& input);
 
         static void scanValue(String& dest, IStream& input);
+
         static void scanKey(String& dest, IStream& input);
+
         static void scanComment(IStream& input);
+
         static char next(IStream& input);
 
     public:
         Config();
 
         ~Config() = default;
+
+        void load(const String& fn);
 
         void load(IStream& input);
 

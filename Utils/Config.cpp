@@ -20,13 +20,21 @@
 -------------------------------------------------------------------------------
 */
 #include "Utils/Config.h"
-
 #include "Exception.h"
 #include "Utils/Char.h"
 
 namespace Rt2
 {
     Config::Config() = default;
+
+    void Config::load(const String& fn)
+    {
+        if (InputFileStream ifs(fn);
+            ifs.is_open())
+            load(ifs);
+        else
+            throw Exception("failed to load: ", fn);
+    }
 
     void Config::load(IStream& input)
     {
@@ -223,7 +231,7 @@ namespace Rt2
 
     const String& Config::string(const String& key, const String& def)
     {
-        if (const StringMap::const_iterator it = _attributes.find(key); 
+        if (const StringMap::const_iterator it = _attributes.find(key);
             it != _attributes.end())
             return it->second;
         return def;
@@ -252,4 +260,4 @@ namespace Rt2
         return _attributes;
     }
 
-}  // namespace MdDox
+}  // namespace Rt2
