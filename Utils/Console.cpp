@@ -315,6 +315,16 @@ namespace Rt2
             hexdump(std::cout, p, len);
     }
 
+    void Console::hexln(const void* p, const uint32_t len)
+    {
+        if (!p) return;
+
+        const char* ch = (const char*)p;
+        for (uint32_t i = 0; i < len; ++i)
+            std::cout << std::hex << (int)(uint8_t)ch[i];
+        std::cout << std::endl;
+    }
+
     void printBinLine(OStream&     dest,
                       const char*  buffer,
                       const size_t offs,

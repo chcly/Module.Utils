@@ -185,7 +185,10 @@ namespace Rt2::CommandLine
 
     String Parser::programDirectory() const
     {
-        return _program.fullDirectory();
+        String copy = _program.fullDirectory();
+        if (!Su::endsWith(copy, '/'))
+            copy.push_back('/');
+        return copy;
     }
 
     String Parser::currentDirectory()

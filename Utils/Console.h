@@ -79,6 +79,7 @@ namespace Rt2
         static void hexdump(const OutputStringStream& str);
         static void hexdump(OStream& dest, const void* p, uint32_t len);
         static void hexdump(const void* p, uint32_t len);
+        static void hexln(const void* p, uint32_t len);
 
         static void bindump(const String& str);
         static void bindump(const OutputStringStream& str);
