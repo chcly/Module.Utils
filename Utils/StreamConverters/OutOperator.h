@@ -21,6 +21,7 @@
 */
 #pragma once
 #include "Utils/String.h"
+#include "Utils/Definitions.h" // for global Clamp, Min, Max
 
 namespace Rt2
 {
