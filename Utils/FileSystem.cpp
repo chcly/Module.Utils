@@ -89,6 +89,8 @@ namespace Rt2
     {
         try
         {
+            if (!isDirectory(ent))
+                return {};
             return {ent, DirOptions::skip_permission_denied};
         }
         catch (StdFileSystem::filesystem_error& ex)
