@@ -146,9 +146,19 @@ namespace Rt2
         return ent.status().type() == FileType::regular;
     }
 
+    bool FileSystem::isFile(const String& ent)
+    {
+        return isFile(DirectoryEntry(ent));
+    }
+
     bool FileSystem::isDirectory(const DirectoryEntry& ent)
     {
         return ent.status().type() == FileType::directory;
+    }
+
+    bool FileSystem::isDirectory(const String& ent)
+    {
+        return isDirectory(DirectoryEntry(ent));
     }
 
     size_t FileSystem::fileSize(const DirectoryEntry& ent)

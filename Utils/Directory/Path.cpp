@@ -624,6 +624,19 @@ namespace Rt2::Directory
         return Path(Su::join(val, b));
     }
 
+    String Path::parentDir2() const
+    {
+        String      dest = "/";
+        StringDeque de;
+        Su::split(de, full(), "/");
+        if (!de.empty())
+        {
+            de.pop_back();
+            Su::combine(dest, de, '\0', '/');
+        }
+        return FileSystem::sanitize(dest);
+    }
+
     Path Path::parentDir() const
     {
         if (!stem().empty())

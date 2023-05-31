@@ -73,6 +73,10 @@ namespace Rt2
 
         static bool isFile(const DirectoryEntry& ent);
 
+        static bool isFile(const String& ent);
+
+        static bool isDirectory(const String& ent);
+
         static bool isDirectory(const DirectoryEntry& ent);
 
         static size_t fileSize(const DirectoryEntry& ent);

@@ -134,6 +134,8 @@ namespace Rt2::Directory
 
         static Path combine(const String& a, const String& b);
 
+        String parentDir2() const;
+
         Path parentDir() const;
     };
 
