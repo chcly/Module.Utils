@@ -626,7 +626,8 @@ namespace Rt2::Directory
 
     String Path::parentDir2() const
     {
-        String      dest;
+        String dest;
+
         StringDeque de;
         Su::split(de, full(), "/");
         if (!de.empty())
@@ -636,6 +637,8 @@ namespace Rt2::Directory
         }
         if (dest.empty())
             dest = root();
+        if (dest.empty())
+            dest = "/";
         return FileSystem::sanitize(dest);
     }
 

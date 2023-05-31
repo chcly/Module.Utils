@@ -69,7 +69,19 @@ namespace Rt2
 
     String FileSystem::currentPath()
     {
-        return StdFileSystem::current_path().string();
+        try
+        {
+            return StdFileSystem::current_path().string();
+        }
+        catch (StdFileSystem::filesystem_error& ex)
+        {
+            Console::println(ex.what());
+            return {};
+        }
+        catch (...)
+        {
+            return {};
+        }
     }
 
     String FileSystem::current()
@@ -165,7 +177,19 @@ namespace Rt2
 
     size_t FileSystem::fileSize(const DirectoryEntry& ent)
     {
-        return StdFileSystem::file_size(ent);
+        try
+        {
+            return StdFileSystem::file_size(ent);
+        }
+        catch (StdFileSystem::filesystem_error& ex)
+        {
+            Console::println(ex.what());
+            return 0;
+        }
+        catch (...)
+        {
+            return 0;
+        }
     }
 
     String FileSystem::extension(const DirectoryEntry& ent)
