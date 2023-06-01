@@ -10,8 +10,54 @@
 #include "Utils/ObjectPool.h"
 #include "Utils/Path.h"
 #include "Utils/Stack.h"
+#include "Utils/SymbolStream.h"
 #include "gtest/gtest.h"
 using namespace Rt2;
+
+GTEST_TEST(Utils, SymbolStream_001)
+{
+    SymbolStream ss;
+    ss.setBase(2);
+    String s;
+    ss.base(s, 0b101000000011111);
+    EXPECT_EQ(s, "101000000011111");
+
+    ss.setBase(16);
+    ss.base(s, 0xFF764AC0);
+    EXPECT_EQ(s, "FF764AC0");
+
+    ss.setBase(8);
+    ss.base(s, 511);
+    EXPECT_EQ(s, "777");
+}
+
+GTEST_TEST(Utils, SymbolStream_002)
+{
+    {
+        SymbolStream ss({'A', 'B'});
+        ss.setBase(2);
+        String s;
+        ss.base(s, 0b101000000011111);
+        EXPECT_EQ(s, "BABAAAAAAABBBBB");
+    }
+
+    {
+        SymbolStream ss({'F', 'E', 'D', 'C', 'B', 'A', '9', '8', '7', '6', '5', '4', '3', '2', '1', '0'});
+        String s;
+        ss.setBase(16);
+        ss.base(s, 0x89C53F0);
+        EXPECT_EQ(s, "763AC0F");
+    }
+
+    {
+        SymbolStream ss({'H', 'E', 'l', 'o', '[', '/', '-', '!', '$', '^', '5', '4', '%', '2', '1', '0'});
+        String s;
+        ss.setPad(true);
+        ss.setBase(ss.size());
+        ss.base(s, "Hello World!");
+        EXPECT_EQ(s, "[$-/-%-%-0lH/!-0!l-%-[lElE");
+    }
+}
 
 constexpr int List[] = {50, 30, 70, 20, 40, 60, 80, 32, 34, 36, 65, 75, 85};
 constexpr int C1[]   = {36, 20, 65, 75, 85};

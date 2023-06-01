@@ -20,7 +20,7 @@
 -------------------------------------------------------------------------------
 */
 #ifndef _CRT_SECURE_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS 1
+    #define _CRT_SECURE_NO_WARNINGS 1
 #endif
 #include "Utils/Char.h"
 #include <bitset>
@@ -29,7 +29,8 @@
 #include <iomanip>
 #include <limits>
 #include <sstream>
-#include "StreamMethods.h"
+#include "Utils/StreamMethods.h"
+#include "Utils/SymbolStream.h"
 #include "Utils/String.h"
 
 namespace Rt2
@@ -467,6 +468,15 @@ namespace Rt2
         return copyOnReturn;
     }
 
+    String Char::toOctalString(uint64_t v)
+    {
+        OutputStringStream stream;
+        SymbolStream ss ({'0', '1', '2', '3', '4', '5', '6', '7'});
+        ss.setBase(8);
+        ss.base(stream, v);
+        return stream.str();
+    }
+
     int Char::hexToDec(const char v)
     {
         switch (v)
@@ -503,7 +513,7 @@ namespace Rt2
 
     int Char::invertId(const int ch)
     {
-        #define fs(s, e, c) ((e) - (c) + (s) - (s))
+#define fs(s, e, c) ((e) - (c) + (s) - (s))
         if (isUpper(ch))
             return 'a' + fs('A', 'Z', ch);
         if (isLower(ch))
@@ -546,4 +556,5 @@ namespace Rt2
         commaInt(copyOnReturn, iv);
         return copyOnReturn;
     }
+
 }  // namespace Rt2
