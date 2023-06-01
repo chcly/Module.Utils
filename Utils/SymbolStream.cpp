@@ -19,8 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 -------------------------------------------------------------------------------
 */
-#include <cmath>
 #include "Utils/SymbolStream.h"
+#include <cmath>
 #include "TextStreamWriter.h"
 #include "Utils/String.h"
 
@@ -38,6 +38,7 @@ namespace Rt2
     {
         _scratch.resizeFast(0);
         uint64_t q, r;
+        uint32_t idx;
 
         if (v == 0)
         {
@@ -47,7 +48,8 @@ namespace Rt2
                 r += _shift;
                 r %= _base;
             }
-            _scratch.push_back(_symbols.at(r));
+            idx = r % _symbols.size();
+            _scratch.push_back(_symbols.at(idx));
         }
         else
         {
@@ -63,7 +65,8 @@ namespace Rt2
                         r += _shift;
                         r %= _base;
                     }
-                    _scratch.push_back(_symbols.at(r));
+                    idx = r % _symbols.size();
+                    _scratch.push_back(_symbols.at(idx));
                 }
                 v = q;
             }
@@ -79,20 +82,20 @@ namespace Rt2
                     r += _shift;
                     r %= _base;
                 }
-                _scratch.push_back(_symbols.at(r));
+                idx = r % _symbols.size();
+                _scratch.push_back(_symbols.at(idx));
             }
         }
-
         if (_ws)
         {
-            r = (int)Max<size_t>(0, charsPerBase() - (size_t)_scratch.size());
+            r = Max<int>(0, (int)charsPerBase() - (int)_scratch.size());
             for (q = 0; q < r; ++q)
                 Ts::print(dest, ' ');
             Ts::print(dest, ' ');
         }
 
         for (int i = _scratch.sizeI() - 1; i >= 0; --i)
-            Ts::print(dest, (char)_scratch[i]);
+            Ts::print(dest, _scratch[i]);
     }
 
     void SymbolStream::base(String& dest, uint64_t v)
@@ -146,14 +149,7 @@ namespace Rt2
     size_t SymbolStream::charsPerBase()
     {
         if (_cpb == Npos)
-        {
-            int ln = int(ceil(log(255.0) / log((double)_base)));
-            if (ln < 2)
-                ln = 2;
-            if (ln > 8)
-                ln = 8;
-            _cpb = ln;
-        }
+            _cpb = Clamp(int(ceil(log(255.0) / log((double)_base))), 2, 8);
         return _cpb;
     }
 
