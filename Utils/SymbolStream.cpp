@@ -19,6 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 -------------------------------------------------------------------------------
 */
+#include <cmath>
 #include "Utils/SymbolStream.h"
 #include "TextStreamWriter.h"
 #include "Utils/String.h"
