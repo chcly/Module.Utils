@@ -352,6 +352,15 @@ namespace Rt2
         return copyOnReturn;
     }
 
+    void Char::toHexString(String& dest, const void* p, const size_t len)
+    {
+        OutputStringStream oss;
+        const char* ch = (const char*)p;
+        for (uint32_t i = 0; i < len; ++i)
+            oss << std::hex << (int)(uint8_t)ch[i];
+        dest = oss.str();
+    }
+
     void Char::toHexString(String& dest, const uint8_t v)
     {
         std::ostringstream oss;

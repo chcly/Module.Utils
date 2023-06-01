@@ -131,6 +131,8 @@ namespace Rt2
 
         static String toString(uint64_t v);
 
+        static void toHexString(String& dest, const void *p, size_t len);
+
         static void toHexString(String& dest, uint8_t v);
 
         static void toHexString(String& dest, uint16_t v);
