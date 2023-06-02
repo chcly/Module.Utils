@@ -36,6 +36,8 @@ namespace Rt2
 
         static void close();
 
+        static void clear();
+
         static String current();
 
         static void endl(const int n = 1)
@@ -60,6 +62,7 @@ namespace Rt2
             Ts::println(oss, std::forward<Args>(args)...);
             flush(oss);
         }
+
     };
 
 }  // namespace Rt2

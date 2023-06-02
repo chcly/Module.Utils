@@ -34,7 +34,7 @@ namespace Rt2
             fs << ss.str();
         }
         else
-            Console::println(ss.str());
+            Console::print(ss.str());
     }
 
     void Log::open(const String& log)
@@ -54,6 +54,15 @@ namespace Rt2
     {
         delete path;
         path = nullptr;
+    }
+
+    void Log::clear()
+    {
+        if (path)
+        {
+            OutputFileStream fs = OutputFileStream();
+            fs.open(*path, std::ios_base::trunc);
+        }
     }
 
     String Log::current()
