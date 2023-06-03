@@ -21,6 +21,8 @@
 */
 // <including all headers intentionally>
 #include "Utils/Assert.h"
+#include "StreamConverters/Fill.h"
+#include "StreamConverters/Tab.h"
 #include "Utils/Allocator.h"
 #include "Utils/Array.h"
 #include "Utils/ArrayBase.h"
@@ -42,11 +44,9 @@
 #include "Utils/Traits.h"
 // </including all headers intentionally>
 
-
-
 #if RT_DEBUG == 1
-#include "Utils/Console.h"
-#include "Utils/Exception.h"
+    #include "Utils/Console.h"
+    #include "Utils/Exception.h"
 #endif
 
 namespace Rt2
@@ -62,4 +62,20 @@ namespace Rt2
     }
 
 #endif
-}  // namespace Jam
+    void AssertLog(const char* declaration, const char* file, unsigned long line, const char* function)
+    {
+        Console::setForeground(CS_YELLOW);
+        Console::println(file, '(', line, ')');
+        Console::setForeground(CS_WHITE);
+        Console::println(Line());
+        Console::println(Tab(4), function, "(...) {");
+        Console::print(Tab(8), "if ( !(", declaration, ") )");
+        Console::setForeground(CS_CYAN);
+        Console::print("<-- (failed) ");
+        Console::setForeground(CS_WHITE);
+        Console::println(" { ... }");
+        Console::println(Tab(4), '}');
+        Console::resetColor();
+    }
+
+}  // namespace Rt2

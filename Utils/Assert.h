@@ -28,5 +28,13 @@ namespace Rt2
                                         const char*   file,
                                         unsigned long line,
                                         const char*   function);
+
 #endif
-}  // namespace Jam
+
+    extern void AssertLog(const char*   declaration,
+                          const char*   file,
+                          unsigned long line,
+                          const char*   function);
+
+
+}  // namespace Rt2
