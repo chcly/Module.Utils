@@ -78,6 +78,7 @@
 
 
 // Is a assert that has an exit path (opposed to a hard stop)
+// (worst case redundancy)
 #define RT_GUARD_CHECK_IMPL(PL, RET) \
     if (!(PL))                       \
     {                                \

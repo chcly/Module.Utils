@@ -76,6 +76,7 @@ namespace Rt2
         Console::println(" { ... }");
         Console::println(Tab(4), '}');
         Console::resetColor();
+        Console::debugBreak();
     }
 
 }  // namespace Rt2
