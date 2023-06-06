@@ -219,7 +219,7 @@ namespace Rt2
             return _buffer[i];
         }
 
-        char* at(uint16_t i)
+        char at(uint16_t i)
         {
             RT_ASSERT(i < _size && i < L);
             return _buffer[i];
