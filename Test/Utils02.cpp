@@ -53,7 +53,7 @@ GTEST_TEST(Utils, SymbolStream_002)
         SymbolStream ss({'H', 'E', 'l', 'o', '[', '/', '-', '!', '$', '^', '5', '4', '%', '2', '1', '0'});
         String s;
         ss.setPad(true);
-        ss.setBase(ss.size());
+        ss.setBase((int)ss.size());
         ss.base(s, "Hello World!");
         EXPECT_EQ(s, "[$-/-%-%-0lH/!-0!l-%-[lElE");
     }

@@ -94,8 +94,7 @@ namespace Rt2
     {
         while (!input.eof())
         {
-            const char ch = next(input);
-            switch (ch)
+            switch (const char ch = next(input))
             {
             // allow only white space and a quote
             // after an = character
@@ -124,9 +123,7 @@ namespace Rt2
 
         while (!input.eof())
         {
-            const char ch = next(input);
-
-            switch (ch)
+            switch (const char ch = next(input))
             {
             case ':':
             case '#':
@@ -163,9 +160,7 @@ namespace Rt2
         bool lock = false;
         while (!input.eof())
         {
-            const char ch = next(input);
-
-            switch (ch)
+            switch (const char ch = next(input))
             {
             // A valid id is composed of the expression
             // [a-zA-Z][a-zA-Z0-9]+[_-.]*
@@ -202,9 +197,7 @@ namespace Rt2
     {
         while (!input.eof())
         {
-            const char ch = next(input);
-
-            switch (ch)
+            switch (const char ch = next(input))
             {
             case '\r':
             case '\n':
