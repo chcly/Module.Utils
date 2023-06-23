@@ -55,7 +55,7 @@ GTEST_TEST(Utils, SymbolStream_002)
         ss.setPad(true);
         ss.setBase((int)ss.size());
         ss.base(s, "Hello World!");
-        EXPECT_EQ(s, "[$-/-%-%-0lH/!-0!l-%-[lElE");
+        EXPECT_EQ(s, "[$-/-%-%-0lH/!-0!l-%-[lE");
     }
 }
 
