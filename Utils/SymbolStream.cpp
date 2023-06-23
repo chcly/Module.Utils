@@ -34,11 +34,27 @@ namespace Rt2
             makeSymbolDefault();
     }
 
+    SymbolStream::SymbolStream(const Initializer& symbols) :
+        _base(symbols.size()),
+        _symbols(symbols)
+    {
+    }
+
+    SymbolStream::SymbolStream(const String& symbols):
+        _base(symbols.size())
+    {
+        for (const char ch : symbols)
+            _symbols.push_back(ch);
+    }
+
     void SymbolStream::base(OStream& dest, uint64_t v)
     {
         _scratch.resizeFast(0);
         uint64_t q, r;
         uint32_t idx;
+
+        if (_base < 2)
+            return;
 
         if (v == 0)
         {
@@ -107,11 +123,11 @@ namespace Rt2
 
     void SymbolStream::base(OStream& dest, IStream& in)
     {
-        while (!in.eof())
+        char ch;
+        while (!in.read(&ch, 1).eof())
         {
-            char ch;
-            in.read(&ch, 1);
-            base(dest, (uint64_t)ch);
+            if (ch > 0) 
+                base(dest, (uint64_t)ch);
         }
     }
 
@@ -130,20 +146,53 @@ namespace Rt2
         dest = oss.str();
     }
 
-    void SymbolStream::setBase(const int i)
+    String SymbolStream::toString(const I8 v, const Initializer& sym, const int offs)
     {
-        _base = i;
-        _cpb  = Npos;
+        return toString((uint64_t)v, sym, offs);
     }
 
-    void SymbolStream::setPad(const bool v)
+    String SymbolStream::toString(const I16 v, const Initializer& sym, const int offs)
     {
-        _pad = v;
+        return toString((uint64_t)v, sym, offs);
     }
 
-    void SymbolStream::setWs(const bool v)
+    String SymbolStream::toString(const I32 v, const Initializer& sym, const int offs)
     {
-        _ws = v;
+        return toString((uint64_t)v, sym, offs);
+    }
+
+    String SymbolStream::toString(const I64 v, const Initializer& sym, const int offs)
+    {
+        return toString((uint64_t)v, sym, offs);
+    }
+
+    String SymbolStream::toString(const U8 v, const Initializer& sym, const int offs)
+    {
+        return toString((uint64_t)v, sym, offs);
+    }
+
+    String SymbolStream::toString(const U16 v, const Initializer& sym, const int offs)
+    {
+        return toString((uint64_t)v, sym, offs);
+    }
+
+    String SymbolStream::toString(const U32 v, const Initializer& sym, const int offs)
+    {
+        return toString((uint64_t)v, sym, offs);
+    }
+
+    String SymbolStream::toString(const U64 v, const Initializer& sym, const int offs)
+    {
+        String copy;
+        toString(copy, v, sym, offs);
+        return copy;
+    }
+
+    void SymbolStream::toString(String& dest, const U64 v, const Initializer& sym, const int offs)
+    {
+        SymbolStream ss(sym);
+        ss.setShift(offs);
+        ss.base(dest, v);
     }
 
     size_t SymbolStream::charsPerBase()
