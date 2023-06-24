@@ -22,14 +22,14 @@
 #include "Utils/Win32/CrtUtils.h"
 
 #ifdef _WIN32
-#include <crtdbg.h>
-#include "Utils/Console.h"
+    #include <crtdbg.h>
+    #include "Utils/Console.h"
 #endif
 
 namespace Rt2
 {
 #ifdef _WIN32
-    static _CrtMemState __startState = {};
+    static _CrtMemState StartState = {};
 
     int CrtReportHook(const int type, char* msg, int*)
     {
@@ -42,7 +42,6 @@ namespace Rt2
     void CrtTestMemory()
     {
 #ifdef _WIN32
-
         // enable reporting and keep any flags that are present.
         int flag = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
         flag |= _CRTDBG_LEAK_CHECK_DF;
@@ -53,21 +52,21 @@ namespace Rt2
         _CrtSetDbgFlag(flag);
         _CrtSetReportHook(CrtReportHook);
 
-        __startState = {};
-        _CrtMemCheckpoint(&__startState);
+        StartState = {};
+        _CrtMemCheckpoint(&StartState);
 #endif
     }
 
     void CrtDump()
     {
 #ifdef _WIN32
-        if (__startState.pBlockHeader != nullptr)
+        if (StartState.pBlockHeader != nullptr)
         {
             _CrtMemState endState = {};
             _CrtMemCheckpoint(&endState);
 
             _CrtMemState dumpState = {};
-            if (_CrtMemDifference(&dumpState, &__startState, &endState) != 0)
+            if (_CrtMemDifference(&dumpState, &StartState, &endState) != 0)
             {
                 _CrtMemDumpStatistics(&dumpState);
 
@@ -80,14 +79,13 @@ namespace Rt2
                 _CrtSetDbgFlag(flag);
             }
 
-            __startState = {};
+            StartState = {};
         }
 
         if (_CrtDumpMemoryLeaks() == 0)
         {
-            // Console::writeLine("No memory leaks were found");
+            //Console::writeLine("No memory leaks were found");
         }
-
         _CrtSetReportHook(nullptr);
 #endif
     }
@@ -95,10 +93,10 @@ namespace Rt2
     void CrtBreakOn(const long alloc)
     {
 #ifdef _DEBUG
-#ifdef _WIN32
+    #ifdef _WIN32
         _crtBreakAlloc = alloc;
-#endif
+    #endif
 #endif
     }
 
-}  // namespace Jam
+}  // namespace Rt2
