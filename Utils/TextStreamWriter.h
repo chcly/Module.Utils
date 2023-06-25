@@ -22,6 +22,7 @@
 #pragma once
 #include <iomanip>
 #include "Utils/String.h"
+#include "Utils/Definitions.h"
 
 namespace Rt2
 {
