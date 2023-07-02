@@ -55,6 +55,11 @@ namespace Rt2
         Stack()               = default;
         Stack(const Stack& q) = default;
 
+        explicit Stack(const SizeType & initialCapacity)
+        {
+            this->explicit_reserve(initialCapacity);
+        }
+
         ~Stack()
         {
             clear();

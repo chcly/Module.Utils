@@ -31,13 +31,20 @@ namespace Rt2
     public:
         using Buffer   = SimpleArray<char>;
         using SizeType = Buffer::SizeType;
+
     private:
         Buffer         _buf;
         mutable bool   _dirty{true};
         mutable String _cache;
+
     public:
         ScratchString()  = default;
         ~ScratchString() = default;
+
+        explicit ScratchString(const SizeType& initialCapacity)
+        {
+            reserve(initialCapacity);
+        }
 
         void reserve(const SizeType& size)
         {

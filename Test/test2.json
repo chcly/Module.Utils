@@ -1,0 +1,8 @@
+{
+  "Hello": "World",
+  "abc": -123.456,
+  "bool0": true,
+  "bool1": false,
+  "null": null,
+  "array": [ "a", 1, false, null ]
+}
