@@ -196,17 +196,21 @@ GTEST_TEST(Json, Parse_001)
     EXPECT_EQ(v.integer(), -123);
 }
 
-void ValidateTestObject(const Dictionary& dict)
+void ValidateTestObject(const Dictionary& dict, bool testArray = false)
 {
     EXPECT_TRUE(dict.contains("A"));
     EXPECT_TRUE(dict.contains("B"));
     EXPECT_TRUE(dict.contains("C"));
     EXPECT_TRUE(dict.contains("D"));
-    EXPECT_TRUE(dict.contains("E"));
     EXPECT_TRUE(dict.contains("W"));
     EXPECT_TRUE(dict.contains("X"));
     EXPECT_TRUE(dict.contains("Y"));
     EXPECT_TRUE(dict.contains("Z"));
+
+    if (testArray)
+    {
+        EXPECT_TRUE(dict.contains("E"));
+    }
 
     auto v = dict.get("A");
     EXPECT_TRUE(v.isString());
@@ -254,18 +258,21 @@ void ValidateTestObject(const Dictionary& dict)
     EXPECT_DOUBLE_EQ(v.real(), 0.0);
     EXPECT_EQ(v.string(), "0");
 
-    v = dict.get("E");
-    EXPECT_TRUE(v.isArray());
-
-    MixedArray a = v.array();
-
-    EXPECT_EQ(3, a.sizeI());
-
-    for (int i = 0; i < 3; ++i)
+    if (testArray)
     {
-        v = a.at(i);
-        EXPECT_TRUE(v.isObject());
-        ValidateTestObject(v.object());
+        v = dict.get("E");
+        EXPECT_TRUE(v.isArray());
+
+        MixedArray a = v.array();
+
+        EXPECT_EQ(3, a.sizeI());
+
+        for (int i = 0; i < 3; ++i)
+        {
+            v = a.at(i);
+            EXPECT_TRUE(v.isObject());
+            ValidateTestObject(v.object(), false);
+        }
     }
 }
 
@@ -277,7 +284,7 @@ void ValidateTest3(const MixedArray& arr)
     {
         Value v = arr.at(i);
         EXPECT_TRUE(v.isObject());
-        ValidateTestObject(v.object());
+        ValidateTestObject(v.object(), true);
     }
 }
 
