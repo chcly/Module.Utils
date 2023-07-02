@@ -91,7 +91,11 @@ namespace Rt2
 
         static String toString(U64 v, const Initializer& sym, int offs = 0);
 
+        static String toString(const String &v, const Initializer& sym, int offs = 0);
+
         static void toString(String& dest, U64 v, const Initializer& sym, int offs = 0);
+
+        static void toString(String& dest,  const String &v, const Initializer& sym, int offs = 0);
 
     private:
         uint64_t charsPerBase();

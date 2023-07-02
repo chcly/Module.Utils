@@ -253,8 +253,8 @@ namespace Rt2
                     throw Exception("no room to merge");
 
                 Fill(this->_data + this->_size,
-                    rhs._data,
-                    rhs._size);
+                     rhs._data,
+                     rhs._size);
 
                 this->_size += rhs._size;
             }
@@ -265,11 +265,20 @@ namespace Rt2
     class SimpleArray : public Array<T, AOP_SIMPLE_TYPE, Allocator>
     {
     public:
+        using BaseType = Array<T, AOP_SIMPLE_TYPE, Allocator>;
+        using SizeType = typename BaseType::SizeType;
+
+    public:
         SimpleArray()                     = default;
         SimpleArray(const SimpleArray& o) = default;
 
+        explicit SimpleArray(const SizeType& initialCapacity) :
+            BaseType(initialCapacity)
+        {
+        }
+
         SimpleArray(std::initializer_list<T> o) :
-            Array<T, AOP_SIMPLE_TYPE, Allocator>(o)
+            BaseType(o)
         {
         }
     };

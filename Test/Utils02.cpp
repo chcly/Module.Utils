@@ -1,18 +1,15 @@
-#include "ThisDir.h"
 #include "Utils/Allocator.h"
 #include "Utils/Array.h"
 #include "Utils/Char.h"
-#include "Utils/Console.h"
 #include "Utils/Directory/Path.h"
-#include "Utils/FixedArray.h"
 #include "Utils/HashMap.h"
 #include "Utils/ListBinaryTree.h"
 #include "Utils/ObjectPool.h"
-#include "Utils/Path.h"
-#include "Utils/Stack.h"
 #include "Utils/SymbolStream.h"
 #include "gtest/gtest.h"
+
 using namespace Rt2;
+
 
 GTEST_TEST(Utils, SymbolStream_001)
 {
@@ -43,7 +40,7 @@ GTEST_TEST(Utils, SymbolStream_002)
 
     {
         SymbolStream ss({'F', 'E', 'D', 'C', 'B', 'A', '9', '8', '7', '6', '5', '4', '3', '2', '1', '0'});
-        String s;
+        String       s;
         ss.setBase(16);
         ss.base(s, 0x89C53F0);
         EXPECT_EQ(s, "763AC0F");
@@ -51,7 +48,7 @@ GTEST_TEST(Utils, SymbolStream_002)
 
     {
         SymbolStream ss({'H', 'E', 'l', 'o', '[', '/', '-', '!', '$', '^', '5', '4', '%', '2', '1', '0'});
-        String s;
+        String       s;
         ss.setPad(true);
         ss.setBase((int)ss.size());
         ss.base(s, "Hello World!");

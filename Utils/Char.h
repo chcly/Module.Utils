@@ -95,9 +95,9 @@ namespace Rt2
 
         static double toDouble(const String& in, const double& def = 0.0);
 
-        static void toString(String& dest, float v);
+        static void toString(String& dest, float v, bool sci=false);
 
-        static void toString(String& dest, double v);
+        static void toString(String& dest, double v, bool sci=false);
 
         static void toString(String& dest, bool v);
 
@@ -113,9 +113,9 @@ namespace Rt2
 
         static void toString(String& dest, uint64_t v);
 
-        static String toString(float v);
+        static String toString(float v, bool sci = false);
 
-        static String toString(double v);
+        static String toString(double v, bool sci = false);
 
         static String toString(bool v);
 

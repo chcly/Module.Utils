@@ -29,9 +29,10 @@
 #include <iomanip>
 #include <limits>
 #include <sstream>
+#include "Utils/TextStreamWriter.h"
 #include "Utils/StreamMethods.h"
-#include "Utils/SymbolStream.h"
 #include "Utils/String.h"
+#include "Utils/SymbolStream.h"
 
 namespace Rt2
 {
@@ -223,18 +224,24 @@ namespace Rt2
         return toDouble(in.c_str(), def);
     }
 
-    void Char::toString(String& dest, const float v)
+    void Char::toString(String& dest, const float v, const bool sci)
     {
-        std::stringstream stream;
-        stream << v;
-        dest = stream.str();
+        OutputStringStream oss;
+        if (sci)
+            Ts::print(oss, PrintR32Sci(v));
+        else
+            Ts::print(oss, PrintR32(v));
+        dest = oss.str();
     }
 
-    void Char::toString(String& dest, const double v)
+    void Char::toString(String& dest, const double v, const bool sci)
     {
-        std::stringstream stream;
-        stream << std::fixed << v;
-        dest = stream.str();
+        OutputStringStream oss;
+        if (sci)
+            Ts::print(oss, PrintR64Sci(v));
+        else
+            Ts::print(oss, PrintR64(v));
+        dest = oss.str();
     }
 
     void Char::toString(String& dest, const bool v)
@@ -247,17 +254,17 @@ namespace Rt2
             dest.push_back('0');
     }
 
-    String Char::toString(const float v)
+    String Char::toString(const float v, bool sci)
     {
         String copyOnReturn;
-        toString(copyOnReturn, v);
+        toString(copyOnReturn, v, sci);
         return copyOnReturn;
     }
 
-    String Char::toString(const double v)
+    String Char::toString(const double v, bool sci)
     {
         String copyOnReturn;
-        toString(copyOnReturn, v);
+        toString(copyOnReturn, v, sci);
         return copyOnReturn;
     }
 
@@ -270,8 +277,8 @@ namespace Rt2
 
     void Char::toString(String& dest, const int16_t v)
     {
-        std::ostringstream oss;
-        oss << v;
+        OutputStringStream oss;
+        Ts::print(oss, v);
         dest = oss.str();
     }
 
@@ -284,8 +291,8 @@ namespace Rt2
 
     void Char::toString(String& dest, const int32_t v)
     {
-        std::ostringstream oss;
-        oss << v;
+        OutputStringStream oss;
+        Ts::print(oss, v);
         dest = oss.str();
     }
 
@@ -298,8 +305,8 @@ namespace Rt2
 
     void Char::toString(String& dest, const int64_t v)
     {
-        std::ostringstream oss;
-        oss << v;
+        OutputStringStream oss;
+        Ts::print(oss, v);
         dest = oss.str();
     }
 
@@ -312,8 +319,8 @@ namespace Rt2
 
     void Char::toString(String& dest, const uint16_t v)
     {
-        std::ostringstream oss;
-        oss << v;
+        OutputStringStream oss;
+        Ts::print(oss, v);
         dest = oss.str();
     }
 
@@ -326,8 +333,8 @@ namespace Rt2
 
     void Char::toString(String& dest, const uint32_t v)
     {
-        std::ostringstream oss;
-        oss << v;
+        OutputStringStream oss;
+        Ts::print(oss, v);
         dest = oss.str();
     }
 
@@ -340,8 +347,8 @@ namespace Rt2
 
     void Char::toString(String& dest, const uint64_t v)
     {
-        std::ostringstream oss;
-        oss << v;
+        OutputStringStream oss;
+        Ts::print(oss, v);
         dest = oss.str();
     }
 
@@ -355,18 +362,16 @@ namespace Rt2
     void Char::toHexString(String& dest, const void* p, const size_t len)
     {
         OutputStringStream oss;
-        const char* ch = (const char*)p;
+        const char*        ch = (const char*)p;
         for (uint32_t i = 0; i < len; ++i)
-            oss << std::hex << (int)(uint8_t)ch[i];
+            Ts::print(oss, Hex((uint8_t)ch[i]));
         dest = oss.str();
     }
 
     void Char::toHexString(String& dest, const uint8_t v)
     {
         std::ostringstream oss;
-        oss << std::setfill('0');
-        oss << std::setw(2);
-        oss << std::hex << (int)v;
+        Ts::print(oss, Hex(v));
         dest = oss.str();
     }
 
@@ -380,9 +385,7 @@ namespace Rt2
     void Char::toHexString(String& dest, const uint16_t v)
     {
         std::ostringstream oss;
-        oss << std::setfill('0');
-        oss << std::setw(4);
-        oss << std::hex << v;
+        Ts::print(oss, Hex(v));
         dest = oss.str();
     }
 
@@ -396,9 +399,7 @@ namespace Rt2
     void Char::toHexString(String& dest, const uint32_t v)
     {
         std::ostringstream oss;
-        oss << std::setfill('0');
-        oss << std::setw(8);
-        oss << std::hex << v;
+        Ts::print(oss, Hex(v));
         dest = oss.str();
     }
 
@@ -412,9 +413,7 @@ namespace Rt2
     void Char::toHexString(String& dest, const uint64_t v)
     {
         std::ostringstream oss;
-        oss << std::setfill('0');
-        oss << std::setw(16);
-        oss << std::hex << v;
+        Ts::print(oss, Hex(v));
         dest = oss.str();
     }
 
@@ -477,10 +476,11 @@ namespace Rt2
         return copyOnReturn;
     }
 
-    String Char::toOctalString(uint64_t v)
+    String Char::toOctalString(const uint64_t v)
     {
         OutputStringStream stream;
-        SymbolStream ss ({'0', '1', '2', '3', '4', '5', '6', '7'});
+
+        SymbolStream ss({'0', '1', '2', '3', '4', '5', '6', '7'});
         ss.setBase(8);
         ss.base(stream, v);
         return stream.str();

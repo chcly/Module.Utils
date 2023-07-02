@@ -20,56 +20,58 @@
 -------------------------------------------------------------------------------
 */
 #pragma once
-#include <iomanip>
-#include <cfloat>
-#include "Utils/StreamConverters/OutOperator.h"
+
+#include "Utils/Array.h"
+#include "Utils/String.h"
 
 namespace Rt2
 {
-    template <typename T,
-              uint8_t W = sizeof(T) << 1,
-              uint8_t P = sizeof(T) << 1>
-    class FPrintT : OutOperator<FPrintT<T, W, P>>
+    class ScratchString
     {
-    private:
-        T       _v;
-        uint8_t _w;
-        uint8_t _p;
-
     public:
-        explicit FPrintT(const T&      v,
-                         const uint8_t w = W,
-                         const uint8_t p = P) :
-            _v{v}, _w(w), _p(p) {}
+        using Buffer   = SimpleArray<char>;
+        using SizeType = Buffer::SizeType;
+    private:
+        Buffer         _buf;
+        mutable bool   _dirty{true};
+        mutable String _cache;
+    public:
+        ScratchString()  = default;
+        ~ScratchString() = default;
 
-        OStream& operator()(OStream& out) const
+        void reserve(const SizeType& size)
         {
-            if (_p > 0)
-                out << std::setprecision(_p) << std::fixed;
-            else
-                out << std::defaultfloat;
-            return out << _v;
+            _buf.reserve(size);
         }
 
-        void from(IStream& in)
+        void push(const char ch)
         {
-            in >>
-                std::setfill(' ') >>
-                std::setw(_w) >>
-                std::setprecision(_p) >>
-                _v;
+            _dirty = true;
+            _buf.push_back(ch);
         }
 
-        explicit operator T()
+        void push(const String& str)
         {
-            return _v;
+            _dirty = true;
+            for (const auto& ch : str)
+                _buf.push_back(ch);
+        }
+
+        const String& value() const
+        {
+            if (_dirty)
+            {
+                _dirty = false;
+                _cache = {_buf.data(), _buf.size()};
+            }
+            return _cache;
+        }
+
+        void clear()
+        {
+            _dirty = true;
+            _buf.resizeFast(0);
         }
     };
-
-    using PrintR32 = FPrintT<float, FLT_DIG, FLT_DIG>;
-    using PrintR64 = FPrintT<double, DBL_DIG, DBL_DIG>;
-
-    using PrintR32Sci = FPrintT<float, 0, 0>;
-    using PrintR64Sci = FPrintT<double, 0, 0>;
 
 }  // namespace Rt2

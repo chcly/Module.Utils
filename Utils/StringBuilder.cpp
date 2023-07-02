@@ -63,7 +63,7 @@ namespace Rt2
         }
     }
 
-    size_t StringBuilder::getNextCapacity(size_t len) const
+    size_t StringBuilder::getNextCapacity(const size_t len) const
     {
         size_t next;
         if (_strategy == ALLOC_MUL2)
@@ -174,14 +174,14 @@ namespace Rt2
     void StringBuilder::write(const double val)
     {
         _scratch.resize(0);
-        Char::toString(_scratch, val);
+        Char::toString(_scratch, val, true);
         writeToBuffer(_scratch.c_str(), _scratch.size());
     }
 
     void StringBuilder::write(const float val)
     {
         _scratch.resize(0);
-        Char::toString(_scratch, val);
+        Char::toString(_scratch, val, true);
         writeToBuffer(_scratch.c_str(), _scratch.size());
     }
 

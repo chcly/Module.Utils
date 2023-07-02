@@ -38,9 +38,14 @@ namespace Rt2
         _base(symbols.size()),
         _symbols(symbols)
     {
+        if (_symbols.empty())
+        {
+            makeSymbolDefault();
+            _base = _symbols.size();
+        }
     }
 
-    SymbolStream::SymbolStream(const String& symbols):
+    SymbolStream::SymbolStream(const String& symbols) :
         _base(symbols.size())
     {
         for (const char ch : symbols)
@@ -126,7 +131,7 @@ namespace Rt2
         char ch;
         while (!in.read(&ch, 1).eof())
         {
-            if (ch > 0) 
+            if (ch > 0)
                 base(dest, (uint64_t)ch);
         }
     }
@@ -188,7 +193,21 @@ namespace Rt2
         return copy;
     }
 
+    String SymbolStream::toString(const String& v, const Initializer& sym, const int offs)
+    {
+        String copy;
+        toString(copy, v, sym, offs);
+        return copy;
+    }
+
     void SymbolStream::toString(String& dest, const U64 v, const Initializer& sym, const int offs)
+    {
+        SymbolStream ss(sym);
+        ss.setShift(offs);
+        ss.base(dest, v);
+    }
+
+    void SymbolStream::toString(String& dest, const String& v, const Initializer& sym, const int offs)
     {
         SymbolStream ss(sym);
         ss.setShift(offs);

@@ -35,11 +35,10 @@ namespace Rt2
         Value  second{};
         hash_t hash{Npos};
 
-        Entry()  = default;
-        ~Entry() = default;
+        Entry() = default;
 
-        Entry(const Key& k, const Value& v, const hash_t hk) :
-            first(k),
+        Entry(Key k, const Value& v, const hash_t hk) :
+            first(std::move(k)),
             second(v),
             hash(hk)
         {
@@ -120,13 +119,13 @@ namespace Rt2
 
             if (_indices)
             {
-                _iAlloc.deallocateArray(_indices, _capacity);
+                IndexAllocator::deallocateArray(_indices, _capacity);
                 _indices = nullptr;
             }
 
             if (_next)
             {
-                _iAlloc.deallocateArray(_next, _capacity);
+                IndexAllocator::deallocateArray(_next, _capacity);
                 _next = nullptr;
             }
             _size = _capacity = 0;
@@ -321,12 +320,12 @@ namespace Rt2
                 rehash(nr);
         }
 
-        Entry<Key, Value>* begin() const
+        PointerType begin() const
         {
             return _bucket;
         }
 
-        Entry<Key, Value>* end() const
+        PointerType end() const
         {
             return _bucket + _size;
         }
@@ -338,7 +337,7 @@ namespace Rt2
                 return;
 #ifdef RT_OPEN_MP
             {
-#pragma omp parallel for num_threads(4)
+    #pragma omp parallel for num_threads(4)
                 for (int64_t i = from; i < (int64_t)to; ++i)
                 {
                     _indices[i] = _next[i] = Npos;

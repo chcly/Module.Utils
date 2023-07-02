@@ -30,11 +30,14 @@ namespace Rt2
     // On each level of recursion, use the test method to check the depth.
     // If test returns true the limit has been reached, and the recursive call
     // should start exiting.
-    template <U16 Max>
+    template <I32 Max>
     class FixedStackGuard
     {
     private:
-        mutable U16 _depth{0};
+        mutable I32 _depth{0};
+
+        static_assert(Max > 0);
+        static_assert(Max < 0xFFFF);
 
         FixedStackGuard(const FixedStackGuard&) = default;
 
@@ -65,7 +68,7 @@ namespace Rt2
             _depth = 0;
         }
 
-        U16 depth() const
+        I32 depth() const
         {
             return _depth;
         }

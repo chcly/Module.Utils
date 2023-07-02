@@ -2,17 +2,14 @@ option(Utils_BUILD_TEST          "Build the unit test program." ON)
 option(Utils_AUTO_RUN_TEST       "Automatically run the test program." OFF)
 option(Utils_USE_STATIC_RUNTIME  "Build with the MultiThreaded(Debug) runtime library." ON)
 option(Utils_JUST_MY_CODE        "Enable the /JMC flag" ON)
-option(Utils_OPEN_MP             "Enable low-level fill and copy using OpenMP" ON)
+option(Utils_OPEN_MP             "Enable low-level fill and copy using OpenMP" OFF)
 
 
 set(Utils_EXTRA_FLAGS )
 if (MSVC)
     # globally disable scoped enum warnings
     set(Utils_EXTRA_FLAGS "${Utils_EXTRA_FLAGS} /wd26812")
-    
-    
     set(Utils_EXTRA_FLAGS "${Utils_EXTRA_FLAGS} /W3")
-
 
     if (Utils_JUST_MY_CODE)
         # Enable just my code...
