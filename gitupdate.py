@@ -18,6 +18,7 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 # ------------------------------------------------------------------------------
+import codecs
 import os, subprocess, re
 
 PULL = "git pull"
@@ -30,8 +31,8 @@ def trim(line):
     return line
 
 
-def makeAbsolute(currentDir, relativeDir):
-    return os.path.join(currentDir, relativeDir).replace("\\", "/")
+def makeAbsolute(cwd, relativeDir):
+    return os.path.join(cwd, relativeDir).replace("\\", "/")
 
 
 def checkUrl(url):
@@ -57,8 +58,30 @@ def checkShallow(shallow):
 def execProgram(args):
     subprocess.run(args.split(' '),
                    shell=False,
+                   check=False,
+                   env=os.environ,
+                   capture_output=False)
+
+def checkPrimaryBranch():
+    # capture the output from git branch -a
+    co = subprocess.run("git branch -a",
+                   shell=True,
+                   check=False,
                    env=os.environ,
                    capture_output=True)
+    
+    rv = None
+    if (co != None and co.stdout != None):
+
+        ot = codecs.decode(co.stdout);
+        sl = ot.split('\n')
+        if (len(sl) > 0):
+            cb = sl[0]
+            cb = cb.replace("*", '')
+            cb = cb.strip(' ')
+            rv = cb
+    return rv
+
 
 
 def changeDirectory(directory):
@@ -83,10 +106,10 @@ def initModules():
     execProgram("git submodule update --init --merge")
 
 
-def updateModules(moduleDict):
+def updateModules(dict):
 
-    for key in moduleDict.keys():
-        module = moduleDict[key]
+    for key in dict.keys():
+        module = dict[key]
 
         path = module.get("path", None)
         branch = module.get("branch", None)
@@ -112,7 +135,13 @@ def updateModules(moduleDict):
                     "to the module at the supplied path:", path)
                 continue
 
-            branchStr = "master"
+            branchStr = checkPrimaryBranch()
+            if (branchStr == None):
+                branchStr = "master"
+
+            if (branchStr != "master" and branchStr != "main"):
+                print("Using nonstandard branch,", branchStr)
+
             if (branch != None):
                 branchStr = branch
 
@@ -128,72 +157,70 @@ def updateModules(moduleDict):
                 execProgram(PULL + " %s %s" % (url, branchStr))
 
 
-def collectModules(currentDir, gitModulesFile):
+def collectModules(cwd, dict):
 
-    moduleDict = {}
-    fp = open(makeAbsolute(currentDir, gitModulesFile), mode='r')
+    mp = makeAbsolute(cwd, dict)
+    if (not os.path.exists(mp)):
+        print("No .gitmodule found in", cwd, "\nNothing to update...")
+        return None
+
+    dict = {}
+    fp = open(mp, mode='r')
     lines = fp.readlines()
     fp.close()
 
-    # this assumes that variables come after the path
-    moduleName = None
+
+    name = None
 
     for line in lines:
         line = trim(line)
-        subModuleCode = "[submodule\""
-        if (line.startswith(subModuleCode)):
-            moduleName = line[len(subModuleCode):-2]
-            moduleDict[moduleName] = {}
-            variableDict = moduleDict[moduleName]
-            variableDict['hasUrl'] = False
 
-        elif (moduleName != None):
-            # exclude everything before
-            variableDict = moduleDict[moduleName]
+        opt = "[submodule\""
+        if (line.startswith(opt)):
+            name = line[len(opt):-2]
 
+            dict[name] = {}
+            var = dict[name]
+            var['hasUrl'] = False
+
+        elif (name != None):
+            var = dict[name]
             if (line.find("url=") != -1):
-                variableDict["url"] = checkUrl(line.replace("url=", ''))
-                variableDict['hasUrl'] = True
+                var["url"] = checkUrl(line.replace("url=", ''))
+                var['hasUrl'] = True
             elif (line.find("branch=") != -1):
-                variableDict["branch"] = checkBranch(
-                    line.replace("branch=", ''))
+                var["branch"] = checkBranch(line.replace("branch=", ''))
             elif (line.find("shallow=") != -1):
-                variableDict["shallow"] = checkShallow(
-                    line.replace("shallow=", ''))
+                var["shallow"] = checkShallow(line.replace("shallow=", ''))
             elif (line.find("path=") != -1):
-                moduleDirectory = line.replace("path=", '')
-                absPath = None
-                if (os.path.isabs(moduleDirectory)):
-                    absPath = moduleDirectory
+                loc = line.replace("path=", '')
+                path = None
+                if (os.path.isabs(loc)):
+                    path = loc
                 else:
-                    absPath = makeAbsolute(currentDir, moduleDirectory)
+                    path = makeAbsolute(cwd, loc)
 
-                if (os.path.isdir(absPath)):
-                    variableDict["path"] = absPath
-                    variableDict["name"] = moduleDirectory
+                if (os.path.isdir(path)):
+                    var["path"] = path
+                    var["name"] = loc
             else:
                 if (len(line) > 0):
                     print("unhandled line: ", line)
 
-    for key in moduleDict.keys():
-        module = moduleDict[key]
+    for key in dict.keys():
+        module = dict[key]
         if (module.get("hasUrl", False) == False):
             print("unable to determine the url for the module:", key)
-
-    return moduleDict
+    return dict
 
 
 def main():
-    currentDir = os.getcwd()
-    gitModulesFile = os.path.abspath(".gitmodules")
-    if (not os.path.isfile(gitModulesFile)):
-        print("No .gitmodule found in", currentDir, "\nNothing to update...")
-        return
-    moduleDict = collectModules(currentDir, gitModulesFile)
-
-    initModules()
-    updateModules(moduleDict)
-    changeDirectory(currentDir)
+    cwd = os.getcwd()
+    dict = collectModules(cwd, ".gitmodules")
+    if (dict != None):
+        initModules()
+        updateModules(dict)
+        changeDirectory(cwd)
 
 
 if __name__ == '__main__':
