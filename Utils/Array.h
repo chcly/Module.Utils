@@ -221,6 +221,13 @@ namespace Rt2
             return nullptr;
         }
 
+        PointerType _end()
+        {
+            if (this->_data != nullptr)
+                return &this->_data[this->_size];
+            return nullptr;
+        }
+
         ConstPointerType begin() const
         {
             if (this->_size > 0)

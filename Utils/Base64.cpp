@@ -48,7 +48,7 @@ namespace Rt2
     {
         uint8_t p[3]{0, 0, 0};
         int64_t n = (int64_t)inp.size();
-        dest.reserve(n + 2 * (n % 3));
+        dest.reserve(uint32_t(4 * double(n) / 3));
 
         for (int64_t i = 0; i < n; i += 3)
         {
@@ -120,9 +120,9 @@ namespace Rt2
             const int d = decodeIndex(inp[i + 3]);
 
             const int64_t cb = (int64_t)a << 18 | (int64_t)b << 12 | (int64_t)c << 6 | (int64_t)d;
-            const uint8_t ra = (cb & 0xFF0000) >> 16;
-            const uint8_t rb = (cb & 0x00FF00) >> 8;
-            const uint8_t rc = cb & 0x0000FF;
+            const uint8_t ra = (uint8_t)((cb & 0xFF0000) >> 16);
+            const uint8_t rb = (uint8_t)((cb & 0x00FF00) >> 8);
+            const uint8_t rc = (uint8_t)(cb & 0x0000FF);
 
             if (ra > 0) dest.push_back((char)ra);
             if (rb > 0) dest.push_back((char)rb);

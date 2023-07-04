@@ -76,7 +76,6 @@
     #define RT_GUARD_MESSAGE(PL)
 #endif
 
-
 // Is a assert that has an exit path (opposed to a hard stop)
 // (worst case redundancy)
 #define RT_GUARD_CHECK_IMPL(PL, RET) \
@@ -211,10 +210,7 @@ namespace Rt2
     template <typename T>
     constexpr const T& Clamp(const T& v, const T& mi, const T& ma)
     {
-        if (v > ma)
-            return v < mi ? mi : ma;
-        else
-            return v < mi ? mi : v;
+        return v < mi ? mi : (v > ma ? ma : v);
     }
 
     template <typename T>
@@ -227,6 +223,12 @@ namespace Rt2
     constexpr T MakeLimit()
     {
         return (T)-1;
+    }
+
+    template <typename T>
+    constexpr T MakeMax()
+    {
+        return MakeLimit<T>() - 1;
     }
 
     template <typename T>

@@ -1669,7 +1669,7 @@ namespace Rt2::Json
 
         }  // namespace Dom
 
-        Visitor* defaultVisitor()
+        inline Visitor* defaultVisitor()
         {
             return new Dom::Document();
         }
@@ -2064,6 +2064,7 @@ namespace Rt2::Json
         {
             RT_GUARD_CHECK_VOID(_value)
             _mark = true;
+
             const auto array = new Internal::Dom::ArrayValue();
             for (const auto v : val)
                 array->push_back(v);
