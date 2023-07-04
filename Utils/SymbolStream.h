@@ -22,6 +22,7 @@
 #pragma once
 
 #include "Utils/Array.h"
+#include "Utils/Definitions.h"
 #include "Utils/String.h"
 
 namespace Rt2
@@ -32,15 +33,11 @@ namespace Rt2
     {
     public:
         using Initializer = std::initializer_list<char>;
-
-        static constexpr Initializer Bin = {'0', '1'};
-        static constexpr Initializer Hex = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-
-        static constexpr Initializer HexA = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p'};
-        static constexpr Initializer HexB = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'H', 'G', 'F', 'E', 'D', 'C', 'B', 'A'};
-
+        static constexpr Initializer Bin    = {'0', '1'};
+        static constexpr Initializer Hex    = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+        static constexpr Initializer HexA   = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p'};
+        static constexpr Initializer HexB   = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'H', 'G', 'F', 'E', 'D', 'C', 'B', 'A'};
         static constexpr Initializer Base10 = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-
     private:
         uint64_t    _base{10};
         uint64_t    _shift{0};
@@ -91,11 +88,11 @@ namespace Rt2
 
         static String toString(U64 v, const Initializer& sym, int offs = 0);
 
-        static String toString(const String &v, const Initializer& sym, int offs = 0);
+        static String toString(const String& v, const Initializer& sym, int offs = 0);
 
         static void toString(String& dest, U64 v, const Initializer& sym, int offs = 0);
 
-        static void toString(String& dest,  const String &v, const Initializer& sym, int offs = 0);
+        static void toString(String& dest, const String& v, const Initializer& sym, int offs = 0);
 
     private:
         uint64_t charsPerBase();

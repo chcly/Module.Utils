@@ -26,7 +26,6 @@
 
 namespace Rt2
 {
-
     SymbolStream::SymbolStream(const SymbolArray& symbols) :
         _symbols(symbols)
     {

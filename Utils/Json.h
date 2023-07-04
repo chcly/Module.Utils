@@ -26,6 +26,7 @@
 #include "Utils/Stack.h"
 #include "Utils/StackGuard.h"
 #include "Utils/StreamConverters/Hex.h"
+#include "Utils/Streams/StreamBase.h"
 #include "Utils/StringBuilder.h"
 #include "Utils/TextStreamWriter.h"
 
@@ -285,11 +286,11 @@ namespace Rt2::Json
                 bool isOpen() const;
 
             private:
-                bool check(int& cur)
+                bool check(int& cur) const
                 {
                     if (cur == '\\')
                     {
-                        int nch = _stream->peek();
+                        const int nch = _stream->peek();
                         for (const auto& v : Keyword::Sequences)
                         {
                             if (nch == v.c)
@@ -303,7 +304,7 @@ namespace Rt2::Json
                     return cur > 0 && cur != 0x22;
                 }
 
-                void scanString(Token& tok)
+                void scanString(Token& tok) const
                 {
                     RT_GUARD_CHECK_VOID(_stream)
 
@@ -318,7 +319,7 @@ namespace Rt2::Json
                     tok.setType(JT_STRING);
                 }
 
-                void scanDigit(Token& tok)
+                void scanDigit(Token& tok) const
                 {
                     RT_GUARD_CHECK_VOID(_stream)
                     bool hasDot = false;
@@ -1343,7 +1344,7 @@ namespace Rt2::Json
                     case Lex::JT_R_BRACKET:
                         _visitor->error(t1, "undefined token in this context");
                         return;
-                    default: 
+                    default:
                     case Lex::JT_EOF:
                         _visitor->error({}, "unexpected end of file");
                         return;
@@ -2021,24 +2022,15 @@ namespace Rt2::Json
             Print::Printer::formatted(_value, _mark, _serialization, space);
             return _serialization;
         }
-
-
-        ValueType* value() const
-        {
-            return _value;
-        }
     };
 
     class Dictionary : public ApiType<Internal::Dom::ObjectValue>
     {
     public:
-        using BaseType = ApiType<Internal::Dom::ObjectValue>;
+        using BaseType = ApiType;
 
     public:
-        Dictionary() :
-            BaseType()
-        {
-        }
+        Dictionary() = default;
 
         explicit Dictionary(Internal::Dom::ObjectValue* v, const bool own = false) :
             BaseType(v, own)
@@ -2070,17 +2062,6 @@ namespace Rt2::Json
                 array->push_back(v);
             _value->insert(key, array);
         }
-
-
-
-        void insert(const String& key, const Dictionary& dict) const
-        {
-            RT_GUARD_CHECK_VOID(_value && dict._value)
-            _mark = true;
-            _value->insert(key, dict._value->clone());
-        }
-
-        void insert(const String& key, const MixedArray& arr) const;
 
         int integer(const String& key, const int& def = -1) const
         {
@@ -2128,17 +2109,14 @@ namespace Rt2::Json
         }
     };
 
-    class MixedArray final : public ApiType<Internal::Dom::ArrayValue>
+    class MixedArray : public ApiType<Internal::Dom::ArrayValue>
     {
     public:
-        using BaseType = ApiType<Internal::Dom::ArrayValue>;
+        using BaseType = ApiType;
         using SizeType = Internal::Dom::ArrayValue::SizeType;
 
     public:
-        MixedArray() :
-            BaseType()
-        {
-        }
+        MixedArray() = default;
 
         explicit MixedArray(Internal::Dom::ArrayValue* v, const bool own = false) :
             BaseType(v, own)
@@ -2158,14 +2136,6 @@ namespace Rt2::Json
             _mark = true;
             _value->push_back(val);
         }
-
-        void push(const Dictionary& val) const
-        {
-            RT_GUARD_CHECK_VOID(_value && val.value())
-            _mark = true;
-            _value->push_back(val.value()->clone());
-        }
-
 
         void pushCode(const String& code) const
         {
@@ -2240,7 +2210,7 @@ namespace Rt2::Json
 
         void load(const String& text)
         {
-            InputStringStream iss(text);
+            InputBufferStream iss(text);
             Internal::Parser  p;
             p.parse(iss);
             attach(p.detachRoot());
@@ -2257,13 +2227,6 @@ namespace Rt2::Json
     {
         RT_GUARD_CHECK_RET(_val, {})
         return MixedArray(_val->cast<Internal::Dom::ArrayValue>());
-    }
-
-    inline void Dictionary::insert(const String& key, const MixedArray& arr) const
-    {
-        RT_GUARD_CHECK_VOID(_value && arr.value())
-        _mark = true;
-        _value->insert(key, arr.value()->clone());
     }
 
     inline Dictionary& Document::dictionary()

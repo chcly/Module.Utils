@@ -21,6 +21,7 @@
 */
 #pragma once
 #include <cstdint>
+#include <limits>
 
 #define RT_PLATFORM_UNIX 0
 #define RT_PLATFORM_APPLE 1
@@ -84,18 +85,8 @@
         RT_GUARD_MESSAGE(PL);        \
         return RET;                  \
     }
-
-#define RT_GUARD_IMPL(PL, RET) \
-    if (!(PL))                       \
-    {                                \
-        return RET;                  \
-    }
-
 #define RT_GUARD_CHECK_VOID(PL) RT_GUARD_CHECK_IMPL(PL, RT_VOID_RET)
 #define RT_GUARD_CHECK_RET(PL, RV) RT_GUARD_CHECK_IMPL(PL, RV)
-
-#define RT_GUARD_VOID(PL) RT_GUARD_IMPL(PL, RT_VOID_RET)
-#define RT_GUARD_RET(PL, RV) RT_GUARD_IMPL(PL, RV)
 
 #define RT_COMPILER_MSVC 0
 #define RT_COMPILER_GNU 1
