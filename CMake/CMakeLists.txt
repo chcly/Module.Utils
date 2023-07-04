@@ -11,10 +11,13 @@ set(GroupRoot ../)
 set_ro_group(TargetName_SRC
     :${GroupRoot}/CMakeLists.txt
     :${GroupRoot}/README.md
-    :${GroupRoot}/.github/workflows/*.yml
+    Actions:${GroupRoot}/.github/workflows/*.yml
+    Style:${GroupRoot}/.clang-format
     Config:${GroupRoot}/CMake/CMakeLists.txt
     Config:${GroupRoot}/CMake/*.cmake
     Config/Modules:${GroupRoot}/CMake/Modules/*.cmake
+    Python:${GroupRoot}/*.py
+    Python:${GroupRoot}/CMake/*.py
 )
 
 add_custom_target(
@@ -22,5 +25,7 @@ add_custom_target(
     ALL SOURCES ${TargetName_SRC}
     )
 
-
-set_target_properties(${TargetName} PROPERTIES FOLDER "${TargetGroup}")
+set_target_properties(
+    ${TargetName} 
+    PROPERTIES FOLDER "${TargetGroup}"
+)
