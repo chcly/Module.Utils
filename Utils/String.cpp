@@ -125,9 +125,9 @@ namespace Rt2
     {
         if (binary)
         {
-            in.seekg(0, std::ios::end);
+            in.seekg(0, std::ios_base::end);
             const std::streamsize sz = in.tellg();
-            in.seekg(0, std::ios::beg);
+            in.seekg(0, std::ios_base::beg);
 
             if (sz > 0)
             {
@@ -141,15 +141,17 @@ namespace Rt2
         }
         else
         {
-            in.seekg(0, std::ios::beg);
-            while (!in.eof())
+            in.seekg(0, std::ios_base::beg);
+            int ch;
+            do
             {
-                if (const int ch = in.get(); isPrintableAscii(ch))
+                if (ch = in.get(); 
+                    isPrintableAscii(ch))
                 {
                     if (newLine || !isNewLine(ch))
                         out.put((char)ch);
                 }
-            }
+            } while (ch > 0 && !in.eof());
         }
     }
 

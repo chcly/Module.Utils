@@ -2021,6 +2021,12 @@ namespace Rt2::Json
             Print::Printer::formatted(_value, _mark, _serialization, space);
             return _serialization;
         }
+
+
+        ValueType* value() const
+        {
+            return _value;
+        }
     };
 
     class Dictionary : public ApiType<Internal::Dom::ObjectValue>
@@ -2058,12 +2064,22 @@ namespace Rt2::Json
         {
             RT_GUARD_CHECK_VOID(_value)
             _mark = true;
-
             const auto array = new Internal::Dom::ArrayValue();
             for (const auto v : val)
                 array->push_back(v);
             _value->insert(key, array);
         }
+
+
+
+        void insert(const String& key, const Dictionary& dict) const
+        {
+            RT_GUARD_CHECK_VOID(_value && dict._value)
+            _mark = true;
+            _value->insert(key, dict._value->clone());
+        }
+
+        void insert(const String& key, const MixedArray& arr) const;
 
         int integer(const String& key, const int& def = -1) const
         {
@@ -2111,7 +2127,7 @@ namespace Rt2::Json
         }
     };
 
-    class MixedArray : public ApiType<Internal::Dom::ArrayValue>
+    class MixedArray final : public ApiType<Internal::Dom::ArrayValue>
     {
     public:
         using BaseType = ApiType<Internal::Dom::ArrayValue>;
@@ -2141,6 +2157,14 @@ namespace Rt2::Json
             _mark = true;
             _value->push_back(val);
         }
+
+        void push(const Dictionary& val) const
+        {
+            RT_GUARD_CHECK_VOID(_value && val.value())
+            _mark = true;
+            _value->push_back(val.value()->clone());
+        }
+
 
         void pushCode(const String& code) const
         {
@@ -2232,6 +2256,13 @@ namespace Rt2::Json
     {
         RT_GUARD_CHECK_RET(_val, {})
         return MixedArray(_val->cast<Internal::Dom::ArrayValue>());
+    }
+
+    inline void Dictionary::insert(const String& key, const MixedArray& arr) const
+    {
+        RT_GUARD_CHECK_VOID(_value && arr.value())
+        _mark = true;
+        _value->insert(key, arr.value()->clone());
     }
 
     inline Dictionary& Document::dictionary()
