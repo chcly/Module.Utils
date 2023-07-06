@@ -85,8 +85,16 @@
         RT_GUARD_MESSAGE(PL);        \
         return RET;                  \
     }
+#define RT_GUARD_CHECK_QUIET_IMPL(PL, RET) \
+    if (!(PL))                       \
+    {                                \
+        return RET;                  \
+    }
 #define RT_GUARD_CHECK_VOID(PL) RT_GUARD_CHECK_IMPL(PL, RT_VOID_RET)
 #define RT_GUARD_CHECK_RET(PL, RV) RT_GUARD_CHECK_IMPL(PL, RV)
+
+#define RT_GUARD_VOID(PL) RT_GUARD_CHECK_QUIET_IMPL(PL, RT_VOID_RET)
+#define RT_GUARD_RET(PL, RV) RT_GUARD_CHECK_QUIET_IMPL(PL, RV)
 
 #define RT_COMPILER_MSVC 0
 #define RT_COMPILER_GNU 1
@@ -146,6 +154,14 @@
 #ifdef RT_OPEN_MP
     #include <omp.h>
     #include <thread>
+#endif
+
+#ifdef min
+    #undef min
+#endif
+
+#ifdef max
+    #undef max
 #endif
 
 namespace Rt2

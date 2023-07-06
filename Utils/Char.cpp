@@ -170,7 +170,7 @@ namespace Rt2
         return !in || !*in;
     }
 
-    bool Char::toBool(const char* in)
+    bool Char::toBool(const char* in, const bool def)
     {
         if (in)
         {
@@ -186,7 +186,7 @@ namespace Rt2
                 break;
             }
         }
-        return false;
+        return def;
     }
 
     float Char::toFloat(const char* in, const float& def)
@@ -209,9 +209,9 @@ namespace Rt2
         return def;
     }
 
-    bool Char::toBool(const String& in)
+    bool Char::toBool(const String& in, const bool def)
     {
-        return toBool(in.c_str());
+        return toBool(in.c_str(), def);
     }
 
     float Char::toFloat(const String& in, const float& def)
@@ -254,14 +254,14 @@ namespace Rt2
             dest.push_back('0');
     }
 
-    String Char::toString(const float v, bool sci)
+    String Char::toString(const float v, const bool sci)
     {
         String copyOnReturn;
         toString(copyOnReturn, v, sci);
         return copyOnReturn;
     }
 
-    String Char::toString(const double v, bool sci)
+    String Char::toString(const double v, const bool sci)
     {
         String copyOnReturn;
         toString(copyOnReturn, v, sci);

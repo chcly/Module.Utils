@@ -20,6 +20,7 @@
 -------------------------------------------------------------------------------
 */
 #pragma once
+
 #include "Utils/Char.h"
 #include "Utils/HashMap.h"
 #include "Utils/ScratchString.h"
@@ -30,25 +31,27 @@
 #include "Utils/StringBuilder.h"
 #include "Utils/TextStreamWriter.h"
 
-#ifndef JSON_STACK_DEPTH
-    #define JSON_STACK_DEPTH 16
-#endif
-
-#ifndef JSON_HASH_RESERVE
-    #define JSON_HASH_RESERVE 64
-#endif
-
-#ifndef JSON_ARRAY_RESERVE
-    #define JSON_ARRAY_RESERVE 8
-#endif
-
 namespace Rt2::Json
 {
+
+    namespace Defaults
+    {
+        constexpr int64_t Int64        = std::numeric_limits<int64_t>::max();
+        constexpr int32_t Int32        = std::numeric_limits<int32_t>::max();
+        constexpr double  Real         = std::numeric_limits<double>::max();
+        constexpr bool    Bool         = std::numeric_limits<bool>::min();
+        constexpr uint8_t Spacing      = 4;
+        constexpr int32_t MaxStack     = 16;
+        constexpr int32_t HashReserve  = 16;
+        constexpr int32_t ArrayReserve = 8;
+
+    }  // namespace Defaults
 
     namespace Internal
     {
         // limits the maximum number of nested elements
-        using StackCheck = FixedStackGuard<JSON_STACK_DEPTH>;
+        using StackCheck = FixedStackGuard<Defaults::MaxStack>;
+
         namespace Dom
         {
             class Value;
@@ -60,6 +63,7 @@ namespace Rt2::Json
             class PointerValue;
             class ObjectValue;
             class ArrayValue;
+
         }  // namespace Dom
         class Parser;
 
@@ -88,7 +92,7 @@ namespace Rt2::Json
             class Token
             {
             private:
-                ScratchString _value{16};
+                ScratchString _value{};
                 Type          _type{JT_UNDEFINED};
 
             public:
@@ -228,7 +232,7 @@ namespace Rt2::Json
 
                 ~Scanner() = default;
 
-                void scan(Token& tok)
+                void scan(Token& tok) const
                 {
                     tok.clear();
                     RT_GUARD_CHECK_VOID(_stream)
@@ -515,7 +519,7 @@ namespace Rt2::Json
                     notifyStringChanged();
                 }
 
-                int64_t integer(const int64_t defaultValue = -1) const
+                int64_t integer(const int64_t defaultValue = Defaults::Int64) const
                 {
                     if (isInteger()) return Char::toInt64(_value, defaultValue);
                     if (isBoolean()) return boolean() ? 1 : 0;
@@ -523,17 +527,17 @@ namespace Rt2::Json
                     return defaultValue;
                 }
 
-                double real(const double defaultValue = 0.0) const
+                double real(const double defaultValue = Defaults::Real) const
                 {
-                    if (isReal()) return Char::toDouble(_value);
+                    if (isReal()) return Char::toDouble(_value, defaultValue);
                     if (isBoolean()) return boolean() ? 1.0 : 0.0;
                     if (isInteger()) return (double)integer();
                     return defaultValue;
                 }
 
-                bool boolean(const bool defaultValue = false) const
+                bool boolean(const bool defaultValue = Defaults::Bool) const
                 {
-                    if (isBoolean()) return Char::toBool(_value);
+                    if (isBoolean()) return Char::toBool(_value, defaultValue);
                     if (isInteger()) return Char::toInt64(_value) != 0;
                     if (isReal()) return Char::toDouble(_value) != 0.0;
                     return defaultValue;
@@ -670,7 +674,7 @@ namespace Rt2::Json
 
                 void notifyStringChanged() override
                 {
-                    _integer.i64 = Char::toInt64(_value);
+                    _integer.i64 = Char::toInt64(_value, Defaults::Int64);
                 }
 
                 void notifyValueChanged() override
@@ -796,7 +800,7 @@ namespace Rt2::Json
                 using PointerType         = Dictionary::PointerType;
 
             private:
-                Dictionary _dictionary{JSON_HASH_RESERVE};
+                Dictionary _dictionary{Defaults::HashReserve};
 
                 Value* at(const size_t& pos)
                 {
@@ -901,7 +905,7 @@ namespace Rt2::Json
                     insert(key, new StringValue(value));
                 }
 
-                void string(String& dest, const String& key, const String& def = "")
+                void string(String& dest, const String& key, const String& def = {})
                 {
                     if (const auto v = at(key))
                         dest.assign(v->value());
@@ -909,14 +913,14 @@ namespace Rt2::Json
                         dest.assign(def);
                 }
 
-                String string(const String& key, const String& def = "")
+                String string(const String& key, const String& def = {})
                 {
                     String copy;
                     string(copy, key, def);
                     return copy;
                 }
 
-                void integer(int64_t& dest, const String& key, const int64_t& def = -1)
+                void integer(int64_t& dest, const String& key, const int64_t& def = Defaults::Int64)
                 {
                     if (const auto v = at(key))
                         dest = v->integer(def);
@@ -924,21 +928,21 @@ namespace Rt2::Json
                         dest = def;
                 }
 
-                int64_t integer(const String& key, const int64_t& def = -1)
+                int64_t integer(const String& key, const int64_t& def = Defaults::Int64)
                 {
                     int64_t v;
                     integer(v, key, def);
                     return v;
                 }
 
-                bool boolean(const String& key, const bool def = false)
+                bool boolean(const String& key, const bool def = Defaults::Bool)
                 {
                     if (const auto v = at(key))
                         return v->boolean(def);
                     return def;
                 }
 
-                double real(const String& key, const double& def = 0.0)
+                double real(const String& key, const double& def = Defaults::Real)
                 {
                     if (const auto v = at(key))
                         return v->real(def);
@@ -1451,10 +1455,10 @@ namespace Rt2::Json
                 typedef Stack<ArrayValue*>  ArrayStack;
 
             private:
-                ObjectStack _obj{JSON_ARRAY_RESERVE};
-                ArrayStack  _arr{JSON_ARRAY_RESERVE};
-                ObjectStack _fObj{JSON_ARRAY_RESERVE};
-                ArrayStack  _fArr{JSON_ARRAY_RESERVE};
+                ObjectStack _obj{Defaults::ArrayReserve};
+                ArrayStack  _arr{Defaults::ArrayReserve};
+                ObjectStack _fObj{};
+                ArrayStack  _fArr{};
 
             public:
                 Document() = default;
@@ -1517,7 +1521,6 @@ namespace Rt2::Json
 
                 void objectStarted() override
                 {
-                    _obj.reserve(_obj.size() + 1);
                     _obj.push(new ObjectValue());
                 }
 
@@ -1549,6 +1552,7 @@ namespace Rt2::Json
                 {
                     if (!_arr.empty())
                     {
+                        _fArr.reserve(_fArr.size() + 1);
                         _fArr.push(_arr.top());
                         _arr.pop();
                     }
@@ -1839,7 +1843,7 @@ namespace Rt2::Json
             static void formatted(Internal::Dom::Value* val,
                                   bool&                 cache,
                                   String&               buffer,
-                                  const int             space = 4)
+                                  const uint8_t         space = Defaults::Spacing)
             {
                 RT_GUARD_CHECK_VOID(val)
                 if (cache)
@@ -1904,9 +1908,9 @@ namespace Rt2::Json
             return _val->isString();
         }
 
-        String string() const
+        const String& string(const String& error = {}) const
         {
-            RT_GUARD_CHECK_RET(_val, {})
+            RT_GUARD_CHECK_RET(_val, error)
             return _val->value();
         }
 
@@ -1916,9 +1920,9 @@ namespace Rt2::Json
             return _val->isBoolean();
         }
 
-        bool boolean() const
+        bool boolean(const bool error = Defaults::Bool) const
         {
-            RT_GUARD_CHECK_RET(_val, false)
+            RT_GUARD_CHECK_RET(_val, error)
             return _val->boolean();
         }
 
@@ -1928,9 +1932,9 @@ namespace Rt2::Json
             return _val->isReal();
         }
 
-        double real() const
+        double real(const double& error = Defaults::Real) const
         {
-            RT_GUARD_CHECK_RET(_val, false)
+            RT_GUARD_CHECK_RET(_val, error)
             return _val->real();
         }
 
@@ -1940,9 +1944,9 @@ namespace Rt2::Json
             return _val->isInteger();
         }
 
-        int integer() const
+        int integer(const int error = Defaults::Int32) const
         {
-            RT_GUARD_CHECK_RET(_val, 0)
+            RT_GUARD_CHECK_RET(_val, error)
             return (int)Clamp<int64_t>(_val->integer(), INT32_MIN, INT32_MAX);
         }
     };
@@ -1957,6 +1961,7 @@ namespace Rt2::Json
         ValueType*     _value{nullptr};
         mutable String _serialization;
         mutable bool   _mark{true};
+        mutable int    _markCache{0};
 
         void clear()
         {
@@ -2013,14 +2018,31 @@ namespace Rt2::Json
 
         const String& compact() const
         {
+            if (_markCache != 0)
+            {
+                _mark = true;
+                _markCache = 0;
+            }
+
             Print::Printer::compact(_value, _mark, _serialization);
             return _serialization;
         }
 
-        const String& formatted(const int space = 4) const
+        const String& formatted(const uint8_t space = Defaults::Spacing) const
         {
+            if (_markCache != 1)
+            {
+                _mark = true;
+                _markCache = 1;
+            }
+
             Print::Printer::formatted(_value, _mark, _serialization, space);
             return _serialization;
+        }
+
+        ValueType* value() const
+        {
+            return _value;
         }
     };
 
@@ -2062,6 +2084,15 @@ namespace Rt2::Json
                 array->push_back(v);
             _value->insert(key, array);
         }
+
+        void insert(const String& key, const Dictionary& val) const
+        {
+            RT_GUARD_CHECK_VOID(_value && val.value())
+            _mark = true;
+            _value->insert(key, val.value()->clone());
+        }
+
+        void insert(const String& key, const MixedArray& val) const;
 
         int integer(const String& key, const int& def = -1) const
         {
@@ -2137,6 +2168,13 @@ namespace Rt2::Json
             _value->push_back(val);
         }
 
+        void push(const Dictionary& val) const
+        {
+            RT_GUARD_CHECK_VOID(_value && val.value())
+            _mark = true;
+            _value->push_back(val.value()->clone());
+        }
+
         void pushCode(const String& code) const
         {
             RT_GUARD_CHECK_VOID(_value)
@@ -2191,7 +2229,13 @@ namespace Rt2::Json
         }
 
     public:
+        Document()  = default;
         ~Document() = default;
+
+        explicit Document(IStream& is)
+        {
+            load(is);
+        }
 
         Dictionary& dictionary();
 
@@ -2227,6 +2271,13 @@ namespace Rt2::Json
     {
         RT_GUARD_CHECK_RET(_val, {})
         return MixedArray(_val->cast<Internal::Dom::ArrayValue>());
+    }
+
+    inline void Dictionary::insert(const String& key, const MixedArray& val) const
+    {
+        RT_GUARD_CHECK_VOID(_value && val.value())
+        _mark = true;
+        _value->insert(key, val.value()->clone());
     }
 
     inline Dictionary& Document::dictionary()

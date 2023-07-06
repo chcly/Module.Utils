@@ -83,13 +83,13 @@ namespace Rt2
 
         static bool isNullOrEmpty(const char* in);
 
-        static bool toBool(const char* in);
+        static bool toBool(const char* in, bool def = false);
 
         static float toFloat(const char* in, const float& def = 0.f);
 
         static double toDouble(const char* in, const double& def = 0.0);
 
-        static bool toBool(const String& in);
+        static bool toBool(const String& in, bool def = false);
 
         static float toFloat(const String& in, const float& def = 0.f);
 

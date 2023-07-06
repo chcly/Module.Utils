@@ -201,15 +201,17 @@ namespace Rt2
             {
                 if (_data)
                 {
-                    _data     = _alloc.reallocateArray(_data,
+                    _data = _alloc.reallocateArray(_data,
                                                    capacity,
                                                    _size,
                                                    (Options & AOP_SIMPLE_TYPE) != 0);
+
                     _capacity = capacity;
                 }
                 else
                 {
-                    _data     = _alloc.allocateArray(capacity);
+                    _data = _alloc.allocateArray(capacity);
+
                     _capacity = capacity;
                 }
 
