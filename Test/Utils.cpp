@@ -192,8 +192,8 @@ GTEST_TEST(Utils, DirPath_007)
 
 void CheckDirState(
     const Directory::Path& b,
-    bool                   hasDir,
-    bool                   isRoot,
+    const bool             hasDir,
+    const bool             isRoot,
     const String&          expRoot,
     const String&          expDirState,
     const String&          expFileName)
@@ -955,7 +955,7 @@ GTEST_TEST(Utils, Array_002)
 #if RT_DEBUG == 1
     try
     {
-        Console::writeLine((int64_t)ia[ia.capacity()]);
+        Console::println((int64_t)ia[ia.capacity()]);
         FAIL();
     }
     catch (...)
@@ -964,7 +964,7 @@ GTEST_TEST(Utils, Array_002)
 
     try
     {
-        Console::writeLine((int64_t)ia[ia.capacity()]);
+        Console::println((int64_t)ia[ia.capacity()]);
         FAIL();
     }
     catch (...)

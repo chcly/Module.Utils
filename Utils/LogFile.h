@@ -43,7 +43,7 @@ namespace Rt2
         static void endl(const int n = 1)
         {
             OutputStringStream oss;
-            Ts::newLine(oss, n);
+            Ts::nl(oss, n);
             flush(oss);
         }
 

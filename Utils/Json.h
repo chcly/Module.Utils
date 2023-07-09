@@ -1875,6 +1875,9 @@ namespace Rt2::Json
 
     class Value
     {
+    public:
+        using ClassType = Internal::Dom::Class;
+
     protected:
         Internal::Dom::Value* _val{nullptr};
 
@@ -1949,6 +1952,22 @@ namespace Rt2::Json
             RT_GUARD_CHECK_RET(_val, error)
             return (int)Clamp<int64_t>(_val->integer(), INT32_MIN, INT32_MAX);
         }
+
+        bool isValid() const
+        {
+            return _val != nullptr;
+        }
+
+        ClassType type() const
+        {
+            RT_GUARD_CHECK_RET(_val, ClassType::CT_UNDEFINED)
+            return _val->type();
+        }
+
+        Internal::Dom::Value* value() const
+        {
+            return _val;
+        }
     };
 
     template <typename T>
@@ -2020,7 +2039,7 @@ namespace Rt2::Json
         {
             if (_markCache != 0)
             {
-                _mark = true;
+                _mark      = true;
                 _markCache = 0;
             }
 
@@ -2032,7 +2051,7 @@ namespace Rt2::Json
         {
             if (_markCache != 1)
             {
-                _mark = true;
+                _mark      = true;
                 _markCache = 1;
             }
 
@@ -2090,6 +2109,27 @@ namespace Rt2::Json
             RT_GUARD_CHECK_VOID(_value && val.value())
             _mark = true;
             _value->insert(key, val.value()->clone());
+        }
+
+        void insert(const String& key, const Value& val) const
+        {
+            RT_GUARD_CHECK_VOID(_value && val.value())
+            _mark = true;
+            switch (val.type())
+            {
+            case Internal::Dom::CT_REAL:
+            case Internal::Dom::CT_BOOLEAN:
+            case Internal::Dom::CT_OBJECT:
+            case Internal::Dom::CT_INTEGER:
+            case Internal::Dom::CT_STRING:
+            case Internal::Dom::CT_POINTER:
+            case Internal::Dom::CT_ARRAY:
+                _value->insert(key, val.value()->clone());
+                break;
+            case Internal::Dom::CT_UNDEFINED:
+            default:
+                break;
+            }
         }
 
         void insert(const String& key, const MixedArray& val) const;
@@ -2221,7 +2261,7 @@ namespace Rt2::Json
 
         void attach(Internal::Dom::Value* value)
         {
-            RT_GUARD_CHECK_VOID(value)
+            RT_GUARD_VOID(value)
             if (value->isObject())
                 _dictionary = Dictionary(value->cast<Internal::Dom::ObjectValue>(), true);
             else if (value->isArray())

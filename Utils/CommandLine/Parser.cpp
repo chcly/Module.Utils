@@ -292,7 +292,6 @@ namespace Rt2::CommandLine
         out.println("<options>");
         out.endl();
         out.inc();
-
         out.println("-h, --help", Tab(mw - 4), " - Display this message.");
 
         for (const auto opt : _options)
@@ -356,8 +355,7 @@ namespace Rt2::CommandLine
     {
         if (sw.shortSwitch == 0 && sw.longSwitch == nullptr)
         {
-            Console::writeError(
-                "A switch must have at least a long or short name");
+            error("A switch must have at least a long or short name");
             return false;
         }
 
@@ -365,7 +363,7 @@ namespace Rt2::CommandLine
         {
             if (hasSwitch(String(sw.shortSwitch, 1)))
             {
-                Console::writeError("Duplicate switch: ", (char)sw.shortSwitch);
+                error("Duplicate switch: ", (char)sw.shortSwitch);
                 return false;
             }
         }
@@ -378,7 +376,7 @@ namespace Rt2::CommandLine
 
             if (hasSwitch(lsw))
             {
-                Console::writeError("Duplicate switch: ", (char)sw.shortSwitch);
+                error("Duplicate switch: ", (char)sw.shortSwitch);
                 return false;
             }
         }
@@ -406,7 +404,7 @@ namespace Rt2::CommandLine
         {
             if (switches[i].id != i)
             {
-                Console::writeError("misaligned switch id");
+                error("misaligned switch id");
                 result = false;
             }
             else
@@ -424,10 +422,12 @@ namespace Rt2::CommandLine
 
     int Parser::writeError(const OutputStringStream& stream) const
     {
-        Console::println(programPath());
         Console::nl();
-        Console::setForeground(CS_RED);
-        Console::println(Tab(4), stream.str());
+        Console::text(CS_WHITE);
+        Console::print("error in: ");
+        Console::text(CS_YELLOW);
+        Console::println(programPath());
+        Console::error(Tab(2), stream.str());
         return -1;
     }
 

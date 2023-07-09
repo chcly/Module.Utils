@@ -21,8 +21,8 @@
 */
 #pragma once
 #include <iomanip>
-#include "Utils/String.h"
 #include "Utils/Definitions.h"
+#include "Utils/String.h"
 
 namespace Rt2
 {
@@ -37,16 +37,28 @@ namespace Rt2
                 out.put(' ');
         }
 
-        static void newLine(OStream& out, int n)
+        [[deprecated]] static void newLine(OStream& out, int n)
         {
             n = Min(Max(n, 0), 20);
             while (--n >= 0)
                 out << std::endl;
         }
 
-        static void next(OStream& out, int n)
+        static void nl(OStream& out, int n)
         {
-            newLine(out, 1);
+            n = Min(Max(n, 0), 20);
+            while (--n >= 0)
+                out << std::endl;
+        }
+
+        static void nl(OStream& out)
+        {
+            out << std::endl;
+        }
+
+        static void next(OStream& out, const int n)
+        {
+            nl(out);
             indent(out, n);
         }
 
@@ -55,7 +67,7 @@ namespace Rt2
         {
             indent(out, n);
             ((out << std::forward<Args>(args)), ...);
-            newLine(out, 1);
+            nl(out);
         }
 
         template <typename... Args>
@@ -63,7 +75,7 @@ namespace Rt2
         {
             indent(out, n);
             ((out << std::forward<Args>(args)), ...);
-            newLine(out, line);
+            nl(out, line);
         }
 
         template <typename... Args>
@@ -76,7 +88,23 @@ namespace Rt2
         static void println(OStream& out, Args&&... args)
         {
             ((out << std::forward<Args>(args)), ...);
-            out << std::endl;
+            nl(out);
+        }
+
+        static void puts(OStream& out, const String& string)
+        {
+            out.write(string.c_str(), (std::streamsize)string.size());
+        }
+
+        static void puts(OStream& out, const char* string)
+        {
+            RT_GUARD_VOID(string)
+            out.write(string, (std::streamsize)std::strlen(string));
+        }
+
+        static void put(OStream& out, const char& ch)
+        {
+            out.put(ch);
         }
     };
 

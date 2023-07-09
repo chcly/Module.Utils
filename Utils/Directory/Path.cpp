@@ -176,7 +176,7 @@ namespace Rt2::Directory
                 else if (state == SearchSep)
                     pushFlipped(directories, t0, '/');
                 else
-                    Console::writeError("unhandled exit: ", state);
+                    Console::error("unhandled exit: ", state);
             }
             else  // transition state
             {
@@ -185,7 +185,7 @@ namespace Rt2::Directory
                 else if (prev == SearchSep && state == SearchDrive)
                     Su::reverse(root, t0);
                 else
-                    Console::writeError("unhandled transition: ", prev, "->", state);
+                    Console::error("unhandled transition: ", prev, "->", state);
             }
             prev = state;
         }

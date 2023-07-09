@@ -28,26 +28,33 @@ namespace Rt2
 {
     enum ConsoleColor
     {
-        CS_BLACK = 0,
-        CS_DARK_BLUE,
-        CS_DARK_GREEN,
-        CS_DARK_CYAN,
-        CS_DARK_RED,
-        CS_DARK_MAGENTA,
-        CS_DARK_YELLOW,
-        CS_LIGHT_GREY,
-        CS_GREY,
-        CS_BLUE,
-        CS_GREEN,
-        CS_CYAN,
-        CS_RED,
-        CS_MAGENTA,
-        CS_YELLOW,
-        CS_WHITE,
+        CS_WHITE        = 0,
+        CS_BLACK        = 30,
+        CS_DARK_RED     = 31,
+        CS_DARK_GREEN   = 32,
+        CS_DARK_YELLOW  = 33,
+        CS_DARK_BLUE    = 34,
+        CS_DARK_MAGENTA = 35,
+        CS_DARK_CYAN    = 36,
+        CS_GREY         = 37,
+        CS_LIGHT_GREY   = 90,
+        CS_RED          = 91,
+        CS_GREEN        = 92,
+        CS_YELLOW       = 93,
+        CS_BLUE         = 94,
+        CS_MAGENTA      = 95,
+        CS_CYAN         = 96,
     };
 
     class Console
     {
+    public:
+        enum Flags
+        {
+            NoColor     = 0x01,
+            NoSequences = 0x02,
+        };
+
     public:
         static void read();
 
@@ -61,18 +68,25 @@ namespace Rt2
         static void read(uint64_t& v);
         static void read(String& v);
 
-        static void readLine(String& v);
+        static void readln(String& v);
+
+        static void setFlags(int flags);
+
+        static void text(ConsoleColor col);
+        static void background(ConsoleColor col);
 
         static void setForeground(ConsoleColor col);
         static void setBackground(ConsoleColor col);
 
         static void resetColor();
 
-        static void write(IStream& stream);
+        [[deprecated]] static void write(IStream& stream);
+
+        [[deprecated]] static void writeLine(const int64_t& i);
+        [[deprecated]] static void writeLine(const double& i);
+
         static void write(const String& str);
         static void writeLine(const String& str);
-        static void writeLine(const int64_t& i);
-        static void writeLine(const double& i);
         static void writeError(const String& str);
 
         static void hexdump(const String& str);
@@ -87,7 +101,7 @@ namespace Rt2
         static void bindump(const void* p, uint32_t len);
 
         template <typename... Args>
-        static void writeLine(const String& str, Args&&... args)
+        [[deprecated]] static void writeLine(const String& str, Args&&... args)
         {
             OutputStringStream oss;
             oss << str;
@@ -96,7 +110,7 @@ namespace Rt2
         }
 
         template <typename... Args>
-        static void writeError(const String& str, Args&&... args)
+        [[deprecated]] static void writeError(const String& str, Args&&... args)
         {
             OutputStringStream oss;
             oss << str;
@@ -105,7 +119,7 @@ namespace Rt2
         }
 
         template <typename... Args>
-        static void write(const String& str, Args&&... args)
+        [[deprecated]] static void write(const String& str, Args&&... args)
         {
             OutputStringStream oss;
             oss << str;
@@ -113,8 +127,8 @@ namespace Rt2
             write(oss.str());
         }
 
-        static void writeLine(const OutputStringStream& str);
-        static void writeError(const OutputStringStream& str);
+        [[deprecated]] static void writeLine(const OutputStringStream& str);
+        [[deprecated]] static void writeError(const OutputStringStream& str);
 
         static void debugBreak();
         static void nl();
@@ -135,7 +149,22 @@ namespace Rt2
             write(oss.str());
         }
 
+        template <typename... Args>
+        static void error(Args&&... args)
+        {
+            OutputStringStream oss;
+            ((oss << std::forward<Args>(args)), ...);
+            writeError(oss.str());
+        }
+
         static void put(char c);
+
+        static void puts(const String& str);
+
+        static void puts(const char* str);
+
+        static void clear();
+        static void flush();
 
         static void execute(const String& exe, const OutputStringStream& args, String& dest);
 
@@ -149,9 +178,9 @@ namespace Rt2
             execute(exe, out, output);
             return output;
         }
-
-        using Out = Console;
-        using Con = Console;
-        using Dbg = Console;
     };
+
+    using Out = Console;
+    using Con = Console;
+    using Dbg = Console;
 }  // namespace Rt2

@@ -59,6 +59,11 @@ namespace Rt2
             const String& input,
             char          separator);
 
+        static void splitRejectEmpty(
+            StringDeque&  destination,
+            const String& input,
+            char          separator);
+
         static void split(
             StringArray&  destination,
             const String& input,

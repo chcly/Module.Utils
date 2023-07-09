@@ -42,11 +42,11 @@ namespace Rt2::Win32
 
         if (buf)
         {
-            Console::writeError("code: ", Hex(err), ", ", buf, " ", message);
+            Console::error("code: ", Hex(err), ", ", buf, " ", message);
             LocalFree(buf);
         }
         else
-            Console::writeError(message, ": (", res, ") ", err);
+            Console::error(message, ": (", res, ") ", err);
     }
 }  // namespace Rt2::Win32
 

@@ -145,7 +145,7 @@ namespace Rt2
             int ch;
             do
             {
-                if (ch = in.get(); 
+                if (ch = in.get();
                     isPrintableAscii(ch))
                 {
                     if (newLine || !isNewLine(ch))
@@ -342,40 +342,15 @@ namespace Rt2
                             const String& input,
                             const char    separator)
     {
-        String inp;
-        inp.push_back(separator);
-        split(destination, input, inp);
+        String sep;
+        sep.push_back(separator);
+        split(destination, input, sep);
     }
 
-    void StringUtils::splitRejectEmpty(StringArray&  destination,
-                                       const String& input,
-                                       const char    separator)
-    {
-        String t0 = input;
-
-        size_t pos = t0.find(separator);
-        while (pos != String::npos)
-        {
-            String t1 = t0.substr(0, pos);
-
-            trimWs(t1, t1);
-            if (!t1.empty())
-                destination.push_back(t1);
-
-            t0  = t0.substr(pos + 1, t0.size());
-            pos = t0.find(separator);
-        }
-
-        if (!t0.empty())
-        {
-            trimWs(t0, t0);
-            destination.push_back(t0);
-        }
-    }
-
-    void StringUtils::split(StringArray&  destination,
-                            const String& input,
-                            const String& separator)
+    template <typename Container>
+    void splitT(Container&    destination,
+                const String& input,
+                const String& separator)
     {
         String t0  = input;
         size_t pos = t0.find(separator);
@@ -390,33 +365,81 @@ namespace Rt2
             destination.push_back(t0);
     }
 
-    void StringUtils::split(StringDeque&  destination,
-                            const String& input,
-                            const String& separator)
+    template <typename Container>
+    void splitRejectT(Container&    destination,
+                      const String& input,
+                      const String& separator)
     {
-        String tmp = input;
+        String t0 = input;
 
-        size_t pos = tmp.find(separator);
+        size_t pos = t0.find(separator);
         while (pos != String::npos)
         {
-            destination.push_back(tmp.substr(0, pos));
-            tmp = tmp.substr(pos + separator.size(), tmp.size());
-            pos = tmp.find(separator);
+            String t1 = t0.substr(0, pos);
+            Su::trimWs(t1, t1);
+            if (!t1.empty())
+                destination.push_back(t1);
+
+            t0  = t0.substr(pos + separator.size(), t0.size());
+            pos = t0.find(separator);
         }
 
-        if (!tmp.empty())
-            destination.push_back(tmp);
+        if (!t0.empty())
+        {
+            Su::trimWs(t0, t0);
+            if (!t0.empty())
+                destination.push_back(t0);
+        }
     }
 
-    void StringUtils::trim(String&       destination,
-                           const String& input,
-                           const char    character)
+    void StringUtils::splitRejectEmpty(
+        StringArray&  destination,
+        const String& input,
+        const char    separator)
+    {
+        String sep;
+        sep.push_back(separator);
+        splitRejectT<StringArray>(destination, input, sep);
+    }
+
+    void StringUtils::splitRejectEmpty(
+        StringDeque&  destination,
+        const String& input,
+        const char    separator)
+    {
+        String sep;
+        sep.push_back(separator);
+        splitRejectT<StringDeque>(destination, input, sep);
+    }
+
+    void StringUtils::split(
+        StringArray&  destination,
+        const String& input,
+        const String& separator)
+    {
+        splitT<StringArray>(destination, input, separator);
+    }
+
+    void StringUtils::split(
+        StringDeque&  destination,
+        const String& input,
+        const String& separator)
+    {
+        splitT<StringDeque>(destination, input, separator);
+    }
+
+    void StringUtils::trim(
+        String&       destination,
+        const String& input,
+        const char    character)
     {
         trimL(destination, input, character);
         trimR(destination, destination, character);
     }
 
-    String StringUtils::stripEol(const String& input, const char replacement)
+    String StringUtils::stripEol(
+        const String& input,
+        const char    replacement)
     {
         OutputStringStream dest;
         StringArray        src;
@@ -436,10 +459,11 @@ namespace Rt2
         return dest.str();
     }
 
-    bool StringUtils::filter(String&               destination,
-                             const String&         input,
-                             const FilterFunction& pass,
-                             const size_t          max)
+    bool StringUtils::filter(
+        String&               destination,
+        const String&         input,
+        const FilterFunction& pass,
+        const size_t          max)
     {
         if (!pass) return false;
         if (input.empty()) return false;

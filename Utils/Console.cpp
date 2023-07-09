@@ -23,97 +23,94 @@
 #include <bitset>
 #include <iostream>
 #include <sstream>
-#include "Char.h"
-#include "Path.h"
-#include "Utils/Definitions.h"
+#include "FixedString.h"
+#include "Utils/Char.h"
+#include "Utils/Path.h"
+#include "Utils/TextStreamWriter.h"
 #ifdef _WIN32
     #include <Windows.h>
+    #define popen _popen
+    #define pclose _pclose
+    #ifdef _DEBUG
+        #define USE_EXCEPTION_BREAK  // This meant to be switched off later
+        #define Break()              \
+            if (IsDebuggerPresent()) \
+            {                        \
+                DebugBreak();        \
+            }
+
+        #define LogImmediateWindow(msg) \
+            if (IsDebuggerPresent())    \
+            {                           \
+                OutputDebugString(msg); \
+            }
+    #else
+        #define LogImmediateWindow(msg)
+        #define Break()
+    #endif
+#else
+    #define LogImmediateWindow(msg)
+    #define Break()
 #endif
 
 namespace Rt2
 {
-    static ConsoleColor gForeground = CS_WHITE;
-    static ConsoleColor gBackground = CS_BLACK;
-
-#ifndef _WIN32
-    static uint8_t MapColor(const ConsoleColor& col, bool bg)
+    namespace Detail
     {
-        uint8_t color = 0;
-        switch (col)
+        constexpr const char* Clear      = "\x1b[2J";
+        constexpr const char* ZeroCursor = "\x1b[0;0H";
+        constexpr const char* ResetColor = "\x1b[0m";
+        constexpr const char* Sequence   = "\x1b[";
+
+        using TempBuf = char[32];
+
+        class Private
         {
-        case CS_BLACK:
-            color = 30;
-            break;
-        case CS_DARK_BLUE:
-            color = 34;
-            break;
-        case CS_DARK_GREEN:
-            color = 32;
-            break;
-        case CS_DARK_CYAN:
-            color = 36;
-            break;
-        case CS_DARK_RED:
-            color = 31;
-            break;
-        case CS_DARK_MAGENTA:
-            color = 35;
-            break;
-        case CS_DARK_YELLOW:
-            color = 33;
-            break;
-        case CS_LIGHT_GREY:
-            color = 90;
-            break;
-        case CS_GREY:
-            color = 37;
-            break;
-        case CS_BLUE:
-            color = 94;
-            break;
-        case CS_GREEN:
-            color = 92;
-            break;
-        case CS_CYAN:
-            color = 96;
-            break;
-        case CS_RED:
-            color = 91;
-            break;
-        case CS_MAGENTA:
-            color = 95;
-            break;
-        case CS_YELLOW:
-            color = 93;
-            break;
-        case CS_WHITE:
-            color = 0;
-            break;
-        }
-        if (bg)
-            color += 10;
-        return color;
-    }
+        private:
+            static uint8_t fg;
+            static uint8_t bg;
+            static int     flags;
+            static TempBuf buf;
 
-#endif
+        public:
+            static void setForeground(ConsoleColor col);
 
-    static void SetColor()
-    {
-#ifdef _WIN32
-        SetConsoleTextAttribute(
-            GetStdHandle(STD_OUTPUT_HANDLE),
-            (UCHAR)((UCHAR)gBackground * 16 + (UCHAR)gForeground));
-#else
-        uint8_t color[2] = {
-            MapColor(gForeground, false),
-            MapColor(gBackground, true),
+            static void setBackground(ConsoleColor col);
+
+            static void applyColor();
+
+            static void clear();
+
+            static void put(char ch);
+
+            static void nl();
+
+            static void write(const String& line, bool newline = false);
+            
+            static void error(const String& line, bool newline = false);
+
+            static void resetColor();
+
+            static void setFlags(int fl);
+
+        private:
+            static void clear(OStream& dest);
+
+            static void applyColor(OStream& dest);
+
+            static void resetColor(OStream& dest);
+
+            static void nl(OStream& dest);
+
+            static void write(OStream& dest, const String& line, bool newline = false);
         };
-        if (gBackground != CS_BLACK)
-            printf("\033[%dm\033[%dm", color[0], color[1]);
-        else
-            printf("\033[%dm", color[0]);
-#endif
-    }
+
+        uint8_t Private::fg    = CS_WHITE;
+        uint8_t Private::bg    = CS_BLACK;
+        int     Private::flags = 0;
+        TempBuf Private::buf = {};
+
+    }  // namespace Detail
 
     void Console::read()
     {
@@ -165,32 +162,40 @@ namespace Rt2
         std::cin >> v;
     }
 
-    void Console::readLine(String& v)
+    void Console::readln(String& v)
     {
         std::getline(std::cin, v);
+        std::cin.clear();
+    }
+
+    void Console::setFlags(const int flags)
+    {
+        Detail::Private::setFlags(flags);
+    }
+
+    void Console::text(const ConsoleColor col)
+    {
+        setForeground(col);
+    }
+
+    void Console::background(const ConsoleColor col)
+    {
+        setBackground(col);
     }
 
     void Console::setForeground(const ConsoleColor col)
     {
-        gForeground = col;
+        Detail::Private::setForeground(col);
     }
 
     void Console::setBackground(const ConsoleColor col)
     {
-        gBackground = col;
+        Detail::Private::setBackground(col);
     }
 
     void Console::resetColor()
     {
-#ifndef _WIN32
-        gForeground = CS_WHITE;
-        gBackground = CS_BLACK;
-        printf("\033[0m");
-#else
-        gForeground = CS_WHITE;
-        gBackground = CS_BLACK;
-        SetColor();
-#endif
+        Detail::Private::resetColor();
     }
 
     void Console::write(IStream& stream)
@@ -200,32 +205,17 @@ namespace Rt2
 
     void Console::write(const String& str)
     {
-        SetColor();
-        std::cout << str;
-
-#if defined(_WIN32) && defined(_DEBUG)
-        if (IsDebuggerPresent())
-            OutputDebugString(str.c_str());
-#endif
+        Detail::Private::write(str);
     }
 
     void Console::writeLine(const String& str)
     {
-        SetColor();
-        std::cout << str << std::endl;
-        resetColor();
-#if defined(_WIN32) && defined(_DEBUG)
-        if (IsDebuggerPresent())
-            OutputDebugString((str + "\n").c_str());
-#endif
+        Detail::Private::write(str, true);
     }
 
     void Console::writeError(const String& str)
     {
-        setForeground(CS_RED);
-        SetColor();
-        std::cerr << str << std::endl;
-        resetColor();
+        Detail::Private::error(str);
     }
 
     void printHexLine(OStream&     dest,
@@ -404,6 +394,7 @@ namespace Rt2
         if (p)
             bindump(std::cout, p, len);
     }
+
     void Console::writeLine(const int64_t& i)
     {
         OutputStringStream oss;
@@ -430,20 +421,36 @@ namespace Rt2
 
     void Console::nl()
     {
-        writeLine("");
+        Detail::Private::nl();
     }
 
-    void Console::put(char c)
+    void Console::put(const char c)
     {
-        std::cout.put(c);
+        Detail::Private::put(c);
+    }
+
+    void Console::puts(const String& str)
+    {
+        Detail::Private::write(str, true);
+    }
+
+    void Console::puts(const char* str)
+    {
+        Detail::Private::write(str, true);
+    }
+
+    void Console::clear()
+    {
+        Detail::Private::clear();
+    }
+
+    void Console::flush()
+    {
+        std::cout.flush();
     }
 
     void Console::execute(const String& exe, const OutputStringStream& args, String& dest)
     {
-#ifdef _WIN32
-    #define popen _popen
-    #define pclose _pclose
-#endif
         PathUtil prgDir(exe);
 
 #ifdef _WIN32
@@ -484,19 +491,125 @@ namespace Rt2
             dest = out.str();
         }
         else
-            writeLine("Failed to launch: ", ss.str());
+            error("Failed to launch: ", ss.str());
     }
 
-// This meant to be switched off later
-#define USE_EXCEPTION_BREAK
     void Console::debugBreak()
     {
-#ifdef USE_EXCEPTION_BREAK
-    #if defined(_WIN32) && defined(_DEBUG)
-
-        if (IsDebuggerPresent())
-            DebugBreak();
-    #endif
-#endif  // USE_EXCEPTION_BREAK
+        Break();
     }
+
+    namespace Detail
+    {
+        void Private::setForeground(const ConsoleColor col)
+        {
+            RT_GUARD_VOID((flags & Console::NoColor) == 0)
+            fg = col;
+        }
+
+        void Private::setBackground(const ConsoleColor col)
+        {
+            RT_GUARD_VOID((flags & Console::NoColor) == 0)
+            bg = col;
+        }
+
+        void Private::applyColor()
+        {
+            RT_GUARD_VOID((flags & Console::NoColor) == 0)
+            applyColor(std::cout);
+        }
+
+        void Private::clear()
+        {
+            clear(std::cout);
+            std::cin.clear();
+        }
+
+        void Private::put(const char ch)
+        {
+            buf[0] = ch;
+            buf[1] = 0;
+            write(std::cout, buf, false);
+        }
+
+        void Private::nl()
+        {
+            nl(std::cout);
+        }
+
+        void Private::write(const String& line, const bool newline)
+        {
+            write(std::cout, line, newline);
+        }
+
+        void Private::error(const String& line, const bool newline)
+        {
+            setForeground(CS_RED);
+            write(std::cerr, line, newline);
+
+            if (!newline)  // force  a reset here
+                resetColor(std::cerr);
+        }
+
+        void Private::resetColor()
+        {
+            resetColor(std::cout);
+        }
+
+        void Private::setFlags(const int fl)
+        {
+            flags = fl;
+        }
+
+        void Private::clear(OStream& dest)
+        {
+            RT_GUARD_VOID((flags & Console::NoSequences) == 0)
+            Ts::puts(dest, ZeroCursor);
+            Ts::puts(dest, Clear);
+        }
+
+        void Private::applyColor(OStream& dest)
+        {
+            RT_GUARD_VOID((flags & Console::NoSequences) == 0)
+            RT_GUARD_VOID((flags & Console::NoColor) == 0)
+
+            (void)std::snprintf(buf, 4, "%d", (int)fg);
+            Ts::print(dest, Sequence, buf, 'm');
+            if (bg != CS_BLACK)  // use the default background
+            {
+                (void)std::snprintf(buf, 4, "%d", bg + 10);
+                Ts::print(dest, Sequence, buf, 'm');
+            }
+        }
+
+        void Private::resetColor(OStream& dest)
+        {
+            RT_GUARD_VOID((flags & Console::NoColor) == 0)
+            fg = CS_WHITE;
+            bg = CS_BLACK;
+            Ts::puts(dest, ResetColor);
+        }
+
+        void Private::nl(OStream& dest)
+        {
+            LogImmediateWindow("\n");
+            Ts::nl(dest);
+            resetColor(dest);
+        }
+
+        void Private::write(OStream& dest, const String& line, const bool newline)
+        {
+            LogImmediateWindow(line.c_str());
+            applyColor(dest);
+            if (newline)
+            {
+                Ts::print(dest, line);
+                nl(dest);
+            }
+            else
+                Ts::print(dest, line);
+        }
+
+    }  // namespace Detail
+
 }  // namespace Rt2

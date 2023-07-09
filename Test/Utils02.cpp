@@ -10,6 +10,40 @@
 
 using namespace Rt2;
 
+GTEST_TEST(Utils, Console_001)
+{
+    constexpr int index[] = {
+        CS_BLACK,
+        CS_DARK_BLUE,
+        CS_DARK_GREEN,
+        CS_DARK_CYAN,
+        CS_DARK_RED,
+        CS_DARK_MAGENTA,
+        CS_DARK_YELLOW,
+        CS_LIGHT_GREY,
+        CS_GREY,
+        CS_BLUE,
+        CS_GREEN,
+        CS_CYAN,
+        CS_RED,
+        CS_MAGENTA,
+        CS_YELLOW,
+        CS_WHITE,
+    };
+    Con::resetColor();
+    for (auto i : index)
+    {
+        Con::setForeground((ConsoleColor)i);
+        Con::print("#");
+    }
+    Con::nl();
+    for (auto i : index)
+    {
+        Con::setBackground((ConsoleColor)i);
+        Con::print("#");
+    }
+    Con::nl();
+}
 
 GTEST_TEST(Utils, SymbolStream_001)
 {
