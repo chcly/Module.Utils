@@ -1870,14 +1870,15 @@ namespace Rt2::Json
 
     }  // namespace Print
 
+    // public(primary) interface...
+
+    using ClassType = Internal::Dom::Class;
+
     class Dictionary;
     class MixedArray;
 
     class Value
     {
-    public:
-        using ClassType = Internal::Dom::Class;
-
     protected:
         Internal::Dom::Value* _val{nullptr};
 

@@ -326,7 +326,8 @@ namespace Rt2
     void StringUtils::combine(String&            dest,
                               const StringDeque& input,
                               const char         in,
-                              const char         out)
+                              const char         out,
+                              const bool         excludeLast)
     {
         for (const auto& el : input)
         {
@@ -334,7 +335,15 @@ namespace Rt2
                 dest.push_back(in);
             dest.append(el);
             if (out != 0)
-                dest.push_back(out);
+            {
+                if (!excludeLast)
+                    dest.push_back(out);
+                else
+                {
+                    if (el != input.back())
+                        dest.push_back(out);
+                }
+            }
         }
     }
 

@@ -170,7 +170,12 @@ namespace Rt2
     void Console::readln(String& v)
     {
         std::getline(std::cin, v);
-        std::cin.clear();
+        if (std::cin.fail() || std::cin.eof())
+        {
+            std::cin.clear();
+            std::cout.put('\n');
+            std::cin.sync();
+        }
     }
 
     void Console::setFlags(const int flags)
