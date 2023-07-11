@@ -86,7 +86,7 @@ namespace Rt2
             static void nl();
 
             static void write(const String& line, bool newline = false);
-            
+
             static void error(const String& line, bool newline = false);
 
             static void resetColor();
@@ -105,9 +105,14 @@ namespace Rt2
             static void write(OStream& dest, const String& line, bool newline = false);
         };
 
-        uint8_t Private::fg    = CS_WHITE;
-        uint8_t Private::bg    = CS_BLACK;
-        int     Private::flags = 0;
+        uint8_t Private::fg = CS_WHITE;
+        uint8_t Private::bg = CS_BLACK;
+
+#if Utils_NO_COLOR == 1
+        int Private::flags = Console::NoSequences | Console::NoColor;
+#else
+        int Private::flags = 0;
+#endif
         TempBuf Private::buf = {};
 
     }  // namespace Detail

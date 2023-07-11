@@ -166,7 +166,10 @@ namespace Rt2
         static void clear();
         static void flush();
 
-        static void execute(const String& exe, const OutputStringStream& args, String& dest);
+        static void execute(
+            const String&             exe,
+            const OutputStringStream& args,
+            String&                   dest);
 
         template <typename... Args>
         static String launch(const String& exe, Args&&... args)

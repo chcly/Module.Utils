@@ -7,8 +7,12 @@ option(Utils_DISABLE_CRT_WARNINGS "Disable CRT warnings" ON)
 
 
 set(Utils_EXTRA_FLAGS )
+
 add_definitions(-DNOMINMAX=1)
 
+if (Utils_AUTO_RUN_TEST)
+    add_definitions(-DUtils_NO_COLOR=1)
+endif()
 
 if (MSVC)
     if (Utils_DISABLE_CRT_WARNINGS)
