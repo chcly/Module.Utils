@@ -86,8 +86,9 @@ namespace Rt2
         static void combine(
             String&            dest,
             const StringDeque& input,
-            char               in  = 0,
-            char               out = 0);
+            char               in          = 0,
+            char               out         = 0,
+            bool               excludeLast = false);
 
         static void trimWs(
             String&       di,
